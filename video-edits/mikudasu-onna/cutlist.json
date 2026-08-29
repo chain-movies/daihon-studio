@@ -1,0 +1,88 @@
+{
+  "source": "見下す女 (source.mov)",
+  "source_duration": 145.02,
+  "preset": "shortdrama / 間を活かす・弱め (ユーザー確定)",
+  "fps": 30,
+  "resolution_display": "1080x1920 (rotate -90 メタ付き 1920x1080)",
+  "keep_segments": [
+    {
+      "start": 4.3,
+      "end": 120.2
+    },
+    {
+      "start": 123.8,
+      "end": 145.02
+    }
+  ],
+  "cuts": [
+    {
+      "start": 0.0,
+      "end": 4.3,
+      "reason": "冒頭の無発話区間。物音のみで台詞なし（0-4.3sを単独窓で再転写しても発話ゼロ）",
+      "confidence": "high",
+      "transition": "hard cut"
+    },
+    {
+      "start": 120.6,
+      "end": 123.8,
+      "reason": "リツコ退出後、一人で黙っている間の中だるみを3.2秒圧縮。単一カット素材なのでジャンプカットを避け0.4秒のクロスディゾルブで時間経過として繋ぐ",
+      "confidence": "medium",
+      "transition": "crossfade 0.4s (src 120.20-120.60 → 123.80-124.20)"
+    }
+  ],
+  "kept_pauses": [
+    {
+      "start": 76.44,
+      "end": 84.62,
+      "duration": 8.18,
+      "reason": "「手取り28万のうち半分は私の時給」直前のタメ。演出上の間なので保持"
+    },
+    {
+      "start": 114.1,
+      "end": 120.2,
+      "duration": 6.1,
+      "reason": "決め台詞後〜リツコ退出のアクション。カット不可"
+    },
+    {
+      "start": 124.2,
+      "end": 128.36,
+      "duration": 4.16,
+      "reason": "スマホを手に取るまでのアクション。オチへの導線"
+    }
+  ],
+  "flags": [
+    {
+      "time": "136.88-141.06",
+      "note": "冒頭4.38-11.42と同じ台詞（転職して3ヶ月で28万／うちの会社来ない?）。言い直しではなく脚本上の反復＝オチなのでカット禁止",
+      "action": "keep"
+    },
+    {
+      "time": "144.96-145.02",
+      "note": "素材の末尾で音声がほぼ切れ際。元素材がここで終了しており延長不可",
+      "action": "as-is"
+    },
+    {
+      "time": "56.06-56.60",
+      "note": "「それ」の重複を1回に整理（言い淀み）",
+      "action": "telopのみ整理・映像はカットせず"
+    }
+  ],
+  "render_timeline": {
+    "A": {
+      "src_in": 4.3,
+      "src_out": 120.6,
+      "out_in": 0.0
+    },
+    "B": {
+      "src_in": 123.8,
+      "src_out": 145.02,
+      "out_in": 115.9
+    },
+    "transition": {
+      "type": "crossfade",
+      "duration": 0.4,
+      "out_at": 115.9
+    },
+    "output_duration": 137.12
+  }
+}

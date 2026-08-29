@@ -1,0 +1,718 @@
+{
+ "resolution": [
+  1080,
+  1920
+ ],
+ "font": "Noto Sans CJK JP Bold",
+ "note": "start/end は編集後タイムライン（cutlist.json の render_timeline）基準の秒",
+ "items": [
+  {
+   "file": "telop_001.png",
+   "text": "リツコの手取りってまだ",
+   "start": 0.08,
+   "end": 1.46,
+   "font_px": 88,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_002.png",
+   "text": "14万?",
+   "start": 1.46,
+   "end": 2.26,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_003.png",
+   "text": "うん",
+   "start": 2.96,
+   "end": 4.06,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_004.png",
+   "text": "やっば",
+   "start": 4.06,
+   "end": 4.88,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_005.png",
+   "text": "うち転職して3ヶ月で",
+   "start": 4.88,
+   "end": 6.6,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_006.png",
+   "text": "28万",
+   "start": 6.6,
+   "end": 7.42,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_007.png",
+   "text": "え、うちの",
+   "start": 9.18,
+   "end": 9.68,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_008.png",
+   "text": "会社紹介してあげようか?",
+   "start": 9.68,
+   "end": 10.92,
+   "font_px": 84,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_009.png",
+   "text": "今の会社",
+   "start": 10.92,
+   "end": 12.54,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_010.png",
+   "text": "いいよ",
+   "start": 12.54,
+   "end": 13.78,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_011.png",
+   "text": "遠慮しないでよ",
+   "start": 13.78,
+   "end": 15.04,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_012.png",
+   "text": "リツコ昔から",
+   "start": 15.04,
+   "end": 15.77,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_013.png",
+   "text": "要領悪いじゃん",
+   "start": 15.77,
+   "end": 16.98,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_014.png",
+   "text": "自分で転職とか無理でしょ",
+   "start": 16.98,
+   "end": 18.76,
+   "font_px": 80,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_015.png",
+   "text": "そうかもね",
+   "start": 19.8,
+   "end": 20.9,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_016.png",
+   "text": "履歴書とかもさ",
+   "start": 22.58,
+   "end": 23.58,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_017.png",
+   "text": "私が見てあげるよ",
+   "start": 23.58,
+   "end": 24.5,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_018.png",
+   "text": "そういうの得意だからさ",
+   "start": 24.5,
+   "end": 26.12,
+   "font_px": 88,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_019.png",
+   "text": "今度持っといて",
+   "start": 27.38,
+   "end": 28.42,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_020.png",
+   "text": "ここリツコでいい?",
+   "start": 31.08,
+   "end": 32.72,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_021.png",
+   "text": "私が誘ったけど",
+   "start": 34.28,
+   "end": 36.14,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_022.png",
+   "text": "これから手取りも",
+   "start": 36.14,
+   "end": 36.98,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_023.png",
+   "text": "上がるだろうし",
+   "start": 36.98,
+   "end": 38.32,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_024.png",
+   "text": "逆にね",
+   "start": 38.32,
+   "end": 39.24,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_025.png",
+   "text": "うん",
+   "start": 40.1,
+   "end": 40.72,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_026.png",
+   "text": "いいよ",
+   "start": 41.42,
+   "end": 42.28,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_027.png",
+   "text": "あとさあとさ",
+   "start": 43.38,
+   "end": 44.2,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_028.png",
+   "text": "来週の部内プレゼンの",
+   "start": 44.2,
+   "end": 45.39,
+   "font_px": 97,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_029.png",
+   "text": "資料また作ってくれない?",
+   "start": 45.39,
+   "end": 47.74,
+   "font_px": 84,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_030.png",
+   "text": "前のやつ新しい部長がさ",
+   "start": 47.74,
+   "end": 49.22,
+   "font_px": 88,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_031.png",
+   "text": "めっちゃ褒められて",
+   "start": 49.22,
+   "end": 50.62,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_032.png",
+   "text": "それ",
+   "start": 51.76,
+   "end": 52.6,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_033.png",
+   "text": "私が作ったやつだよね",
+   "start": 53.52,
+   "end": 55.66,
+   "font_px": 97,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_034.png",
+   "text": "美咲の会社の仕事なのに",
+   "start": 55.66,
+   "end": 57.68,
+   "font_px": 88,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_035.png",
+   "text": "案出したのは私だし",
+   "start": 57.68,
+   "end": 60.46,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_036.png",
+   "text": "前の会社の時の企画書も私",
+   "start": 60.46,
+   "end": 63.62,
+   "font_px": 80,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_037.png",
+   "text": "それは同期だったから",
+   "start": 65.22,
+   "end": 66.78,
+   "font_px": 97,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_038.png",
+   "text": "手伝ってもらってただけで",
+   "start": 66.78,
+   "end": 69.08,
+   "font_px": 81,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_039.png",
+   "text": "転職の面接の想定問答も",
+   "start": 69.08,
+   "end": 71.18,
+   "font_px": 88,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_040.png",
+   "text": "私が書いた",
+   "start": 71.18,
+   "end": 72.44,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_041.png",
+   "text": "美咲の手取り28万のうち",
+   "start": 80.32,
+   "end": 82.96,
+   "font_px": 86,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_042.png",
+   "text": "多分半分は私の時給だよ",
+   "start": 82.96,
+   "end": 85.56,
+   "font_px": 88,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_043.png",
+   "text": "いやでも友達じゃん",
+   "start": 86.9,
+   "end": 88.92,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_044.png",
+   "text": "友達?",
+   "start": 88.92,
+   "end": 89.68,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_045.png",
+   "text": "だから前まで無料だった",
+   "start": 90.62,
+   "end": 92.58,
+   "font_px": 88,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_046.png",
+   "text": "これやっぱ払って",
+   "start": 98.32,
+   "end": 99.8,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_047.png",
+   "text": "え?来週の資料は?",
+   "start": 101.34,
+   "end": 103.0,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_048.png",
+   "text": "見下すのはいいよ",
+   "start": 104.32,
+   "end": 106.7,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_049.png",
+   "text": "でも見下してる人に仕事は",
+   "start": 106.7,
+   "end": 108.13,
+   "font_px": 81,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_050.png",
+   "text": "頼まない方が",
+   "start": 108.13,
+   "end": 108.85,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_051.png",
+   "text": "いいんじゃない?",
+   "start": 108.85,
+   "end": 110.1,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_052.png",
+   "text": "もしもしゆうき?",
+   "start": 120.46,
+   "end": 121.7,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_053.png",
+   "text": "ゆうきって",
+   "start": 122.8,
+   "end": 123.33,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_054.png",
+   "text": "今手取りいくらだっけ?",
+   "start": 123.33,
+   "end": 124.78,
+   "font_px": 92,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_055.png",
+   "text": "え、14万?マジ?",
+   "start": 127.24,
+   "end": 128.98,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_056.png",
+   "text": "うちさ転職してさ3ヶ月で",
+   "start": 128.98,
+   "end": 130.97,
+   "font_px": 83,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_057.png",
+   "text": "28万なの",
+   "start": 130.97,
+   "end": 131.8,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_058.png",
+   "text": "え、うちの会社来ない?",
+   "start": 131.8,
+   "end": 133.46,
+   "font_px": 92,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  },
+  {
+   "file": "telop_059.png",
+   "text": "新たな副業",
+   "start": 135.78,
+   "end": 137.12,
+   "font_px": 100,
+   "pos": [
+    540,
+    1375
+   ],
+   "timeline": "edited"
+  }
+ ]
+}
