@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "timezone": "Asia/Tokyo",
+
+  "_comment_platforms": "投稿先。停止したいときは配列から外す",
+  "platforms": ["x", "threads"],
+
+  "_comment_slots": "generate が下書きを差し込む JST の時刻。1日あたりの本数 = この数",
+  "dailySlots": ["07:30", "12:20", "19:40"],
+
+  "_comment_generate": "何日先までキューを埋めておくか / 直近何日と型・ネタの重複を避けるか",
+  "generateDaysAhead": 3,
+  "dedupeWindowDays": 10,
+
+  "_comment_approval": "false にすると生成分は approved:false で入り、手で true にするまで投稿されない",
+  "autoApproveGenerated": true,
+
+  "_comment_post": "1回の実行で投稿する最大件数。予定時刻をこの分数以上過ぎた項目は捨てる",
+  "maxPostsPerRun": 2,
+  "staleAfterMinutes": 180,
+
+  "_comment_cta": "問い合わせ導線。url を空にするとリンクなしで投稿される（未設定のまま投稿しても壊れない）",
+  "cta": {
+    "url": "",
+    "text": "映像・ショートドラマ・AI内製化のご相談はプロフィールから",
+    "everyNthPost": 4
+  },
+
+  "_comment_signature": "全投稿の末尾に付ける定型（不要なら空文字）",
+  "hashtags": {
+    "x": [],
+    "threads": []
+  }
+}

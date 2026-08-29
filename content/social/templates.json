@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "_comment": "投稿の組み立て方。{hook} {detail} {lesson} は facts.json の同名フィールドに置き換わる。X は短く（全角140相当）、Threads は本文重視。variants はローテーションで使い分ける。",
+  "types": {
+    "jitsuroku": {
+      "label": "実録",
+      "x": [
+        "{hook}\n\n{lesson}",
+        "{hook}\n{detail}"
+      ],
+      "threads": [
+        "{hook}\n\n{detail}\n\n{lesson}",
+        "{hook}\n\n{detail}\n\n——\n{lesson}"
+      ]
+    },
+    "know-how": {
+      "label": "ノウハウ",
+      "x": [
+        "{hook}\n\n{lesson}",
+        "{hook}\n\n{detail}"
+      ],
+      "threads": [
+        "{hook}\n\n{detail}\n\n{lesson}",
+        "{hook}\n\n{detail}\n\nまとめると、{lesson}"
+      ]
+    },
+    "number": {
+      "label": "数字",
+      "x": [
+        "{hook}\n\n{lesson}",
+        "{hook}\n{detail}"
+      ],
+      "threads": [
+        "{hook}\n\n{detail}\n\n{lesson}",
+        "数字で見るとはっきりする。\n\n{hook}\n{detail}\n\n{lesson}"
+      ]
+    },
+    "opinion": {
+      "label": "持論",
+      "x": [
+        "{hook}\n\n{lesson}",
+        "{hook}"
+      ],
+      "threads": [
+        "{hook}\n\n{detail}\n\n{lesson}",
+        "{hook}\n\n{detail}\n\n結局のところ、{lesson}"
+      ]
+    }
+  }
+}

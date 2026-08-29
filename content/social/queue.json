@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "_comment": "status: draft | scheduled | posted | failed | skipped。approved が false の項目は投稿されない。",
+  "items": []
+}

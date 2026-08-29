@@ -1,0 +1,23 @@
+name: SNS 仕組みの検証
+
+on:
+  push:
+    paths: ['scripts/social/**', 'content/social/**', '.github/workflows/social-*.yml']
+  pull_request:
+    paths: ['scripts/social/**', 'content/social/**', '.github/workflows/social-*.yml']
+  workflow_dispatch:
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 送信経路のセルフテスト（外部へは送らない）
+        run: node scripts/social/selftest.mjs
+      - name: 生成のドライラン
+        run: node scripts/social/generate.mjs --days 2 --dry-run
+      - name: キューのドライラン
+        run: DRY_RUN=1 node scripts/social/post.mjs

@@ -1,0 +1,61 @@
+name: SNS 投稿を1件予約
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: '本文'
+        type: string
+        required: true
+      at:
+        description: '投稿日時（JST）。例 2026-09-01T07:30 / now+30m / now'
+        type: string
+        default: 'now+15m'
+      platforms:
+        description: '投稿先'
+        type: choice
+        options: ['x,threads', 'x', 'threads']
+        default: 'x,threads'
+      approve:
+        description: '承認済みにする（外すと下書きのまま入る）'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: social-generate
+  cancel-in-progress: false
+
+jobs:
+  enqueue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: キューに追加
+        env:
+          POST_TEXT: ${{ inputs.text }}
+          POST_AT: ${{ inputs.at }}
+          POST_PLATFORMS: ${{ inputs.platforms }}
+          POST_NO_APPROVE: ${{ inputs.approve && '' || '1' }}
+        run: node scripts/social/enqueue.mjs
+
+      - name: キューを書き戻す
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/social
+          git commit -m "chore(social): 投稿を1件予約"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((2 ** i))
+          done
+          echo "::error::キューの書き戻しに失敗しました" && exit 1

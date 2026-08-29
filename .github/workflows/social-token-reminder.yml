@@ -1,0 +1,26 @@
+name: SNS トークン更新リマインド
+
+on:
+  schedule:
+    # 毎月1日 09:00 JST（= 00:00 UTC）。Threads の長期トークンは約60日で失効する
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Issue を立てる
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          TITLE="Threads アクセストークンの更新（$(date -u +%Y-%m)）"
+          gh issue create --repo "$REPO" --title "$TITLE" \
+            --body-file .github/templates/threads-token-reminder.md

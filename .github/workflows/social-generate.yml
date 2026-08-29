@@ -1,0 +1,58 @@
+name: SNS 下書き生成
+
+on:
+  schedule:
+    # 毎朝 06:10 JST（= 21:10 UTC）にキューを補充する
+    - cron: '10 21 * * *'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '何日先まで埋めるか'
+        type: string
+        default: '3'
+      dry_run:
+        description: '保存せず内容だけ確認する'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: social-generate
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 下書きを生成
+        run: |
+          node scripts/social/generate.mjs \
+            --days "${{ inputs.days || '3' }}" \
+            ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: キューを書き戻す
+        if: ${{ !inputs.dry_run }}
+        run: |
+          if [ -n "$(git status --porcelain content/social)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add content/social
+            git commit -m "chore(social): 下書きを補充"
+            for i in 1 2 3 4; do
+              git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+              sleep $((2 ** i))
+            done
+            echo "::error::キューの書き戻しに失敗しました" && exit 1
+          else
+            echo "変更なし"
+          fi
