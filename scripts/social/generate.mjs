@@ -69,7 +69,10 @@ function ctaBlock(platform) {
   const cta = config.cta || {};
   const parts = [];
   if (cta.text) parts.push(cta.text);
-  if (cta.url) parts.push(cta.url);
+  // X は URL を含む投稿の単価が $0.015 → $0.200 と13倍になるため、
+  // 既定では URL を付ける媒体を urlPlatforms で絞る（Threads は無料）
+  const urlAllowed = cta.urlPlatforms ? cta.urlPlatforms.includes(platform) : true;
+  if (cta.url && urlAllowed) parts.push(cta.url);
   if (!parts.length) return '';
   const tags = (config.hashtags?.[platform] || []).join(' ');
   return '\n\n' + parts.join('\n') + (tags ? `\n${tags}` : '');

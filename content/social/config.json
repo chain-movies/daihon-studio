@@ -20,9 +20,11 @@
   "staleAfterMinutes": 180,
 
   "_comment_cta": "問い合わせ導線。url を空にするとリンクなしで投稿される（未設定のまま投稿しても壊れない）",
+  "_comment_cta_cost": "X は URL を含む投稿だけ単価が $0.015 → $0.200 と13倍になる。urlPlatforms で URL を付ける媒体を絞れる（既定は無料の threads のみ）。X にも URL を出したい場合は [\"x\", \"threads\"] にする",
   "cta": {
     "url": "",
     "text": "映像・ショートドラマ・AI内製化のご相談はプロフィールから",
+    "urlPlatforms": ["threads"],
     "everyNthPost": 4
   },
 

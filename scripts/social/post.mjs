@@ -117,6 +117,13 @@ for (const item of targets) {
       continue;
     }
 
+    // X は従量課金。URL を含む投稿だけ単価が跳ね上がるのでログに出す
+    if (platform === 'x') {
+      const withUrl = texts.filter(t => /https?:\/\//.test(t)).length;
+      const cost = withUrl * 0.2 + (texts.length - withUrl) * 0.015;
+      console.log(`  $ x の概算コスト: $${cost.toFixed(3)}（URL入り ${withUrl} 件 × $0.200 / 通常 ${texts.length - withUrl} 件 × $0.015）`);
+    }
+
     const preview = texts.map(t => `[${lengthFor(platform, t)}/${LIMITS[platform]}] ${t.replace(/\n/g, ' ⏎ ')}`).join('\n      ');
     if (DRY_RUN) {
       console.log(`  ○ ${platform}(dry-run): ${preview}`);
