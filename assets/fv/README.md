@@ -5,8 +5,8 @@
 
 | ファイル | 用途 |
 | --- | --- |
-| `fv_homare_E_main_1920x1080.mp4` | 本命。H.264 / 1920x1080 / 24fps / 5.00秒 / 無音。金属質の金の「誉」が最終フレーム |
-| `fv_homare_E_main_1920x1080.webm` | 同内容のVP9版（`<source>`で併記推奨） |
+| `fv_homare_E_main_audio_1920x1080.mp4` / `.webm` | 本命（BGM・SE入り）。H.264+AAC / VP9+Opus / 1920x1080 / 24fps / 5.00秒 |
+| `fv_homare_E_main_1920x1080.mp4` / `.webm` | 同じ映像の無音版（ミュート自動再生用） |
 | `fv_homare_E_poster.jpg` | 読み込み時のposter画像（C1 夜明け前、本命の先頭フレーム） |
 | `fv_homare_E_lastframe.jpg` | 最終フレーム（再生終了後の静止表示用、金属質の金） |
 | `fv_homare_E_metal_halo_5s_1920x1080.mp4` / `.webm` | 旧本命（3.71秒で保持し、ハロとハイライトを後付けした版） |
@@ -43,7 +43,26 @@ ffmpeg -framerate 24 -i mm_frames/%04d.png \
 ```
 （出力118フレームの末尾に素材90フレーム目を2枚足して120フレーム＝5.00秒にする）
 
+## 音（BGM / SE）
+
+映像は確定版（`fv_homare_E_main_1920x1080.mp4`）をそのまま使い、音声だけを付加した。
+素材はすべて Mixkit（Mixkit License: 商用利用可・クレジット不要）からダウンロード。
+`audio/` に素材・ミックス済みWAV・ミックススクリプト（`mix.py`、ffmpeg）を同梱。
+
+| 時間 | 絵コンテの音指定 | 使用素材 | 配置 |
+| --- | --- | --- | --- |
+| 0.0– | C1 低いドローン音のみ | 楽曲「Vastness」冒頭 | ベッドとして全体に敷く（0.6秒フェードイン） |
+| 1.95 | C2 太陽の出に鈴を一打 | SE「Relaxing bell chime」 | 日の出の瞬間に一打 |
+| 2.2–3.5 | C2 筆に擦過音を薄く | SE「Magical light sweep」 | 光の筆の走行に合わせ2.9秒で頂点 |
+| 1.8–5.0 | C3 渦に持続音 | SE「Cinematic whoosh magic gust」 | 渦から結像へ向けて高まり、4.5秒で頂点 |
+| 4.35– | C3/C4 結像に金属質のきらめき、着地 | SE「Choir magic shine」+「Fairy glitter」 | 金属質の「誉」が定着する瞬間 |
+
+- ラウドネス: -15.6 LUFS（integrated）、トゥルーピーク -1.5 dBTP。末尾0.38秒でフェードアウト。
+- 音量バランスの変更は `audio/mix.py` の `layers` のゲイン（dB）を変えて再実行。
+
 ## 実装メモ
+
+- ブラウザの自動再生は音ありだと止められるため、FVでは無音版を `autoplay muted playsinline` で流し、音あり版はユーザー操作後（音声ONボタン等）に切り替える想定。
 
 - 画は上へ4%オフセット（絵コンテ指示）: `object-position: 50% 46%` などで対応。
 - 終了後は最終フレームで静止させる（`loop`なし、`autoplay muted playsinline`）。
