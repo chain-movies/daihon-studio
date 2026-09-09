@@ -7,6 +7,9 @@
 | --- | --- |
 | `fv_homare_E_main_audio_1920x1080.mp4` / `.webm` | 本命（BGM・SE入り）。H.264+AAC / VP9+Opus / 1920x1080 / 24fps / 5.00秒。太陽光が流れて燃える金の「誉」になる版 |
 | `fv_homare_E_main_1920x1080.mp4` / `.webm` | 同じ映像の無音版（ミュート自動再生用） |
+| `fv_homare_E_main_audio_3840x2160.mp4` / `.webm` | 4K版（音付き）。1080p本命をAIアップスケール（ByteDance, aigcプリセット, 24fps）。H.264 約21Mbps / VP9 |
+| `fv_homare_E_main_3840x2160.mp4` / `.webm` | 4K版の無音版 |
+| `fv_homare_E_poster_3840x2160.jpg` / `fv_homare_E_lastframe_3840x2160.jpg` | 4K版のposter・最終フレーム |
 | `fv_homare_E_alt_blaze_singleclip_*.mp4` | 予備案。中間部を1クリップで生成した版（光の筋から一気に燃える字が立ち上がる） |
 | `fv_homare_E_ribbon_*.mp4` / `.webm` | 旧本命（白い光のリボンが渦を巻く版、音あり／なし） |
 | `fv_homare_E_blaze_keyframe_source.png` | 燃える金の光の「誉」キーフレーム（Nano Banana Pro生成） |
@@ -56,6 +59,13 @@
 
 - ラウドネス: -15.6 LUFS（integrated）、トゥルーピーク -1.5 dBTP。末尾0.38秒でフェードアウト。
 - 音量バランスの変更は `audio/mix.py` の `layers` のゲイン（dB）を変えて再実行。
+
+## 4K版について
+
+- 1080p本命（映像のみ）を Higgsfield の動画アップスケール（ByteDance版、AI生成向けプリセット、4K、24fps）で拡大し、
+  同じ音声ミックスを付け直したもの。映像の内容・タイミングは1080p版と同一。
+- 元素材が1080p生成のため、4Kは「拡大を綺麗にした」画質。文字の輪郭や火の粉のエッジは明確にシャープになる。
+- ファイルサイズは MP4 約13MB / WebM 約2.6MB。FVで使う場合は WebM を優先し、MP4はフォールバックにする。
 
 ## 実装メモ
 
