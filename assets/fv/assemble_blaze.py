@@ -32,7 +32,7 @@ import numpy as np
 from PIL import Image
 head_last=np.asarray(Image.open(f'stretch_frames/{HEAD:04d}.png').convert('RGB')).astype(np.float32)
 end_img=np.asarray(Image.open('mm_frames/0090.png').convert('RGB')).astype(np.float32)
-XF_IN=10; XF_OUT=12
+XF_IN=10; XF_OUT=int(os.environ.get('XF_OUT','0'))   # 0 = no dissolve into a locked frame; clip ends naturally
 for k,p in enumerate(mid):
     fr=np.asarray(Image.open(p).convert('RGB')).astype(np.float32)
     if k < XF_IN:                       # dissolve from the last head frame into the new clip
@@ -41,7 +41,7 @@ for k,p in enumerate(mid):
     if j < XF_OUT:                      # dissolve into the locked final frame
         a=(XF_OUT-j)/(XF_OUT+1); fr=(1-a)*fr + a*end_img
     Image.fromarray(np.clip(fr+0.5,0,255).astype(np.uint8)).save(f'{seq}/{HEAD+k+1:04d}.png')
-shutil.copy('mm_frames/0090.png', f'{seq}/{TOTAL:04d}.png')   # locked final frame
+if XF_OUT>0: shutil.copy('mm_frames/0090.png', f'{seq}/{TOTAL:04d}.png')   # locked final frame only when dissolving
 subprocess.run([ff,'-y','-v','error','-framerate','24','-i',f'{seq}/%04d.png','-an','-vf','format=yuv420p','-c:v','libx264','-preset','slow','-crf','17','-profile:v','high','-level','4.1','-movflags','+faststart','-r','24',f'out/{name}_video.mp4'],check=True)
 subprocess.run([ff,'-y','-v','error','-i',f'out/{name}_video.mp4','-i','audio/mix_5s.wav','-map','0:v:0','-map','1:a:0','-c:v','copy','-c:a','aac','-b:a','192k','-shortest','-movflags','+faststart',f'out/{name}_audio.mp4'],check=True)
 print('done', f'out/{name}_video.mp4', f'out/{name}_audio.mp4')
