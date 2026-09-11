@@ -32,13 +32,42 @@ import numpy as np
 from PIL import Image
 head_last=np.asarray(Image.open(f'stretch_frames/{HEAD:04d}.png').convert('RGB')).astype(np.float32)
 end_img=np.asarray(Image.open('mm_frames/0090.png').convert('RGB')).astype(np.float32)
-XF_IN=10; XF_OUT=int(os.environ.get('XF_OUT','0'))   # 0 = no dissolve into a locked frame; clip ends naturally
+XF_IN=int(os.environ.get('XF_IN','0')); XF_OUT=int(os.environ.get('XF_OUT','0'))
+MATCH=int(os.environ.get('MATCH','1')); MATCH_LEN=int(os.environ.get('MATCH_LEN','48'))   # frames over which the match decays to identity
+# --- estimate global translation (clip first frame -> head last frame) by phase correlation on the mountain band ---
+def gray(a): return a.mean(2)
+def phasecorr(a,b):
+    A=np.fft.fft2(a-a.mean()); B=np.fft.fft2(b-b.mean()); R=A*np.conj(B); R/=np.abs(R)+1e-6
+    r=np.fft.ifft2(R).real; iy,ix=np.unravel_index(np.argmax(r),r.shape)
+    if iy>a.shape[0]//2: iy-=a.shape[0]
+    if ix>a.shape[1]//2: ix-=a.shape[1]
+    return iy,ix
+first=np.asarray(Image.open(mid[0]).convert('RGB')).astype(np.float32)
+band=(slice(150,750),slice(0,1920))
+dy,dx=phasecorr(gray(head_last)[band],gray(first)[band])
+# --- per-channel affine colour match (clip first frame -> head last), estimated on the whole frame ---
+hm=head_last.reshape(-1,3).mean(0); hs=head_last.reshape(-1,3).std(0)
+cm=first.reshape(-1,3).mean(0); cs=first.reshape(-1,3).std(0)
+gain=hs/np.maximum(cs,1e-3); off=hm-cm*gain
+print('seam match: shift dy,dx =',dy,dx,' colour gain',gain.round(3),'offset',off.round(1))
+def shift_img(a,ty,tx):
+    # translate by (ty,tx) and zoom just enough about the centre so no black border appears
+    im=Image.fromarray(np.clip(a+0.5,0,255).astype(np.uint8)); W_,H_=im.size
+    z=1.0+2.0*max(abs(tx)/W_, abs(ty)/H_)+0.002
+    # output(x,y) = input((x-cx)/z+cx - tx, (y-cy)/z+cy - ty)
+    cx,cy=W_/2,H_/2
+    a11=1/z; a13=cx-cx/z-tx; a23=cy-cy/z-ty
+    return np.asarray(im.transform(im.size, Image.AFFINE, (a11,0,a13,0,a11,a23), resample=Image.BICUBIC)).astype(np.float32)
 for k,p in enumerate(mid):
     fr=np.asarray(Image.open(p).convert('RGB')).astype(np.float32)
-    if k < XF_IN:                       # dissolve from the last head frame into the new clip
+    if MATCH and k < MATCH_LEN:
+        w=1.0-k/MATCH_LEN                                  # 1 at the cut, fading to 0
+        fr=fr*(1+(gain-1)*w)+off*w
+        if (dy or dx): fr=shift_img(fr, dy*w, dx*w)
+    if k < XF_IN:
         a=(k+1)/(XF_IN+1); fr=(1-a)*head_last + a*fr
     j=len(mid)-1-k
-    if j < XF_OUT:                      # dissolve into the locked final frame
+    if XF_OUT>0 and j < XF_OUT:
         a=(XF_OUT-j)/(XF_OUT+1); fr=(1-a)*fr + a*end_img
     Image.fromarray(np.clip(fr+0.5,0,255).astype(np.uint8)).save(f'{seq}/{HEAD+k+1:04d}.png')
 if XF_OUT>0: shutil.copy('mm_frames/0090.png', f'{seq}/{TOTAL:04d}.png')   # locked final frame only when dissolving
