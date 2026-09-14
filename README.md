@@ -14,7 +14,7 @@ GitHub Pages: https://chain-movies.github.io/daihon-studio/
 
 ```
 04:00 JST  Codex（codex-daily.yml）が新パックのデザイン20個を実装して push（OPENAI_API_KEY 設定時）
-05:00 JST  Claude Routine が新規セッションで factory/PLAYBOOK.md を実行
+05:00 JST  Claude Routine が常駐セッション（リポジトリ権限付き）で factory/PLAYBOOK.md を実行
            → Codex の成果を目視確認・修正（Codex 未実行なら自分で実装）・calendar 更新・push
            → 月水金は apps/ にアプリ1本追加
            → factory/reports/YYYY-MM-DD.md に朝の報告
