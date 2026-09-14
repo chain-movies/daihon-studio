@@ -184,5 +184,11 @@
     "2914": "JT",
     "8316": "三井住友FG",
     "4502": "武田薬品工業"
-  }
+  },
+  "sources": [
+    "nikkei",
+    "yahoo"
+  ],
+  "sources_note": "取得順。nikkei=日経の日足ページ（銘柄ごと・出来高あり・25日分）、yahoo=Yahoo Finance spark（20銘柄一括・レート制限されやすい）",
+  "nikkei_interval_ms": 300
 }

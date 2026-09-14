@@ -110,6 +110,40 @@ async function fetchSpark(syms) {
   return [];
 }
 
+/** 日経のヒストリカルページ（日足25日分＋現在値＋出来高）を1銘柄ずつ取得 */
+function fetchNikkei(sym) {
+  const r = curlJson(`https://www.nikkei.com/nkd/company/history/dprice/?scode=${sym}`);
+  if (!r.ok) return null;
+  const h = r.body;
+  const rows = [...h.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)].map((m) => [...m[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/g)].map((c) => c[1].replace(/<[^>]+>/g, '').replace(/,/g, '').trim()));
+  const data = rows.filter((c) => c.length >= 6 && /^\d{1,2}\/\d{1,2}/.test(c[0]) && !isNaN(parseFloat(c[4])));
+  if (data.length < 5) return null;
+  // 日付（年なし）→ 今日から遡って年を推定
+  const y0 = j.getUTCFullYear(), m0 = j.getUTCMonth() + 1;
+  const toTs = (md) => { const mm = md.match(/(\d{1,2})\/(\d{1,2})/); const m = Number(mm[1]), d = Number(mm[2]); const y = m > m0 ? y0 - 1 : y0; return Date.UTC(y, m - 1, d, 6, 30) / 1000; };
+  const asc = data.slice().reverse();
+  const closes = asc.map((c) => parseFloat(c[4])), vols = asc.map((c) => parseInt(c[5], 10) || 0), ts = asc.map((c) => toTs(c[0]));
+  const nowM = h.match(/現在値\((\d{1,2}:\d{2})\)[\s\S]{0,200}?m-stockPriceElm_value now">([\d.]+)/);
+  const price = nowM ? parseFloat(nowM[2]) : closes[closes.length - 1];
+  // 現在値の日付: 表の最終行が今日なら今日、そうでなければ最終行の日
+  const lastDate = new Date(ts[ts.length - 1] * 1000).toISOString().slice(0, 10);
+  let marketTime = ts[ts.length - 1];
+  if (nowM && lastDate === jstDate) { const [hh, mm] = nowM[1].split(':').map(Number); marketTime = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate(), hh - 9, mm) / 1000; }
+  const prevClose = lastDate === jstDate ? closes[closes.length - 2] : closes[closes.length - 1];
+  if (lastDate === jstDate) closes[closes.length - 1] = price; // 当日行は現在値で上書き
+  return { sym, name: (cfg.names || {})[sym] || sym, price, prevClose, marketTime, closes, vols, ts, source: 'nikkei' };
+}
+async function fetchAllNikkei(syms) {
+  const out = []; let fails = 0;
+  for (const sym of syms) {
+    let q = null;
+    for (let i = 0; i < 2 && !q; i++) { q = fetchNikkei(sym); if (!q) await sleep(1500); }
+    if (q) out.push(q); else { fails++; console.error('nikkei fail', sym); if (fails >= 5 && out.length === 0) break; }
+    await sleep(cfg.nikkei_interval_ms || 300);
+  }
+  return out;
+}
+
 /* ---------- 指標 ---------- */
 function rsi(closes, n) {
   if (closes.length < n + 1) return 50;
@@ -175,13 +209,24 @@ function exec(action, sym, shares, price, reason, source) {
 /* ---------- メイン ---------- */
 const universe = [...new Set(cfg.universe)];
 console.log(`[${jstDate} ${jstTime} JST] ${universe.length}銘柄を取得中...`);
-const quotes = [];
-for (let i = 0; i < universe.length; i += 20) { // 20銘柄ずつ一括取得（Yahoo のレート制限対策）
-  const got = await fetchSpark(universe.slice(i, i + 20));
-  if (!got.length && i === 0) { console.error('最初のバッチが取得できないため中断（このIPは制限中の可能性）'); break; }
-  quotes.push(...got);
-  await sleep(3000);
+let quotes = [];
+let sourceUsed = null;
+for (const src of (cfg.sources || ['nikkei', 'yahoo'])) {
+  if (src === 'yahoo') {
+    for (let i = 0; i < universe.length; i += 20) { // 20銘柄ずつ一括取得（Yahoo のレート制限対策）
+      const got = await fetchSpark(universe.slice(i, i + 20));
+      if (!got.length && i === 0) { console.error('Yahoo: 最初のバッチが取得できない（このIPは制限中の可能性）'); break; }
+      quotes.push(...got);
+      await sleep(3000);
+    }
+  } else if (src === 'nikkei') {
+    quotes = await fetchAllNikkei(universe);
+  }
+  if (quotes.length >= universe.length * 0.5) { sourceUsed = src; break; }
+  console.error(`${src}: ${quotes.length}/${universe.length} 銘柄しか取れず、次のソースへ`);
+  quotes = [];
 }
+console.log(`データソース: ${sourceUsed || 'なし'}`);
 console.log(`${quotes.length}銘柄 取得完了`);
 if (quotes.length < universe.length * 0.5) {
   console.error(`取得失敗が多いため中断（${quotes.length}/${universe.length}）。状態は変更しません`);
@@ -272,7 +317,7 @@ state.stats = {
   max_drawdown: (() => { let peak = 0, mdd = 0; for (const e of state.equity_curve) { peak = Math.max(peak, e.equity); mdd = Math.min(mdd, e.equity / peak - 1); } return mdd; })(),
   days_running: Math.max(1, Math.round((now - new Date(state.created_at)) / 86400000)),
 };
-state.last_run = { t: now.toISOString(), jst: `${jstDate} ${jstTime}`, mode: modeNote, quotes: quotes.length, market_date: latestMarketDate };
+state.last_run = { t: now.toISOString(), jst: `${jstDate} ${jstTime}`, mode: modeNote, quotes: quotes.length, market_date: latestMarketDate, source: sourceUsed };
 state.notes = state.notes.slice(-50);
 state.config = { lot_size: cfg.lot_size, max_positions: cfg.max_positions, strategy: cfg.strategy, initial_cash: cfg.initial_cash };
 fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
