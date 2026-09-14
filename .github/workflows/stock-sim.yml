@@ -6,6 +6,11 @@ on:
     - cron: '0,30 0-6 * * 1-5'
     # 大引け後の確定評価（JST 15:45）
     - cron: '45 6 * * 1-5'
+  push:
+    paths:
+      - 'stocks/engine.mjs'
+      - 'stocks/config.json'
+      - 'stocks/manual_orders.json'
   workflow_dispatch:
     inputs:
       force:
