@@ -13,14 +13,31 @@ GitHub Pages: https://chain-movies.github.io/daihon-studio/
 ## 毎日どう回るか
 
 ```
+04:00 JST  Codex（codex-daily.yml）が新パックのデザイン20個を実装して push（OPENAI_API_KEY 設定時）
 05:00 JST  Claude Routine が新規セッションで factory/PLAYBOOK.md を実行
-           → 新パックのデザイン20個を telop/designs.js に追加・calendar 更新・push
+           → Codex の成果を目視確認・修正（Codex 未実行なら自分で実装）・calendar 更新・push
            → 月水金は apps/ にアプリ1本追加
            → factory/reports/YYYY-MM-DD.md に朝の報告
 06:00 JST  daily-product.yml が zip を生成し GitHub Release に添付（product-<pack>-<date>）
 09:00-15:30 stock-sim.yml が30分ごとに株価取得・売買・state.json コミット
 朝         マッキー: Release の zip＋画像を BASE にアップ（listing.md をコピペ）
 ```
+
+## Codex との連携（実装は Codex、品質と報告は Claude）
+
+```
+04:00 JST  codex-daily.yml … Codex が AGENTS.md / factory/codex/daily-prompt.md に従い
+           その日のパック20デザイン（月水金はアプリも）を実装 → 検証 → push（コミット "codex: ..."）
+05:00 JST  Claude Routine … Codex の成果を目視確認・修正 → 朝の報告
+```
+
+有効化に必要なのは1つだけ: GitHub リポジトリの **Settings → Secrets and variables → Actions → New repository secret** で `OPENAI_API_KEY` を登録する（OpenAI Platform の API キー。ChatGPT のログインでは動かない）。未登録の間は Codex ステップをスキップし、Claude が従来どおり全部やる。
+
+- 手動で任せる: Actions → codex-daily → Run workflow の `task` に指示を書く
+- スマホから任せる: Issue を作って `codex` ラベルを付ける（本文がタスクになり、結果が Issue にコメントされる）
+- Codex に翌日やってほしいことは `factory/codex/notes-for-codex.md` に書く
+- 費用は OpenAI の API 従量課金（1回の実行で数十〜数百円規模）。OpenAI Platform の Usage limits で月額上限を必ず設定する
+- 参考: https://github.com/openai/codex-action
 
 ## 手元で動かす
 

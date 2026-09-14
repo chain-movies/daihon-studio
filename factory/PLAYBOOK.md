@@ -11,6 +11,14 @@
 - 法務: 実在のテレビ番組名・局名・企業ロゴを商品名や説明に使わない。「〜風」「〜ジャンル」の汎用表現にする。フォントは Google Fonts（OFL）のみ
 - リポジトリ: `chain-movies/daihon-studio`（GitHub Pages: https://chain-movies.github.io/daihon-studio/ ）
 
+## 0.5 Codex との分業（重要）
+
+- **4:00 JST: Codex**（`.github/workflows/codex-daily.yml`、`AGENTS.md` と `factory/codex/daily-prompt.md` に従う）が、その日のパック20デザインと（月水金）アプリ1本を実装して `codex: <packId> ...` というコミットで push する。最終メッセージは `factory/codex/last-message.md`
+- **5:00 JST: Claude（このPLAYBOOK）** は、まず `git log --since=6.hours --oneline` と `factory/codex/last-message.md` で Codex の成果を確認する
+  - Codex が実装済み → **作り直さない**。§2 の手順3（確認レンダリング→目視→修正）から始め、品質を上げることに時間を使う（文字はみ出し・帯の細さ・色の沈み・サンプル文の不自然さ・実在名の混入）。Codex が「確認してほしい」と書いた箇所を必ず見る
+  - Codex が動いていない（Secrets 未設定・失敗）→ 従来どおり Claude が §2 を全部やる
+- 役割の考え方: Codex＝量産（実装）、Claude＝品質・判断・報告。どちらも同じルール（実在名禁止・OFLフォント・state.json 不可）
+
 ## 1. セットアップ（毎回）
 
 ```bash
@@ -55,6 +63,11 @@ Playwright が無い場合: `npm i -g playwright@1.56.1 && npx playwright instal
 5. roadmap に「built: 日付」を記入し、リサーチで見つけた新候補を 1〜2 件追加
 6. Pages にデモ版が並ぶよう `apps/index.html`（一覧ページ）にリンクを追加
 
+## 4.5 Codex への引き継ぎ
+
+- 翌日 Codex にやってほしい具体的な指示があれば `factory/codex/notes-for-codex.md` に箇条書きで残す（Codex は AGENTS.md 経由で読む）。逆に Codex からの「確認してほしい箇所」は `factory/codex/last-message.md` にある
+- Codex の実装に繰り返し同じ問題が出るなら、`AGENTS.md` のルールに1行追加して再発を止める（プロンプトを増やすより効く）
+
 ## 5. 朝の報告（必須・最後に）
 
 `factory/reports/YYYY-MM-DD.md` を作り、push する。内容:
@@ -62,7 +75,7 @@ Playwright が無い場合: `npm i -g playwright@1.56.1 && npx playwright instal
 ```
 # 本日の成果 YYYY-MM-DD
 ## 作ったもの
-- テロップパック: <名前>（<n>デザイン / Release: https://github.com/chain-movies/daihon-studio/releases/tag/product-<packId>-<date>）
+- テロップパック: <名前>（<n>デザイン / 実装: Codex or Claude / Release: https://github.com/chain-movies/daihon-studio/releases/tag/product-<packId>-<date>）
 - アプリ: <名前>（apps/<id>/、デモ: https://chain-movies.github.io/daihon-studio/apps/<id>/）※月水金
 ## マッキーがやること（3分）
 1. Release の zip とトップ画像を BASE にアップロード（listing.md の文面をコピペ）

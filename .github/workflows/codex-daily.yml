@@ -1,0 +1,127 @@
+name: codex-daily (Codex が商品を実装 → push)
+
+# 毎朝 4:00 JST に Codex（OpenAI）がその日のテロップパック／アプリを実装して push する。
+# 5:00 JST の Claude Routine が品質確認・修正・朝の報告を行う。
+# 必要な設定: リポジトリの Secrets に OPENAI_API_KEY（Settings → Secrets and variables → Actions）
+# 手動実行: Actions → codex-daily → Run workflow（task に自由な指示を書ける）
+# Issue から依頼: Issue に「codex」ラベルを付けると本文をタスクとして実行する
+
+on:
+  schedule:
+    - cron: '0 19 * * *'
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Codex への指示（空なら factory/codex/daily-prompt.md の日次タスク）'
+        default: ''
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: codex-daily
+  cancel-in-progress: false
+
+jobs:
+  codex:
+    if: github.event_name != 'issues' || github.event.label.name == 'codex'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      HAS_KEY: ${{ secrets.OPENAI_API_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Pick working branch
+        id: branch
+        run: |
+          # main に PLAYBOOK があれば main、なければ作業ブランチ
+          if git cat-file -e origin/main:factory/PLAYBOOK.md 2>/dev/null; then B=main; else B=claude/monetization-tool-rebuild-qp828g; fi
+          git checkout -B "$B" "origin/$B"
+          echo "branch=$B" >> "$GITHUB_OUTPUT"
+
+      - name: Skip when OPENAI_API_KEY is missing
+        if: env.HAS_KEY != 'true'
+        run: echo "::warning::OPENAI_API_KEY が未設定のため Codex は実行しません（Claude Routine が代わりに実装します）"
+
+      - uses: actions/setup-node@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          node-version: 22
+
+      - name: Prepare tools (Playwright, fonts)
+        if: env.HAS_KEY == 'true'
+        run: |
+          npm i --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+          node factory/fetch_fonts.mjs
+
+      - name: Build prompt
+        if: env.HAS_KEY == 'true'
+        id: prompt
+        env:
+          TASK: ${{ github.event.inputs.task }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          mkdir -p factory/codex
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            { echo "AGENTS.md と factory/PLAYBOOK.md のルールに従い、次の Issue #$ISSUE_NUMBER を実装してください。質問せず最後まで進め、最後に日本語で結果を報告してください。"; echo; echo "# $ISSUE_TITLE"; echo; echo "$ISSUE_BODY"; } > factory/codex/run-prompt.md
+          elif [ -n "$TASK" ]; then
+            { echo "AGENTS.md と factory/PLAYBOOK.md のルールに従い、次のタスクを実装してください。質問せず最後まで進め、最後に日本語で結果を報告してください。"; echo; echo "$TASK"; } > factory/codex/run-prompt.md
+          else
+            cp factory/codex/daily-prompt.md factory/codex/run-prompt.md
+          fi
+          echo "--- prompt ---"; cat factory/codex/run-prompt.md
+
+      - name: Run Codex
+        if: env.HAS_KEY == 'true'
+        id: codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt-file: factory/codex/run-prompt.md
+          permission-profile: ':workspace'
+          safety-strategy: drop-sudo
+          effort: medium
+          output-file: factory/codex/last-message.md
+
+      - name: Verify build
+        if: env.HAS_KEY == 'true'
+        id: verify
+        run: |
+          node -e "require('./telop/designs.js')"
+          PACK=$(node factory/calendar.mjs today)
+          if [ -n "$PACK" ]; then
+            node factory/build_pack.mjs --pack "$PACK" --quick
+            N=$(node -e "const d=require('./telop/designs.js');console.log(d.DESIGNS.filter(x=>x.pack==='$PACK').length)")
+            echo "pack=$PACK designs=$N"
+            echo "pack=$PACK" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push
+        if: env.HAS_KEY == 'true'
+        run: |
+          rm -f factory/codex/run-prompt.md
+          git config user.name "codex bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "codex: ${{ steps.verify.outputs.pack || 'task' }} $(TZ=Asia/Tokyo date +'%Y-%m-%d %H:%M')"
+          for i in 1 2 3; do git pull --rebase && git push -u origin "${{ steps.branch.outputs.branch }}" && break || sleep 5; done
+
+      - name: Report to issue
+        if: env.HAS_KEY == 'true' && github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body = 'Codex の結果:\n\n';
+            try { body += fs.readFileSync('factory/codex/last-message.md', 'utf8'); } catch (e) { body += '(最終メッセージなし)'; }
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: body.slice(0, 60000) });
