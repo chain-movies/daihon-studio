@@ -61,26 +61,51 @@ async function getJson(url) {
   return { status: r.status, ok: r.ok, json: () => r.json() };
 }
 const sleep = (ms) => new Promise((s) => setTimeout(s, ms));
-/** spark エンドポイントで最大20銘柄を一括取得（レート制限対策）。終値配列と直近値を返す */
+const JAR = path.join(DATA, '.yjar');
+/** Yahoo の cookie + crumb を取得（429 回避に有効なことがある） */
+function getCrumb() {
+  try {
+    spawnSync('curl', ['-sS', '-m', '15', '-A', UA, '-c', JAR, '-o', '/dev/null', 'https://fc.yahoo.com']);
+    const r = spawnSync('curl', ['-sS', '-m', '15', '-A', UA, '-b', JAR, '-c', JAR, 'https://query1.finance.yahoo.com/v1/test/getcrumb'], { encoding: 'utf8' });
+    const c = (r.stdout || '').trim();
+    return c && !c.startsWith('<') && c.length < 40 ? c : null;
+  } catch (e) { return null; }
+}
+function curlJson(url, useJar) {
+  const args = ['-sS', '-m', '30', '-A', UA, '-w', '\n%{http_code}', url];
+  if (useJar) args.unshift('-b', JAR);
+  const r = spawnSync('curl', args, { encoding: 'utf8', maxBuffer: 50e6 });
+  if (r.status !== 0 || !r.stdout) return { status: 0, ok: false, body: '' };
+  const idx = r.stdout.lastIndexOf('\n');
+  const code = Number(r.stdout.slice(idx + 1));
+  return { status: code, ok: code >= 200 && code < 300, body: r.stdout.slice(0, idx) };
+}
+function parseSpark(js, syms) {
+  const out = [];
+  for (const sym of syms) {
+    let d = js[sym + '.T'];
+    if (!d && js.spark && js.spark.result) { const hit = js.spark.result.find((x) => x.symbol === sym + '.T'); d = hit && hit.response && hit.response[0]; if (d && d.indicators) d = { timestamp: d.timestamp, close: d.indicators.quote[0].close, chartPreviousClose: d.meta && d.meta.chartPreviousClose }; }
+    if (!d || !d.close) continue;
+    const closes = [], ts = [];
+    for (let k = 0; k < d.close.length; k++) if (d.close[k] != null) { closes.push(d.close[k]); ts.push(d.timestamp[k]); }
+    if (!closes.length) continue;
+    out.push({ sym, name: (cfg.names || {})[sym] || sym, price: closes[closes.length - 1], prevClose: d.chartPreviousClose || d.previousClose || closes[closes.length - 2], marketTime: ts[ts.length - 1], closes, vols: [], ts });
+  }
+  return out;
+}
+let crumb = null;
+/** spark エンドポイントで最大20銘柄を一括取得。429 なら host 切替・cookie+crumb・バックオフで再試行 */
 async function fetchSpark(syms) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/spark?symbols=${syms.map((s) => s + '.T').join(',')}&range=3mo&interval=1d`;
-  for (let i = 0; i < 4; i++) {
-    try {
-      const r = await getJson(url);
-      if (r.status === 429) { console.error('429 rate limit, wait', 8 * (i + 1) + 's'); await sleep(8000 * (i + 1)); continue; }
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const js = await r.json();
-      const out = [];
-      for (const sym of syms) {
-        const d = js[sym + '.T'] || (js.spark && js.spark.result && (js.spark.result.find((x) => x.symbol === sym + '.T') || {}).response && js.spark.result.find((x) => x.symbol === sym + '.T').response[0]);
-        if (!d || !d.close) continue;
-        const closes = [], ts = [];
-        for (let k = 0; k < d.close.length; k++) if (d.close[k] != null) { closes.push(d.close[k]); ts.push(d.timestamp[k]); }
-        if (!closes.length) continue;
-        out.push({ sym, name: (cfg.names || {})[sym] || sym, price: closes[closes.length - 1], prevClose: d.chartPreviousClose || d.previousClose || closes[closes.length - 2], marketTime: ts[ts.length - 1], closes, vols: [], ts });
-      }
-      return out;
-    } catch (e) { console.error('spark fail', e.message); await sleep(2000); }
+  const hosts = ['query1', 'query2'];
+  for (let i = 0; i < 6; i++) {
+    const host = hosts[i % 2];
+    const useCrumb = i >= 2;
+    if (useCrumb && !crumb) crumb = getCrumb();
+    const url = `https://${host}.finance.yahoo.com/v8/finance/spark?symbols=${syms.map((s) => s + '.T').join(',')}&range=3mo&interval=1d${useCrumb && crumb ? '&crumb=' + encodeURIComponent(crumb) : ''}`;
+    const r = curlJson(url, useCrumb);
+    if (r.ok) { try { return parseSpark(JSON.parse(r.body), syms); } catch (e) { console.error('parse fail', e.message); } }
+    else console.error(`HTTP ${r.status} (${host}${useCrumb ? '+crumb' : ''}) — ${(i + 1) * 10}s 待機`);
+    await sleep((i + 1) * 10000);
   }
   return [];
 }
@@ -153,10 +178,15 @@ console.log(`[${jstDate} ${jstTime} JST] ${universe.length}銘柄を取得中...
 const quotes = [];
 for (let i = 0; i < universe.length; i += 20) { // 20銘柄ずつ一括取得（Yahoo のレート制限対策）
   quotes.push(...await fetchSpark(universe.slice(i, i + 20)));
-  await sleep(1500);
+  await sleep(3000);
 }
 console.log(`${quotes.length}銘柄 取得完了`);
-if (quotes.length < universe.length * 0.5) { console.error('取得失敗が多いため中断'); process.exit(1); }
+if (quotes.length < universe.length * 0.5) {
+  console.error(`取得失敗が多いため中断（${quotes.length}/${universe.length}）。状態は変更しません`);
+  state.notes = (state.notes || []).slice(-49).concat([{ t: now.toISOString(), note: `データ取得失敗（${quotes.length}/${universe.length}銘柄）。評価をスキップ` }]);
+  if (fs.existsSync(STATE)) fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
+  process.exit(0);
+}
 
 // 市場が今日開いているか（最新の regularMarketTime が JST の今日か）
 const latestMarketDate = quotes.length ? jst(new Date(Math.max(...quotes.map((q) => q.marketTime || 0)) * 1000)).toISOString().slice(0, 10) : null;
