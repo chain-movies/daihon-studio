@@ -2,7 +2,7 @@
 
 ## 今日のタスク
 
-1. `node factory/calendar.mjs today` で今日の pack id を確認する。空なら `factory/calendar.json` の queue に今日の日付で新テーマを1件追加してから進める（brief を具体的に書く）。
+1. `node factory/calendar.mjs next-design` で実装対象の pack id を確認する（デザインが20個未満で最も日付の早いもの）。空なら `factory/calendar.json` の queue に新テーマを1件追加してから進める（brief を具体的に書く）。
 2. その pack のデザインを **20個**、`telop/designs.js` の `DESIGNS` に追加する（`pack` を付ける、各3〜4色の `variants`、`PACKS` にも追加）。既存デザインは変更しない。
 3. `node factory/build_pack.mjs --pack <packId> --quick` を実行し、エラーが無いことと `factory/out/<packId>/preview/contact_sheet.jpg` ができることを確認する。エラーがあれば直して再実行する。
 4. `factory/calendar.json` に翌日以降の未ビルドテーマが3件以上残るように補充する（バラエティ／ニュース／縦動画／企業VP／グルメ／季節イベント／スポーツ／教育 など）。

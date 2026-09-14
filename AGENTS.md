@@ -21,7 +21,8 @@
 ## 今日の仕事の決め方
 
 ```bash
-node factory/calendar.mjs today   # → 今日ビルドすべき pack id（空なら calendar に追加してから）
+node factory/calendar.mjs next-design   # → 実装対象の pack id（デザイン20個未満の最も早いもの。空なら calendar に追加してから）
+node factory/calendar.mjs today         # → 今日 Release される pack id
 node factory/calendar.mjs list
 ```
 

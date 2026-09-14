@@ -36,7 +36,7 @@ Playwright が無い場合: `npm i -g playwright@1.56.1 && npx playwright instal
 
 ## 2. 毎日: テロップパックを1つ作る（所要 30〜60分）
 
-1. `factory/calendar.json` の queue で **date が今日以前かつ built が null** のものを対象にする。無ければ末尾の brief を参考に新しいテーマを1つ足す（date=今日）
+1. `node factory/calendar.mjs next-design` が返す pack（デザイン20個未満で最も早いもの）を対象にする。空なら末尾の brief を参考に新しいテーマを1つ足す。Release は別途 `today`（date 到来分）で決まるので、実装は常に1日以上先行させる
 2. `telop/designs.js` に対象 pack のデザインを **20個** 実装する（`pack: '<packId>'`、各デザイン 3〜4 の色バリアント、サンプル文は日本語で自然な番組テロップ）。`PACKS` にも名前・価格を追加（20デザインなら ¥1,980 推奨）
    - 既存 22 デザインの spec（`font / fill / strokes / shadow / extrude / glow / box / tag / sub / deco`）を組み合わせる。新しい表現が必要なら `telop/renderer.js` を拡張してよい（既存デザインの見た目を変えないこと）
    - 縦動画向けパックは `portraitScale: 1` と `anchor.y: 'middle'` を活用

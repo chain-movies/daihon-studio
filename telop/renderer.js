@@ -213,6 +213,26 @@
         const k = box.skew == null ? 22 : box.skew;
         ctx.moveTo(x + k, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h); ctx.closePath(); break;
       }
+      case 'burst': { // 爆発吹き出し
+        const n = box.spikes == null ? 18 : box.spikes, sp = (box.spike == null ? 34 : box.spike);
+        const cx = x + w / 2, cy = y + h / 2, rx = w / 2, ry = h / 2;
+        for (let i = 0; i < n * 2; i++) {
+          const a = (Math.PI * 2 * i) / (n * 2) - Math.PI / 2;
+          const out = i % 2 === 0;
+          const jit = out ? 1 : 0.86;
+          const px = cx + (rx + (out ? sp : 0)) * Math.cos(a) * jit, py = cy + (ry + (out ? sp : 0)) * Math.sin(a) * jit;
+          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.closePath(); break;
+      }
+      case 'speech': { // 角丸吹き出し（左下にしっぽ）
+        const rad = box.radius == null ? 24 : box.radius, t = box.tail == null ? 34 : box.tail;
+        ctx.moveTo(x + rad, y); ctx.lineTo(x + w - rad, y); ctx.quadraticCurveTo(x + w, y, x + w, y + rad);
+        ctx.lineTo(x + w, y + h - rad); ctx.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
+        ctx.lineTo(x + w * 0.3, y + h); ctx.lineTo(x + w * 0.2, y + h + t); ctx.lineTo(x + w * 0.16, y + h);
+        ctx.lineTo(x + rad, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - rad);
+        ctx.lineTo(x, y + rad); ctx.quadraticCurveTo(x, y, x + rad, y); ctx.closePath(); break;
+      }
       case 'brush': { // ざっくり筆帯風（多角形）
         const j = box.jitter == null ? 6 : box.jitter;
         const pts = [];
@@ -340,10 +360,11 @@
     if (subDims && subPos === 'above') textTop = by + subDims.h + subDims.gap;
     const rect = { x: bx, y: textTop, w: blockW, h: blockH };
 
+    if (spec.deco) drawDeco(ctx, spec.deco.filter((d) => d.behind), rect, scale, W, H);
     if (box) { box._canvasW = W; drawBox(ctx, box, rect, scale); }
 
     // decoration lines (e.g. 上下ライン)
-    if (spec.deco) drawDeco(ctx, spec.deco, rect, scale, W);
+    if (spec.deco) drawDeco(ctx, spec.deco.filter((d) => !d.behind), rect, scale, W, H);
 
     // tag
     let textX0 = rect.x + padX;
@@ -390,13 +411,59 @@
     return { rect, spec };
   }
 
-  function drawDeco(ctx, deco, r, scale, W) {
+  function drawDeco(ctx, deco, r, scale, W, H) {
     ctx.save();
     for (const d of deco) {
       const c = d.color || '#fff';
       ctx.fillStyle = c; ctx.strokeStyle = c;
       const t = (d.thickness || 4) * scale;
       switch (d.type) {
+        case 'radial': { // 集中線（ブロック中心から画面端へ）
+          const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+          const r0 = Math.hypot(r.w, r.h) / 2 * (d.inner == null ? 1.15 : d.inner);
+          const R = Math.hypot(W, H);
+          const n = d.count || 40, wdt = (d.width == null ? 0.012 : d.width);
+          for (let i = 0; i < n; i++) {
+            const a = (Math.PI * 2 * i) / n + ((i * 7919) % 13) * 0.004; // 少しランダム
+            const len = R * (0.75 + ((i * 104729) % 10) / 40);
+            ctx.beginPath();
+            ctx.moveTo(cx + r0 * Math.cos(a), cy + r0 * Math.sin(a));
+            ctx.lineTo(cx + len * Math.cos(a - wdt), cy + len * Math.sin(a - wdt));
+            ctx.lineTo(cx + len * Math.cos(a + wdt), cy + len * Math.sin(a + wdt));
+            ctx.closePath(); ctx.fill();
+          }
+          break;
+        }
+        case 'ring': { // 楕円の輪（花マル風）
+          const padX = (d.padX == null ? 40 : d.padX) * scale, padY = (d.padY == null ? 10 : d.padY) * scale;
+          ctx.lineWidth = t; ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.ellipse(r.x + r.w / 2, r.y + r.h / 2, r.w / 2 + padX, r.h / 2 + padY, -0.06, 0.15, Math.PI * 2 + 0.6);
+          ctx.stroke(); break;
+        }
+        case 'speedlines': { // 左右の効果線
+          const g = (d.gap || 24) * scale, n = d.n || 3, len = (d.length || 90) * scale;
+          ctx.lineWidth = t; ctx.lineCap = 'round';
+          for (let i = 0; i < n; i++) {
+            const y = r.y + (r.h * (i + 1)) / (n + 1), l = len * (1 - i * 0.25);
+            ctx.beginPath(); ctx.moveTo(r.x - g, y); ctx.lineTo(r.x - g - l, y - l * 0.2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(r.x + r.w + g, y); ctx.lineTo(r.x + r.w + g + l, y - l * 0.2); ctx.stroke();
+          }
+          break;
+        }
+        case 'zigzag': { // ギザギザ下線（怒り・緊張）
+          const amp = (d.amp || 10) * scale, step = (d.step || 22) * scale, y0 = r.y + r.h + (d.gap || 10) * scale;
+          ctx.lineWidth = t; ctx.lineJoin = 'round';
+          ctx.beginPath(); let up = false;
+          for (let x = r.x; x <= r.x + r.w; x += step) { ctx.lineTo(x, y0 + (up ? -amp : amp)); up = !up; }
+          ctx.stroke(); break;
+        }
+        case 'dropLines': { // 頭上の「ガーン」縦線
+          const n = d.n || 5, len = (d.length || 60) * scale, gap = (d.gap || 14) * scale;
+          ctx.lineWidth = t; ctx.lineCap = 'round';
+          for (let i = 0; i < n; i++) { const x = r.x + (r.w * (i + 0.5)) / n; ctx.beginPath(); ctx.moveTo(x, r.y - gap); ctx.lineTo(x, r.y - gap - len * (0.6 + ((i * 3) % 3) * 0.2)); ctx.stroke(); }
+          break;
+        }
         case 'lineTop': ctx.fillRect(d.full ? 0 : r.x, r.y - (d.gap || 8) * scale - t, d.full ? W : r.w, t); break;
         case 'lineBottom': ctx.fillRect(d.full ? 0 : r.x, r.y + r.h + (d.gap || 8) * scale, d.full ? W : r.w, t); break;
         case 'dotsLeft': { for (let i = 0; i < (d.n || 3); i++) { ctx.beginPath(); ctx.arc(r.x - (d.gap || 24) * scale - i * (d.spacing || 22) * scale, r.y + r.h / 2, t, 0, Math.PI * 2); ctx.fill(); } break; }
