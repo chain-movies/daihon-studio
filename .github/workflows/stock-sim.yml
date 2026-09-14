@@ -1,0 +1,49 @@
+name: stock-sim (仮想トレード)
+
+on:
+  schedule:
+    # JST 9:00〜15:30 の30分ごと（UTC 0:00〜6:30）平日。Actions の cron は数分遅れることがある
+    - cron: '0,30 0-6 * * 1-5'
+    # 大引け後の確定評価（JST 15:45）
+    - cron: '45 6 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '市場時間外でも売買判定を実行する（テスト）'
+        type: boolean
+        default: false
+      reset:
+        description: '状態を初期化して30万円からやり直す'
+        type: boolean
+        default: false
+
+concurrency:
+  group: stock-sim
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run engine
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
+          if [ "${{ github.event.inputs.reset }}" = "true" ]; then ARGS="$ARGS --reset"; fi
+          node stocks/engine.mjs $ARGS
+      - name: Commit state
+        run: |
+          git config user.name "stock-sim bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add stocks/data stocks/manual_orders.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "stock-sim: $(date -u +'%Y-%m-%d %H:%M UTC') [skip ci]"
+          for i in 1 2 3; do git pull --rebase && git push && break || sleep 5; done
