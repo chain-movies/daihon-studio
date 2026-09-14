@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chain-Movies ツール一覧</title>
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#3987e5;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;padding-block:32px;padding-inline:20px;max-width:900px;margin:0 auto;line-height:1.6}
+h1{font-size:22px;margin-bottom:6px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+a.card{display:block;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;color:inherit;text-decoration:none}
+a.card:hover{border-color:var(--accent)}
+.card .t{font-weight:700;font-size:15px}
+.card .d{color:var(--ink2);font-size:13px;margin-top:4px}
+.card .p{color:var(--muted);font-size:12px;margin-top:8px}
+</style>
+</head>
+<body>
+<h1>Chain-Movies ツール一覧</h1>
+<div class="sub">動画制作の現場から生まれた小さなツール。デモ版はここで試せます。製品版は BASE で販売しています。</div>
+<div class="grid">
+  <a class="card" href="../telop/"><div class="t">テロップメーカー</div><div class="d">テレビ番組風テロップを自分の文字で透過PNGに書き出し。台本を貼れば一括生成。</div><div class="p">デモ版（透かしあり）／製品版はテロップ素材集に同梱</div></a>
+  <a class="card" href="../stocks/"><div class="t">仮想トレード30万円チャレンジ</div><div class="d">実在の株価でルール通りに機械売買したらどうなるか、毎日自動で検証。</div><div class="p">無料公開・実験</div></a>
+  <a class="card" href="../"><div class="t">ショートドラマ台本スタジオ</div><div class="d">縦型ショートドラマの脚本制作アプリ。プロット設計・台本エディタ・分析。</div><div class="p">PWA</div></a>
+</div>
+</body>
+</html>

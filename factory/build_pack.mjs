@@ -24,9 +24,12 @@ import { execSync } from 'node:child_process';
 
 const require = createRequire(import.meta.url);
 function loadPlaywright() {
-  try { return require('playwright'); } catch (e) { /* fall through */ }
-  const g = createRequire('/opt/node22/lib/node_modules/');
-  return g('playwright');
+  const roots = [null, path.join(process.cwd(), 'node_modules') + '/', '/opt/node22/lib/node_modules/'];
+  try { roots.push(execSync('npm root -g', { encoding: 'utf8' }).trim() + '/'); } catch (e) { /* ignore */ }
+  for (const r of roots) {
+    try { return (r ? createRequire(r) : require)('playwright'); } catch (e) { /* next */ }
+  }
+  throw new Error('playwright が見つかりません。`npm i playwright@1.56.1 && npx playwright install chromium` を実行してください');
 }
 const { chromium } = loadPlaywright();
 
