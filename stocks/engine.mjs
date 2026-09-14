@@ -97,7 +97,7 @@ let crumb = null;
 /** spark エンドポイントで最大20銘柄を一括取得。429 なら host 切替・cookie+crumb・バックオフで再試行 */
 async function fetchSpark(syms) {
   const hosts = ['query1', 'query2'];
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 4; i++) {
     const host = hosts[i % 2];
     const useCrumb = i >= 2;
     if (useCrumb && !crumb) crumb = getCrumb();
@@ -177,7 +177,9 @@ const universe = [...new Set(cfg.universe)];
 console.log(`[${jstDate} ${jstTime} JST] ${universe.length}銘柄を取得中...`);
 const quotes = [];
 for (let i = 0; i < universe.length; i += 20) { // 20銘柄ずつ一括取得（Yahoo のレート制限対策）
-  quotes.push(...await fetchSpark(universe.slice(i, i + 20)));
+  const got = await fetchSpark(universe.slice(i, i + 20));
+  if (!got.length && i === 0) { console.error('最初のバッチが取得できないため中断（このIPは制限中の可能性）'); break; }
+  quotes.push(...got);
   await sleep(3000);
 }
 console.log(`${quotes.length}銘柄 取得完了`);
@@ -185,7 +187,7 @@ if (quotes.length < universe.length * 0.5) {
   console.error(`取得失敗が多いため中断（${quotes.length}/${universe.length}）。状態は変更しません`);
   state.notes = (state.notes || []).slice(-49).concat([{ t: now.toISOString(), note: `データ取得失敗（${quotes.length}/${universe.length}銘柄）。評価をスキップ` }]);
   if (fs.existsSync(STATE)) fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
-  process.exit(0);
+  process.exit(3); // 3 = データ取得失敗（ワークフロー側で別ランナーから再試行）
 }
 
 // 市場が今日開いているか（最新の regularMarketTime が JST の今日か）
