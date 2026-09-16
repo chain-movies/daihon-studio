@@ -7,7 +7,8 @@ GitHub Pages: https://chain-movies.github.io/daihon-studio/
 | `index.html` | ショートドラマ台本スタジオ（既存） | `/` |
 | `telop/` | **テロップメーカー**（デモ版）＋デザイン定義＋共通レンダラー | `/telop/` |
 | `stocks/` | **仮想トレード30万円チャレンジ** ダッシュボード＋エンジン | `/stocks/` |
-| `factory/` | 商品生成パイプライン（パック生成・カレンダー・PLAYBOOK・リサーチ） | — |
+| `factory/` | 商品生成パイプライン（パック生成・カレンダー・PLAYBOOK・リサーチ・note見出し画像生成 `note_header.mjs`） | — |
+| `content/note/` | note 投稿パック（本文・見出し画像・投稿ガイド・台帳JSON）。週1の「工場実録」 | — |
 | `.github/workflows/` | `daily-product.yml`（毎朝パック生成→Release）／`stock-sim.yml`（平日30分ごと売買） | — |
 
 ## 毎日どう回るか

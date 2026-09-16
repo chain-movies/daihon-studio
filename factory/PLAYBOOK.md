@@ -68,6 +68,19 @@ Playwright が無い場合: `npm i -g playwright@1.56.1 && npx playwright instal
 - 翌日 Codex にやってほしい具体的な指示があれば `factory/codex/notes-for-codex.md` に箇条書きで残す（Codex は AGENTS.md 経由で読む）。逆に Codex からの「確認してほしい箇所」は `factory/codex/last-message.md` にある
 - Codex の実装に繰り返し同じ問題が出るなら、`AGENTS.md` のルールに1行追加して再発を止める（プロンプトを増やすより効く）
 
+## 4.7 note 投稿パック（見出し画像付き・週1）
+
+note編集部（別の定期便）の週3本とは別枠で、**木曜に「工場実録」記事を1本**作る（土曜の体験談号と被る週はスキップ）。必ず見出し画像をセットで作る。
+
+1. `content/note/<日付>-<slug>/` を作り、次を置く
+   - `article.md` … 記事の型v2（冒頭は読者の悩みの問いかけ／誰向けか明示／読まないデメリット／数字付き自己紹介は悩みの後／■見出し3〜5個／末尾は二択の問いかけ→CTA「法人向けAI研修・AI活用の相談窓口」→自己紹介リンク）。数字は factory/reports の事実のみ。創作禁止・実在番組名禁止・9/28の勉強会には触れない
+   - `header.json` → `node factory/note_header.mjs header.json header.png` で見出し画像（8/24サムネ風構成 1280×670）を生成。`『』` で囲んだ行が黒箱＋オレンジ強調になる。JPG も作る（`/tmp` の tojpg 相当: Playwright で jpeg 品質80）
+   - `guide.md` … 便・投稿時刻・手順（■に大見出し→目次確認）・タグ5個・X告知2本（140字以内）・Threads告知2本（500字以内）・見出し画像の raw URL
+   - `ledger.json` … 台帳キュー形式 `{"no","title","status":"公開待ち","made","bin","docUrl","tags","note"}`（No. は Drive「投稿パック」の最新番号＋1）
+2. push 後、見出し画像の公開URLは `https://raw.githubusercontent.com/chain-movies/daihon-studio/<ブランチ>/content/note/<dir>/header.jpg`。朝の報告に貼る
+3. Drive への投入（本文Doc→「投稿パック」フォルダ id 1WdOsOpZkQeav0c2-3FYM56dWiRo_qARp、台帳JSON→「台帳キュー」id 1nsHxtnWea8nD7gHSyDoUoRkMf95DAPrk）は Google Drive コネクタがあるセッションだけが行う。無いセッションは報告に「Drive未投入・URLから投入可」と書く
+4. 公開ボタンは本人（note運営ルール）。自動公開はしない
+
 ## 5. 朝の報告（必須・最後に）
 
 `factory/reports/YYYY-MM-DD.md` を作り、push する。内容:
