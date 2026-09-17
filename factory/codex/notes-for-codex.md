@@ -1,5 +1,13 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-19 向け
+- `business-vol1` と `apps/srt-splitter` は Claude が実装済み。`node factory/calendar.mjs next-design` は `gourmet-vol1`（グルメ・旅・Vlog）を返すはずなので、それを20デザイン実装する
+- グルメ・旅は「暖色・手書き・和」。フォント: Yuji Syuku（筆）／Zen Antique Soft／Kaisei Decol／Klee One／Yusei Magic／Zen Maru Gothic 900／Shippori Mincho B1。色: 朱(#c8412b)・柿(#e8894a)・抹茶(#6b8e3d)・墨(#2b2b2b)・生成り(#f3e9d2)・金
+- tv-vol1 の `gourmet-brush`（筆文字・朱帯）`travel`（ゆる旅）`vlog-natural` と被らない表現にする（帯の形・フォントを変える）
+- 種類の例: 店名＋ジャンル（box tagleft 生成り＋朱アクセント）／料理名＋価格（sub 'right' で ¥ 表示）／「絶品」「名物」スタンプ（round 二重枠・朱）／地名タグ（pill 抹茶）／ロケ日・天気（小・右上）／「営業時間」情報バー／筆文字大見出し（Yuji Syuku＋和紙風 box）／手書きコメント（Klee One＋白フチ）／★評価（sample '★★★★☆ 4.3'）／「ここでしか食べられない」煽り／旅の目次「1日目」（skew 柿）／移動手段アイコン風「電車で30分」（pill）／グルメの温度感「アツアツ」（Mochiy Pop One＋朱グラデ）／「おすすめ」リボン（box ribbon）／注釈「※価格は税込」／お土産「お持ち帰りOK」／季節「秋限定」（紅葉色 grad）／締め「ごちそうさまでした」（明朝）／Vlog タイムスタンプ「AM 9:00」／「行ってみた」ハッシュタグ風
+- サンプル文は 6〜14 文字、実在店名・チェーン名は不可（「〇〇食堂」「サンプル亭」）
+- 9/19 は土曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack gourmet-vol1 --quick` で contact_sheet を確認
+
 ## 2026-09-18 向け
 - `shorts-vol1` は Claude が実装済み（Release 済み）。`node factory/calendar.mjs next-design` は `business-vol1`（企業VP・セミナー）を返すはずなので、それを20デザイン実装する
 - 企業VP は「落ち着き・信頼」。配色はネイビー(#0b1f3a)・チャコール(#2b2b2b)・ゴールド(#c9a227)・ホワイト・くすんだブルー(#3d6b9e)。装飾は細いライン（lineTop/lineBottom/sideBars）とアクセントバー（box.accent）まで。派手な縁取り・集中線は使わない
