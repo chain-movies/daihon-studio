@@ -296,11 +296,12 @@
   /* ---------- レイアウト計算 & 描画 ---------- */
   /**
    * render(canvas, design, options)
-   * options: { text, sub, variant, width, height, plateOnly, offsetY, offsetX, scale, background }
+   * options: { text, sub, tagText, variant, width, height, plateOnly, offsetY, offsetX, scale, background }
    */
   function render(canvas, design, options) {
     const o = Object.assign({ text: design.sample || 'サンプルテロップ', sub: design.sampleSub || '', variant: 0, width: 1920, height: 1080, plateOnly: false, offsetX: 0, offsetY: 0, background: null }, options || {});
     const spec = resolve(design, o.variant);
+    if (o.tagText != null && o.tagText !== '' && spec.tag) spec.tag = Object.assign({}, spec.tag, { text: String(o.tagText) }); // タグ文字の差し替え（未指定なら従来どおり）
     const W = o.width, H = o.height;
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');

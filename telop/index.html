@@ -98,6 +98,7 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
     <div class="label">テキスト（改行で2行）</div>
     <textarea id="text"></textarea>
     <div id="subWrap"><div class="label">サブテキスト（肩書き・見出し）</div><input type="text" id="sub"></div>
+    <div id="tagWrap"><div class="label">タグ文字（速報・POINT 1・① など）</div><input type="text" id="tag"></div>
     <div class="label">カラー</div>
     <div class="swatches" id="variants"></div>
     <div class="label">大きさ</div>
@@ -125,7 +126,7 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
   const DEMO = /* @DEMO */ true; /* @DEMO */
   const R = TelopRenderer, D = TelopDesigns;
   const $ = (s) => document.querySelector(s);
-  const state = { design: D.DESIGNS[0].id, variant: 0, text: '', sub: '', scale: 100, offX: 0, offY: 0, plateOnly: false, aspect: '169', bg: 'checker' };
+  const state = { design: D.DESIGNS[0].id, variant: 0, text: '', sub: '', tag: '', scale: 100, offX: 0, offY: 0, plateOnly: false, aspect: '169', bg: 'checker' };
   try { Object.assign(state, JSON.parse(localStorage.getItem('telopmaker') || '{}')); } catch (e) {}
   if (!D.DESIGNS.find((d) => d.id === state.design)) state.design = D.DESIGNS[0].id;
   const packs = [...new Set(D.DESIGNS.map((d) => d.pack))];
@@ -148,7 +149,7 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
     for (const d of list) {
       const el = document.createElement('div'); el.className = 'dcard' + (d.id === state.design ? ' on' : '');
       el.innerHTML = `<canvas width="384" height="216"></canvas><div class="n"><span>${d.name}</span><small>${(d.variants || []).length}色</small></div>`;
-      el.onclick = () => { state.design = d.id; state.variant = 0; state.text = ''; state.sub = ''; syncInputs(); buildList(); draw(); };
+      el.onclick = () => { state.design = d.id; state.variant = 0; state.text = ''; state.sub = ''; state.tag = ''; syncInputs(); buildList(); draw(); };
       wrap.appendChild(el);
       drawThumb(d, el.querySelector('canvas'));
     }
@@ -173,13 +174,14 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
     $('#text').value = state.text || d.sample || '';
     $('#sub').value = state.sub || d.sampleSub || '';
     $('#subWrap').style.display = d.sub ? '' : 'none';
+    const rt = R.resolve(d, state.variant).tag; $('#tagWrap').style.display = d.tag ? '' : 'none'; $('#tag').value = state.tag || (rt ? rt.text : '');
     $('#scale').value = state.scale; $('#scaleV').textContent = state.scale + '%';
     $('#offY').value = state.offY; $('#offYV').textContent = state.offY;
     $('#offX').value = state.offX; $('#offXV').textContent = state.offX;
     $('#plateOnly').checked = state.plateOnly;
     const vs = d.variants || [];
     $('#variants').innerHTML = vs.map((v, i) => `<span class="sw${i === state.variant ? ' on' : ''}" data-i="${i}">${v.name}</span>`).join('') || '<span class="hint">—</span>';
-    $('#variants').querySelectorAll('.sw').forEach((s) => s.onclick = () => { state.variant = +s.dataset.i; syncInputs(); draw(); });
+    $('#variants').querySelectorAll('.sw').forEach((s) => s.onclick = () => { state.variant = +s.dataset.i; state.tag = ''; syncInputs(); draw(); });
     document.querySelectorAll('#aspect button').forEach((b) => b.classList.toggle('on', b.dataset.v === state.aspect));
     document.querySelectorAll('#bgsel button').forEach((b) => b.classList.toggle('on', b.dataset.v === state.bg));
     $('#stage').className = state.bg;
@@ -194,7 +196,7 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
       const d = cur(); const [W, H] = dims();
       const text = $('#text').value, sub = $('#sub').value;
       await R.ensureFonts(R.resolve(d, state.variant), [text, sub]);
-      R.render($('#preview'), d, { width: W, height: H, variant: state.variant, text, sub, scale: state.scale / 100, offsetX: state.offX, offsetY: state.offY, plateOnly: state.plateOnly });
+      R.render($('#preview'), d, { width: W, height: H, variant: state.variant, text, sub, tagText: d.tag ? $('#tag').value : undefined, scale: state.scale / 100, offsetX: state.offX, offsetY: state.offY, plateOnly: state.plateOnly });
     } finally { drawing = false; if (queued) { queued = false; draw(); } }
   }
 
@@ -208,7 +210,7 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
   async function renderTo(text, sub) {
     const d = cur(); const [W, H] = dims(); const c = document.createElement('canvas');
     await R.ensureFonts(R.resolve(d, state.variant), [text, sub]);
-    R.render(c, d, { width: W, height: H, variant: state.variant, text, sub, scale: state.scale / 100, offsetX: state.offX, offsetY: state.offY, plateOnly: state.plateOnly });
+    R.render(c, d, { width: W, height: H, variant: state.variant, text, sub, tagText: d.tag ? $('#tag').value : undefined, scale: state.scale / 100, offsetX: state.offX, offsetY: state.offY, plateOnly: state.plateOnly });
     watermark(c);
     return c;
   }
@@ -245,6 +247,7 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
   $('#cat').onchange = buildList;
   $('#text').oninput = () => { state.text = $('#text').value; save(); draw(); };
   $('#sub').oninput = () => { state.sub = $('#sub').value; save(); draw(); };
+  $('#tag').oninput = () => { state.tag = $('#tag').value; save(); draw(); };
   $('#scale').oninput = (e) => { state.scale = +e.target.value; $('#scaleV').textContent = state.scale + '%'; save(); draw(); };
   $('#offY').oninput = (e) => { state.offY = +e.target.value; $('#offYV').textContent = state.offY; save(); draw(); };
   $('#offX').oninput = (e) => { state.offX = +e.target.value; $('#offXV').textContent = state.offX; save(); draw(); };
