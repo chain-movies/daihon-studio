@@ -1,5 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-20 向け
+- `kids-vol1`（9/20 分）は Claude が 9/19 に先行実装済み。`node factory/calendar.mjs next-design` は `sports-vol1`（スポーツ中継・速報）を返すはずなので、それを20デザイン実装する
+- スポーツは「スピード感・対戦・記録」。フォント: Noto Sans JP 900 / Dela Gothic One / M PLUS 1p 900 / Train One。skew（斜め帯）と font.skew（斜体）、SILVER/GOLD グラデ、赤青の対戦カラー（#e60012 vs #0050c8）。tv-vol1 の `sports`（速報）と被らない形にする
+- 種類の例: スコアボード「3 - 1」（tag でチーム略称）／選手名＋背番号（tag '10'）／速報「ゴール！」バースト／ハイライト「HIGHLIGHT」英字帯／勝利「WIN」・敗北「LOSE」（tag text を variant で）／記録更新「自己ベスト更新」／タイム表示「9.98」大数字／前半・後半「前半 23分」／対戦カード「A vs B」（deco sideBars）／順位「1位」メダル風（GOLD/SILVER/BRONZE variants）／実況風ツッコミ「決まった！」／MVP／延長戦／逆転／解説コメント／会場・日時／天候「気温28℃」／連勝「5連勝中」／応援「がんばれ！」／リプレイ「REPLAY」
+- 実在チーム名・大会名・選手名は不可（「〇〇FC」「山田 太郎」）
+- 9/20 は日曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack sports-vol1 --quick` で contact_sheet を確認
+
 ## 2026-09-19 向け（更新: 9/18 午前に gourmet-vol1 を先行実装済み）
 - `gourmet-vol1` は Claude が 9/18 に実装済み（20デザイン・quick/full ビルド確認済み）。9/19 の Release は Actions が自動で作る。`node factory/calendar.mjs next-design` は `kids-vol1`（教育・子ども向けポップ）を返すはずなので、それを20デザイン実装する
 - kids は「丸ゴシック・パステル・ドット・ステッカー風」。フォント: Zen Maru Gothic 900 / Mochiy Pop One / Hachi Maru Pop / Kiwi Maru / M PLUS 1p 900 / Potta One。色: パステル（#ffd6e0 #cde7ff #fff3b0 #d4f5d0 #e9d5ff）＋濃い縁取り（#3a3a3a / #5a3e2b）。tv-vol1 の `kids-pop`（レインボー＋白黒縁）と被らない表現に
