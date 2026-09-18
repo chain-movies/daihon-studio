@@ -1,5 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-19 向け（更新: 9/18 午前に gourmet-vol1 を先行実装済み）
+- `gourmet-vol1` は Claude が 9/18 に実装済み（20デザイン・quick/full ビルド確認済み）。9/19 の Release は Actions が自動で作る。`node factory/calendar.mjs next-design` は `kids-vol1`（教育・子ども向けポップ）を返すはずなので、それを20デザイン実装する
+- kids は「丸ゴシック・パステル・ドット・ステッカー風」。フォント: Zen Maru Gothic 900 / Mochiy Pop One / Hachi Maru Pop / Kiwi Maru / M PLUS 1p 900 / Potta One。色: パステル（#ffd6e0 #cde7ff #fff3b0 #d4f5d0 #e9d5ff）＋濃い縁取り（#3a3a3a / #5a3e2b）。tv-vol1 の `kids-pop`（レインボー＋白黒縁）と被らない表現に
+- 種類の例: クイズ「もんだい」タグ／正解○・不正解×（tag text を variant で差し替え）／ひらがな見出し（Hachi Maru Pop）／「やってみよう！」／「ポイント」ふせん風（box round＋shadow ハード）／「おぼえておこう」／数字「①②③」（s-step と違う形: 星や丸）／「なまえ」記名欄風／「きょうのテーマ」ヘッダー／「せいかい！」バースト（burst 小さめ・パステル）／「おしい！」／レベル表示「レベル1」ピル／「まめちしき」吹き出し（speech）／「おわり」／英語「Let's try!」／せんせいのコメント（手書き）／「10びょう」カウント／「まとめ」／注意「おうちのひとといっしょに」／ハートやキラキラ deco（sparkle）
+- サンプル文はひらがな多め・6〜12 文字。実在の教材・番組・キャラ名は不可
+- 9/19 は土曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack kids-vol1 --quick` で contact_sheet を確認
+
 ## 2026-09-19 向け
 - `business-vol1` と `apps/srt-splitter` は Claude が実装済み。`node factory/calendar.mjs next-design` は `gourmet-vol1`（グルメ・旅・Vlog）を返すはずなので、それを20デザイン実装する
 - グルメ・旅は「暖色・手書き・和」。フォント: Yuji Syuku（筆）／Zen Antique Soft／Kaisei Decol／Klee One／Yusei Magic／Zen Maru Gothic 900／Shippori Mincho B1。色: 朱(#c8412b)・柿(#e8894a)・抹茶(#6b8e3d)・墨(#2b2b2b)・生成り(#f3e9d2)・金
