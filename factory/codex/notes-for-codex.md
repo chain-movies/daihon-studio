@@ -1,5 +1,13 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-21 向け
+- `sports-vol1`（9/21 分）は Claude が 9/20 に先行実装済み。`node factory/calendar.mjs next-design` は `season-autumn-vol1`（季節イベント）を返すはずなので、それを20デザイン実装する
+- 4シーズンを5デザインずつ: ハロウィン（紫#5b1a8a・オレンジ#ff7a00・黒、ギザギザ吹き出し burst、コウモリ風は deco で表現できないので色と形で）／紅葉・秋の味覚（暖色、筆文字 Yuji Syuku、Kaisei Decol）／クリスマス（赤#c8102e・緑#0b6b3a・金 GOLD、sparkle deco）／年末年始（和風・金赤、Shippori Mincho B1、Zen Old Mincho、「謹賀新年」「今年もお世話になりました」）
+- 種類の例: 「Happy Halloween」「本日のイベント」「トリック・オア・トリート」「仮装コンテスト」／「紅葉狩り」「秋の味覚フェア」「読書の秋」／「Merry Christmas」「クリスマス限定」「イルミネーション点灯」「プレゼント企画」／「謹賀新年」「今年もありがとうございました」「年末セール」「初売り」「あけましておめでとう」「新年の抱負」
+- 実在のイベント名・店舗名・キャラクター名は不可。gourmet-vol1 の `g-season`（季節限定グラデ）と被らない形にする
+- 9/21 は月曜（祝日）なのでアプリも1本。roadmap の未着手最優先は #5「周年記念動画ヒアリングシート＆構成案ジェネレーター」（無料・営業導線）か #8「撮影香盤表ジェネレーター」（¥1,480・invoice-maker の印刷レイアウト流用）。#8 を推奨（apps/call-sheet/。シーン／時刻／場所／キャスト／機材／備考の行編集、A4 横印刷、CSV 書き出し、DEMO は10行まで）
+- 完了後 `node factory/build_pack.mjs --pack season-autumn-vol1 --quick` で contact_sheet を確認
+
 ## 2026-09-20 向け
 - `kids-vol1`（9/20 分）は Claude が 9/19 に先行実装済み。`node factory/calendar.mjs next-design` は `sports-vol1`（スポーツ中継・速報）を返すはずなので、それを20デザイン実装する
 - スポーツは「スピード感・対戦・記録」。フォント: Noto Sans JP 900 / Dela Gothic One / M PLUS 1p 900 / Train One。skew（斜め帯）と font.skew（斜体）、SILVER/GOLD グラデ、赤青の対戦カラー（#e60012 vs #0050c8）。tv-vol1 の `sports`（速報）と被らない形にする
