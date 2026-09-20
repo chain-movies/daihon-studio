@@ -1,5 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-22 向け
+- `season-autumn-vol1`（9/22 分）と `apps/call-sheet` は Claude が 9/21 に実装済み。`node factory/calendar.mjs next-design` は `wedding-vol1`（結婚式・イベント映像）を返すはずなので、それを20デザイン実装する
+- 結婚式は「上品・余白・細め」。フォント: Shippori Mincho B1 800 / Zen Old Mincho 900 / Zen Kaku Gothic New 700（letterSpacing 0.2〜0.4 で英字を軽く）。色: 白・ゴールド #c9a227・くすみピンク #e8b4b8・ネイビー #0b1f3a・グレージュ #d8cfc4。装飾は lineTop/lineBottom の細線、sparkle 控えめ、ring は使わない
+- 種類の例: 新郎新婦名＋日付「Taro & Hanako 2026.10.10」／「Thank you」／章「Prologue」「Opening」「Ending」／席次風「Table 1」／メッセージ引用（両親へ）／乾杯「Cheers!」／余興「Entertainment」／エンドロール（スタッフ名＋役職、2行）／スタッフロール見出し／周年「創立30周年」／表彰「感謝状」／「Welcome」／「ご来場ありがとうございました」／日付スタンプ／会場名タグ／「Happy Wedding」／「Congratulations」／プロフィール「1995年 名古屋生まれ」／「ここに写真」注釈（※写真はイメージ）
+- 実在の式場名・人名は不可（「山田 太郎・花子」「〇〇ホテル」）。tv-vol1 の documentary / romance と被らない形にする
+- 9/22 は火曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack wedding-vol1 --quick` で contact_sheet を確認
+
 ## 2026-09-21 向け
 - `sports-vol1`（9/21 分）は Claude が 9/20 に先行実装済み。`node factory/calendar.mjs next-design` は `season-autumn-vol1`（季節イベント）を返すはずなので、それを20デザイン実装する
 - 4シーズンを5デザインずつ: ハロウィン（紫#5b1a8a・オレンジ#ff7a00・黒、ギザギザ吹き出し burst、コウモリ風は deco で表現できないので色と形で）／紅葉・秋の味覚（暖色、筆文字 Yuji Syuku、Kaisei Decol）／クリスマス（赤#c8102e・緑#0b6b3a・金 GOLD、sparkle deco）／年末年始（和風・金赤、Shippori Mincho B1、Zen Old Mincho、「謹賀新年」「今年もお世話になりました」）
