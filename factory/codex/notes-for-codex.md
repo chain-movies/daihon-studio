@@ -1,5 +1,13 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-23 向け
+- `wedding-vol1`（9/23 分）は Claude が 9/22 に実装済み（20デザイン・quick/full ビルド確認済み）。`node factory/calendar.mjs next-design` は `stream-vol1`（配信・ゲーム実況）を返すはずなので、それを20デザイン実装する
+- 配信は「ネオン・ピクセル・サイバー」。フォント: DotGothic16 / Train One / Dela Gothic One / M PLUS 1p 900 / Noto Sans JP 900。色: シアン #00e5ff・マゼンタ #ff2d95・ライム #b6ff00・パープル #7a3cff・黒 #0b0b14。glow を主役にし、strokes は細め。tv-vol1 の `game-window` / `music-neon`、shorts-vol1 の `s-neon-outline` と被らない形にする
+- 種類の例: 「LIVE」赤ドット付きピル（tag で ●）／「配信中」／「コメント募集中」／「初見さん歓迎」／「今日の目標」（sub で目標内容）／「クリア！」バースト／「GAME OVER」ピクセル／「ランク」（tag で S/A/B を variant 差し替え）／「視聴者参加型」／告知「次回配信」＋日時／「休憩中」／「BGM:」曲名欄／注意事項「ネタバレ注意」／「チャンネル登録・高評価」／「切り抜きOK」／「メンバー限定」／「おつかれさま」エンド／「質問コーナー」／「ハイライト」／「同時接続 1,234」数字強調
+- 実在ゲーム名・配信サイト名・配信者名は不可（「〇〇（ゲーム名）」「〇〇さん」）
+- 9/23 は水曜なのでアプリも1本。Claude の提案どおり roadmap #10「BASE 商品ギャラリー画像ジェネレーター（社内ツール）」を `apps/base-gallery/` に実装する（各パックの contact_sheet と個別プレビューから 1280×1280 の商品画像 5枚（表紙・デザイン一覧・使い方・同梱物・比較表）を Canvas で生成、PNG 一括 DL。DEMO フラグ不要・listing.md 不要・社内用と README に明記）。時間が無ければ #5「周年記念動画 ヒアリングシート」でもよい
+- 完了後 `node factory/build_pack.mjs --pack stream-vol1 --quick` で contact_sheet を確認
+
 ## 2026-09-22 向け
 - `season-autumn-vol1`（9/22 分）と `apps/call-sheet` は Claude が 9/21 に実装済み。`node factory/calendar.mjs next-design` は `wedding-vol1`（結婚式・イベント映像）を返すはずなので、それを20デザイン実装する
 - 結婚式は「上品・余白・細め」。フォント: Shippori Mincho B1 800 / Zen Old Mincho 900 / Zen Kaku Gothic New 700（letterSpacing 0.2〜0.4 で英字を軽く）。色: 白・ゴールド #c9a227・くすみピンク #e8b4b8・ネイビー #0b1f3a・グレージュ #d8cfc4。装飾は lineTop/lineBottom の細線、sparkle 控えめ、ring は使わない
