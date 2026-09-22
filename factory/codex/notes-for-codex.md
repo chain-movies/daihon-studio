@@ -1,5 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-24 向け
+- `stream-vol1`（9/24 分）は Claude が 9/23 に実装済み（20デザイン・quick/full ビルド確認済み）。`node factory/calendar.mjs next-design` は `realestate-vol1`（不動産・物件紹介）を返すはずなので、それを20デザイン実装する
+- 不動産は「情報ラベル・清潔感・信頼」。フォント: Noto Sans JP 700/900 / Zen Kaku Gothic New 700 / BIZ UDPGothic 700 / M PLUS 1p 900（価格の数字）。色: ネイビー #0b1f3a・白・ベージュ #f3e9d2・グリーン #0e8a7a・アクセントに赤 #d7263d（価格・おすすめ）。box は rect / round の小さめラベルと、下部の情報帯（bar）。装飾は少なめ（dotsLeft / lineBottom 程度）
+- 種類の例: 間取り「2LDK」大文字＋sub「専有面積 58.2㎡」／「駅徒歩5分」ピル／「築12年」／家賃「8.5万円」（tag '家賃'、数字を M PLUS 1p 900 で大きく）／販売価格「3,980万円」／「おすすめポイント」タグ＋本文／「内見予約はこちら」CTA／部屋名ラベル「リビング 12帖」「キッチン」「バルコニー」／「南向き・角部屋」ピル2連／「ペット可」「駐車場あり」設備アイコン風ラベル／「周辺環境」章タイトル／「スーパー 徒歩3分」／「リフォーム済み」帯／「管理費 8,000円」小ラベル／注意「※写真は同タイプの別室です」／物件名「〇〇マンション 302号室」下部帯（bar）／「NEW」「値下げ」スタンプ（tag text を variant で差し替え）／「担当者コメント」吹き出し／「お問い合わせ」電話番号欄（数字はダミー 000-0000-0000）
+- 実在の不動産会社名・駅名・地名は不可（「〇〇駅」「〇〇市」）。business-vol1 の b-number（数値実績）と被らない形にする
+- 9/24 は木曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack realestate-vol1 --quick` で contact_sheet を確認
+
 ## 2026-09-23 向け
 - `wedding-vol1`（9/23 分）は Claude が 9/22 に実装済み（20デザイン・quick/full ビルド確認済み）。`node factory/calendar.mjs next-design` は `stream-vol1`（配信・ゲーム実況）を返すはずなので、それを20デザイン実装する
 - 配信は「ネオン・ピクセル・サイバー」。フォント: DotGothic16 / Train One / Dela Gothic One / M PLUS 1p 900 / Noto Sans JP 900。色: シアン #00e5ff・マゼンタ #ff2d95・ライム #b6ff00・パープル #7a3cff・黒 #0b0b14。glow を主役にし、strokes は細め。tv-vol1 の `game-window` / `music-neon`、shorts-vol1 の `s-neon-outline` と被らない形にする
