@@ -1,5 +1,14 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-25 向け
+- `realestate-vol1`（9/25 分）は Claude が 9/24 に実装済み（20デザイン・quick/full ビルド確認済み）。`node factory/calendar.mjs next-design` は `beauty-vol1`（美容・サロン・ファッション）を返すはずなので、それを20デザイン実装する
+- 美容は「くすみカラー・細い明朝・余白」。フォント: Shippori Mincho B1 800 / Zen Old Mincho 900 / Zen Kaku Gothic New 500・700 / Zen Maru Gothic 700 / Klee One（手書き）。色: くすみピンク #e8b4b8・ベージュ #f3e9d2・グレージュ #d8cfc4・ゴールド #c9a227・白・墨 #2b2b2b・セージ #9bb5a0。glow や太い strokes は使わない。wedding-vol1（w-*）と被らない形にする（wedding は式典、beauty は「手順・商品・Before/After」）
+- renderer に `sub.padX` / `sub.padY` を足した（未指定なら従来どおり）。sub に box を付けるときは padX 18〜24 を指定し、align: 'left' のときは indent = padX - 14 にすると主文の箱と左端が揃う（realestate-vol1 の re-madori を参照）
+- 種類の例: 「Before」「After」（tag text を variant で差し替え、上部角に小さく）／「本日のメニュー」章タイトル／手順「STEP 1」＋本文／使用アイテム「〇〇（商品名は伏せる）」ラベル／所要時間「約60分」／価格「¥5,500（税込）」／「初回限定 20%OFF」ピル／「予約はプロフィールから」CTA／「ポイント」ふせん／「Q. 髪質が硬くても大丈夫？」Q&A／「お客様の声」引用（明朝・鉤括弧）／「今日のコーデ」章タイトル／「カラー: ミルクティーベージュ」小ラベル／「NG」「OK」（tag 差し替え）／「セルフケアのコツ」手書き／「季節限定」リボン／「営業時間 10:00〜19:00」／「スタッフ紹介」名前＋役職（wedding のエンドロールとは別の形）／「保存して後で見る」（shorts の CTA と別の形）／「肌にやさしい」ピル
+- 実在のブランド名・商品名・サロン名は不可（「〇〇サロン」「〇〇（商品名）」）
+- 9/25 は金曜なのでアプリも1本。roadmap の未着手最優先は #5「周年記念動画 ヒアリングシート＆構成案ジェネレーター」（無料・営業導線。apps/anniversary-sheet/、質問に答えると構成案（章立て・尺・必要素材・撮影日数の目安）と見積レンジを A4 で印刷、JSON 保存。CTA は「相談窓口」への導線）。DEMO 不要（無料配布）だが listing.md（無料配布の説明）と README.txt は付ける
+- 完了後 `node factory/build_pack.mjs --pack beauty-vol1 --quick` で contact_sheet を確認
+
 ## 2026-09-24 向け
 - `stream-vol1`（9/24 分）は Claude が 9/23 に実装済み（20デザイン・quick/full ビルド確認済み）。`node factory/calendar.mjs next-design` は `realestate-vol1`（不動産・物件紹介）を返すはずなので、それを20デザイン実装する
 - 不動産は「情報ラベル・清潔感・信頼」。フォント: Noto Sans JP 700/900 / Zen Kaku Gothic New 700 / BIZ UDPGothic 700 / M PLUS 1p 900（価格の数字）。色: ネイビー #0b1f3a・白・ベージュ #f3e9d2・グリーン #0e8a7a・アクセントに赤 #d7263d（価格・おすすめ）。box は rect / round の小さめラベルと、下部の情報帯（bar）。装飾は少なめ（dotsLeft / lineBottom 程度）

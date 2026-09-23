@@ -405,7 +405,10 @@
         else if (salign === 'left') sx = rect.x + 14 * scale + (s.indent == null ? 0 : s.indent * scale);
         else sx = rect.x + rect.w / 2;
         const sb = { x: sx, y: sy, w: subDims.w, h: subDims.h };
-        if (s.box) drawBox(ctx, s.box, { x: salign === 'center' ? sx - subDims.w / 2 - 16 * scale : sx - 14 * scale, y: sy, w: subDims.w + 28 * scale, h: subDims.h }, scale);
+        if (s.box) { // sub.padX / sub.padY で余白を指定（未指定なら従来どおり 14px・0px）
+          const spx = (s.padX == null ? 14 : s.padX) * scale, spy = (s.padY == null ? 0 : s.padY) * scale;
+          drawBox(ctx, s.box, { x: salign === 'center' ? sx - subDims.w / 2 - spx - 2 * scale : sx - spx, y: sy - spy, w: subDims.w + spx * 2, h: subDims.h + spy * 2 }, scale);
+        }
         drawTextBlock(ctx, { font: s.font, lines: subDims.lines, x: salign === 'center' ? sx : sx + (s.box ? 0 : 0), y: sy, scale, fill: s.fill || { type: 'solid', color: '#fff' }, strokes: s.strokes || [], shadow: s.shadow || null, align: salign, lineHeight: s.lineHeight || 1.2, bounds: sb });
       }
     }
