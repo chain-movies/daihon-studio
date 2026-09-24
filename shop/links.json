@@ -1,0 +1,112 @@
+{
+  "shopUrl": "",
+  "packs": {
+    "tv-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-tv-vol1-2026-09-14"
+    },
+    "variety-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-variety-vol1-2026-09-15"
+    },
+    "news-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-news-vol1-2026-09-16"
+    },
+    "shorts-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-shorts-vol1-2026-09-17"
+    },
+    "business-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-business-vol1-2026-09-18"
+    },
+    "gourmet-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-gourmet-vol1-2026-09-19"
+    },
+    "kids-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-kids-vol1-2026-09-20"
+    },
+    "sports-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-sports-vol1-2026-09-21"
+    },
+    "season-autumn-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-season-autumn-vol1-2026-09-22"
+    },
+    "wedding-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-wedding-vol1-2026-09-23"
+    },
+    "stream-vol1": {
+      "base": "",
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-stream-vol1-2026-09-24"
+    },
+    "realestate-vol1": {
+      "base": "",
+      "release": ""
+    },
+    "beauty-vol1": {
+      "base": "",
+      "release": ""
+    }
+  },
+  "sets": {
+    "A": {
+      "name": "YouTube・ショート・配信セット",
+      "packs": [
+        "variety-vol1",
+        "shorts-vol1",
+        "stream-vol1"
+      ],
+      "price": 4980,
+      "base": ""
+    },
+    "B": {
+      "name": "ビジネス・情報セット",
+      "packs": [
+        "news-vol1",
+        "business-vol1",
+        "realestate-vol1"
+      ],
+      "price": 4980,
+      "base": ""
+    },
+    "C": {
+      "name": "ライフスタイル・イベントセット",
+      "packs": [
+        "gourmet-vol1",
+        "season-autumn-vol1",
+        "wedding-vol1"
+      ],
+      "price": 4980,
+      "base": ""
+    }
+  },
+  "bundle": {
+    "name": "全部入りバンドル",
+    "price": 9980,
+    "base": ""
+  },
+  "apps": {
+    "thumb-maker": {
+      "price": 1980,
+      "base": ""
+    },
+    "invoice-maker": {
+      "price": 1980,
+      "base": ""
+    },
+    "srt-splitter": {
+      "price": 980,
+      "base": ""
+    },
+    "call-sheet": {
+      "price": 1480,
+      "base": ""
+    }
+  }
+}

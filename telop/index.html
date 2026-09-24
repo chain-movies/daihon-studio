@@ -76,6 +76,7 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
     <div class="logo"><span class="mark">T</span><span>テロップメーカー</span><span style="color:var(--muted);font-weight:400;font-size:11.5px" id="packName"></span></div>
     <div class="sp"></div>
     <span class="demo" id="demoBadge" hidden>デモ版：書き出しに SAMPLE 透かし</span>
+    <a class="demo" id="shopLink" href="../shop/" style="text-decoration:none;color:var(--ink);border-color:var(--line)" hidden>製品版・素材集はこちら →</a>
     <div class="seg" id="aspect"><button data-v="169" class="on">16:9 横</button><button data-v="916">9:16 縦</button></div>
     <div class="seg" id="bgsel"><button data-v="checker" class="on">透過</button><button data-v="dark">黒</button><button data-v="light">白</button><button data-v="img">画像…</button></div>
     <input type="file" id="bgfile" accept="image/*" hidden>
@@ -131,7 +132,7 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
   if (!D.DESIGNS.find((d) => d.id === state.design)) state.design = D.DESIGNS[0].id;
   const packs = [...new Set(D.DESIGNS.map((d) => d.pack))];
   $('#packName').textContent = packs.map((p) => (D.PACKS[p] || {}).short || p).join(' / ');
-  if (DEMO) $('#demoBadge').hidden = false;
+  if (DEMO) { $('#demoBadge').hidden = false; const sl = $('#shopLink'); if (sl) sl.hidden = false; }
 
   const cur = () => D.DESIGNS.find((d) => d.id === state.design);
   const save = () => { try { localStorage.setItem('telopmaker', JSON.stringify(state)); } catch (e) {} };
