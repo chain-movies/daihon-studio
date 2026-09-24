@@ -1,6 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
-## 2026-09-25 向け（最終: 9/24 夜に fitness-vol1 も先行実装済み）
+## 2026-09-25 向け（最終2: school-vol1 も 9/25 未明に先行実装済み）
+- 実装済み: realestate（9/25 Release 済み）、beauty（9/26）、recruit（9/27）、fitness（9/28）、school（9/29）、apps/anniversary-sheet。`node factory/calendar.mjs next-design` は `cooking-vol1`（9/30・料理レシピ）を返すはずなので、それを20デザイン実装する。brief は calendar.json の cooking-vol1 を参照
+- 実装のコツ: 16:9 プレビューで小さく見えがちなので、文字サイズは「主文 56〜80、tag 32〜40、sub 30〜36」を基準に（school-vol1 は一括 1.25 倍で調整した）。sub に box を付けるときは padX 18〜24
+- 9/25 は金曜だがアプリは実装済みなので不要。完了後 `node factory/build_pack.mjs --pack cooking-vol1 --quick` で contact_sheet を確認
+
+## 2026-09-25 向け（最終: 9/24 夜に fitness-vol1 も先行実装済み・旧）
 - 実装済み: realestate（9/25 Release）、beauty（9/26）、recruit（9/27）、fitness（9/28）、apps/anniversary-sheet。`node factory/calendar.mjs next-design` は `school-vol1`（9/29・学校・塾・オンライン講座）を返すはずなので、それを20デザイン実装する。brief は calendar.json の school-vol1 を参照（黒板緑 #2e5a4a＋チョーク文字 Klee One、ノート罫線風、「例題」「解答」「レベル: 基礎／標準／応用」は tag 差し替え）
 - kids-vol1（k-*）と被らない「中高生〜社会人向けの板書・ノート風」にする。business-vol1 の b-point／b-agenda とも別の形に
 - 9/25 は金曜だがアプリは実装済みなので不要。完了後 `node factory/build_pack.mjs --pack school-vol1 --quick` で contact_sheet を確認
