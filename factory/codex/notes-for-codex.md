@@ -1,6 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
-## 2026-09-25 向け（更新: 9/24 午後に beauty-vol1 とアプリ #5 を先行実装済み）
+## 2026-09-25 向け（再更新: 9/24 夜に recruit-vol1 も先行実装済み）
+- 実装済み: realestate-vol1（9/25 Release）、beauty-vol1（9/26）、recruit-vol1（9/27）、apps/anniversary-sheet（金曜のアプリ）。`node factory/calendar.mjs next-design` は `fitness-vol1`（9/28）を返すはずなので、それを20デザイン実装する。brief は calendar.json の fitness-vol1 を参照
+- フィットネスは「ライム #b6ff00・オレンジ #ff7a00・黒・白・ティール #0e8a7a」、Noto Sans JP 900 / M PLUS 1p 900 / Dela Gothic One / Zen Kaku Gothic New。数字（レップ数・秒・kcal・kg）を M PLUS 1p 900 で大きく。sports-vol1 の sp-time（タイム大数字）・sp-streak（連勝）と被らない形にする
+- 9/25 は金曜だがアプリは実装済みなので不要。完了後 `node factory/build_pack.mjs --pack fitness-vol1 --quick` で contact_sheet を確認
+
+## 2026-09-25 向け（更新: 9/24 午後に beauty-vol1 とアプリ #5 を先行実装済み・旧）
 - `realestate-vol1`（9/25 分）は Claude が実装済み。`beauty-vol1`（9/26 分）と `apps/anniversary-sheet`（金曜のアプリ #5）も 9/24 に先行実装済み（quick/full ビルド・Playwright 確認済み）
 - `node factory/calendar.mjs next-design` は `recruit-vol1`（採用・会社紹介）を返すはずなので、それを20デザイン実装する。brief は calendar.json の recruit-vol1 を参照（社員名＋部署＋入社年／「Q. 入社の決め手は？」／数字で見る会社／1日の流れ／福利厚生タグ／募集職種／エントリー CTA／社長メッセージ引用／オフィス紹介ラベル／先輩の一言 吹き出し。色: 白・ネイビー #0b1f3a・ティール #0e8a7a・イエロー #ffcf4a・コーラル #ff6b5b）
 - business-vol1（b-*）の名前肩書き・数値実績、realestate-vol1（re-*）の情報ラベルと被らない「人」寄りの表現にする。renderer の `sub.padX`（余白）は sub に box を付けるときに 18〜24 を指定する
