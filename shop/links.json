@@ -47,9 +47,17 @@
     },
     "realestate-vol1": {
       "base": "",
-      "release": ""
+      "release": "https://github.com/chain-movies/daihon-studio/releases/tag/product-realestate-vol1-2026-09-25"
     },
     "beauty-vol1": {
+      "base": "",
+      "release": ""
+    },
+    "recruit-vol1": {
+      "base": "",
+      "release": ""
+    },
+    "fitness-vol1": {
       "base": "",
       "release": ""
     }
