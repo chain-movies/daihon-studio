@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>周年記念動画 ヒアリングシート＆構成案ジェネレーター</title>
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--surface3:#2b2b29;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#e5484d;--accent-soft:rgba(229,72,77,.16);--warn:#fab219;--ok:#3fb950;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:13.5px;line-height:1.6}
+#app{display:grid;grid-template-columns:380px 1fr;grid-template-rows:56px 1fr;height:100%}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+header h1{font-size:15px;margin:0;font-weight:700}
+header .free{font-size:11px;color:var(--ok);border:1px solid var(--ok);border-radius:999px;padding:1px 8px}
+header .sp{flex:1}
+header .btn{width:auto;margin:0}
+aside{background:var(--surface);border-right:1px solid var(--line);overflow:auto;padding:12px 14px 40px}
+main{overflow:auto;padding:20px;background:#151514}
+h2.sec{font-size:12px;color:var(--warn);letter-spacing:.08em;margin:18px 0 6px;text-transform:uppercase}
+label{display:block;font-size:12px;color:var(--ink2);margin:8px 0 3px}
+select,input[type=text],input[type=number],input[type=date],textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit}
+textarea{min-height:64px;resize:vertical}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.chk{display:flex;align-items:center;gap:7px;font-size:12.5px;margin:4px 0;color:var(--ink)}
+.chk input{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips .chk{background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:0}
+.chips .chk:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;width:100%;margin-top:8px}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.note{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+/* sheet */
+.sheet{background:#fff;color:#1a1a1a;width:210mm;min-height:297mm;margin:0 auto;padding:16mm 16mm 14mm;box-shadow:0 10px 40px rgba(0,0,0,.5);font-size:11pt;line-height:1.55}
+.sheet h1{font-size:19pt;margin:0 0 2mm;letter-spacing:.02em}
+.sheet .lead{color:#555;font-size:9.5pt;margin-bottom:6mm;display:flex;justify-content:space-between}
+.sheet h2{font-size:12.5pt;margin:7mm 0 2.5mm;padding-bottom:1.5mm;border-bottom:2px solid #1a1a1a}
+.sheet table{width:100%;border-collapse:collapse;font-size:9.5pt}
+.sheet th,.sheet td{border:1px solid #bbb;padding:1.6mm 2.2mm;vertical-align:top;text-align:left}
+.sheet th{background:#f1efe9;font-weight:700;white-space:nowrap}
+.sheet .kv th{width:34mm}
+.sheet .chap td:nth-child(1){width:10mm;text-align:center;font-weight:700}
+.sheet .chap td:nth-child(3){width:16mm;text-align:right;white-space:nowrap}
+.sheet .est{display:flex;gap:6mm;align-items:stretch}
+.sheet .est .big{flex:0 0 62mm;border:2px solid #1a1a1a;padding:3mm;text-align:center}
+.sheet .est .big .n{font-size:19pt;font-weight:900;letter-spacing:.01em}
+.sheet .est .big .s{font-size:8.5pt;color:#555}
+.sheet .est table{flex:1}
+.sheet .bar{display:flex;height:9mm;border:1px solid #1a1a1a;overflow:hidden;font-size:8pt;margin-top:2mm}
+.sheet .bar div{display:flex;align-items:center;justify-content:center;border-right:1px solid #1a1a1a;white-space:nowrap;overflow:hidden;padding:0 1mm;min-width:0}
+.sheet h2,.sheet .est,.sheet .cta,.sheet table tr{page-break-inside:avoid;break-inside:avoid}
+.sheet h2{page-break-after:avoid;break-after:avoid}
+.sheet .bar div:last-child{border-right:0}
+.sheet .cta{margin-top:7mm;border:1.5px solid #1a1a1a;padding:3.5mm 4mm;display:flex;gap:4mm;align-items:center}
+.sheet .cta .t{font-weight:900;font-size:11.5pt;white-space:nowrap}
+.sheet .cta .d{font-size:9.5pt;color:#333}
+.sheet .foot{margin-top:5mm;font-size:8pt;color:#777;display:flex;justify-content:space-between}
+.sheet .memo{font-size:9.5pt;white-space:pre-wrap;border:1px solid #bbb;padding:2mm;min-height:12mm;background:#fafaf7}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--line);padding:8px 14px;border-radius:8px;font-size:12px;display:none}
+@media (max-width:900px){#app{grid-template-columns:1fr;grid-template-rows:auto auto 1fr}header{grid-column:1;flex-wrap:wrap;padding:8px 12px;gap:8px}header .sp{display:none}header .btn{font-size:12px;padding:6px 10px}aside{border-right:0;border-bottom:1px solid var(--line)}main{padding:10px}.sheet{width:100%;min-height:0;padding:8mm}}
+@media print{
+  @page{size:A4;margin:0}
+  body{background:#fff}
+  #app{display:block;height:auto}
+  header,aside,.toast,.noprint{display:none!important}
+  main{padding:0;background:#fff;display:block;overflow:visible}
+  .sheet{box-shadow:none;width:210mm;min-height:297mm;margin:0}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>周年記念動画 ヒアリングシート＆構成案ジェネレーター</h1>
+    <span class="free">無料</span>
+    <span class="sp"></span>
+    <button class="btn" id="btnTxt">構成案をテキストでコピー</button>
+    <button class="btn" id="btnJsonSave">JSON 保存</button>
+    <button class="btn" id="btnJsonLoad">JSON 読み込み</button>
+    <input type="file" id="fileJson" accept="application/json" hidden>
+    <button class="btn primary" id="btnPrint">PDF で保存 / 印刷</button>
+  </header>
+  <aside>
+    <h2 class="sec">1. 基本情報</h2>
+    <label>会社名・団体名</label><input type="text" id="company" placeholder="〇〇株式会社">
+    <div class="row">
+      <div><label>周年</label><input type="number" id="years" value="30" min="1" max="200"></div>
+      <div><label>記念日・上映日</label><input type="date" id="date"></div>
+    </div>
+    <label>上映する場（複数可）</label>
+    <div class="chips" id="venues"></div>
+    <label>主に伝えたい相手（複数可）</label>
+    <div class="chips" id="audience"></div>
+    <div class="row">
+      <div><label>希望の尺</label><select id="duration"><option value="3">3分（式典・SNS向け）</option><option value="5" selected>5分（標準）</option><option value="8">8分（沿革をしっかり）</option><option value="10">10分（ドキュメンタリー寄り）</option><option value="15">15分以上</option></select></div>
+      <div><label>トーン</label><select id="tone"><option>感動・エモーショナル</option><option>明るく親しみやすい</option><option>信頼感・格調高く</option><option>スピード感・未来志向</option></select></div>
+    </div>
+    <h2 class="sec">2. 入れたい内容</h2>
+    <div id="chapters"></div>
+    <div class="row">
+      <div><label>インタビュー人数（目安）</label><input type="number" id="interviews" value="4" min="0" max="50"></div>
+      <div><label>撮影する拠点数</label><input type="number" id="sites" value="1" min="1" max="20"></div>
+    </div>
+    <h2 class="sec">3. 手元にある素材</h2>
+    <div id="assets"></div>
+    <h2 class="sec">4. 制作条件</h2>
+    <div class="row">
+      <div><label>撮影に使える日数</label><select id="shootDays"><option value="1">1日</option><option value="2" selected>2日</option><option value="3">3日</option><option value="4">4日以上</option></select></div>
+      <div><label>希望納期</label><input type="date" id="deadline"></div>
+    </div>
+    <label>オプション</label>
+    <div id="options"></div>
+    <label>予算感（あれば）</label>
+    <select id="budget"><option value="">未定・相談したい</option><option value="30">〜30万円</option><option value="60">30〜60万円</option><option value="100">60〜100万円</option><option value="150">100〜150万円</option><option value="151">150万円以上</option></select>
+    <label>メモ・伝えたいこと（自由記入）</label><textarea id="memo" placeholder="例: 創業者のエピソードを必ず入れたい／式典は10月で撮影は9月中に…"></textarea>
+    <h2 class="sec">5. 相談窓口（印刷に載ります）</h2>
+    <input type="text" id="contact" value="Chain-Movies株式会社（映像制作・AI活用支援）">
+    <input type="text" id="contactUrl" placeholder="問い合わせURL・メール・電話（任意）" style="margin-top:6px">
+    <button class="btn" id="btnReset">入力をクリア</button>
+    <div class="note">入力はこのブラウザに自動保存されます（外部送信なし）。構成案・見積レンジは「目安」です。撮影規模・素材の状態・修正回数で変わるので、正式なお見積りは相談窓口へ。</div>
+  </aside>
+  <main><div class="sheet" id="sheet"></div></main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const KEY = 'anniversary-sheet-v1';
+  const VENUES = ['周年式典・パーティー', '社内共有（朝礼・イントラ）', 'Webサイト・SNS公開', '採用説明会', '取引先・株主向け'];
+  const AUD = ['社員・家族', '取引先・パートナー', '顧客', '採用候補者', '地域・株主'];
+  const CHAPTERS = [
+    { id: 'op', name: 'オープニング（タイトル・周年ロゴ）', w: 7, need: '社名ロゴ／周年ロゴ（あれば）', how: '編集で制作', on: true, fixed: true },
+    { id: 'ceo', name: '代表メッセージ', w: 13, need: '代表のインタビュー撮影（10〜15分）', how: '撮影', on: true },
+    { id: 'his', name: '沿革・年表（創業からの歩み）', w: 20, need: '過去写真・社史・年表データ', how: '素材収集＋編集（写真アニメーション）', on: true },
+    { id: 'int', name: '社員インタビュー', w: 20, need: '出演者の選定・質問リスト', how: '撮影（1人 20〜30分）', on: true },
+    { id: 'par', name: '取引先・お客様からのコメント', w: 10, need: '出演依頼・撮影許可（またはビデオメッセージ提供）', how: '撮影 or 提供素材', on: false },
+    { id: 'site', name: '拠点・工場・オフィス紹介', w: 12, need: '撮影許可・立入ルール', how: '撮影（ドローン検討）', on: true },
+    { id: 'fam', name: '社員の日常・家族へのメッセージ', w: 8, need: '出演者の同意', how: '撮影', on: false },
+    { id: 'vis', name: '未来ビジョン・次の10年', w: 12, need: '中期計画・キーワード', how: '撮影＋グラフィック', on: true },
+    { id: 'ed', name: 'エンディング（感謝・スタッフロール）', w: 6, need: '関係者名リスト', how: '編集で制作', on: true, fixed: true },
+  ];
+  const ASSETS = ['過去の写真（紙・データ）', '過去の映像（VHS・DVD・データ）', 'ロゴデータ（AI／PNG）', '社史・年表', '既存の会社紹介動画', 'ブランドカラー・フォント指定'];
+  const OPTIONS = [
+    { id: 'drone', name: 'ドローン空撮', cost: 8 }, { id: 'nar', name: 'プロナレーション', cost: 6 }, { id: 'bgm', name: '有料BGM（ライセンス）', cost: 3 },
+    { id: 'sub', name: '英語字幕', cost: 6 }, { id: 'short', name: '縦型ダイジェスト（SNS用 60秒）', cost: 8 }, { id: 'digi', name: '過去素材のデジタル化（VHS等）', cost: 5 },
+  ];
+
+  // ---- build inputs ----
+  const mk = (wrap, items, name, cls) => items.forEach((it, i) => {
+    const l = document.createElement('label'); l.className = 'chk';
+    l.innerHTML = `<input type="checkbox" name="${name}" value="${typeof it === 'string' ? it : it.id}"> <span>${typeof it === 'string' ? it : it.name}${it.cost ? `（+${it.cost}万円目安）` : ''}</span>`;
+    if (it.on) l.querySelector('input').checked = true; if (it.fixed) { l.querySelector('input').disabled = true; }
+    wrap.appendChild(l);
+  });
+  mk($('#venues'), VENUES, 'venue'); mk($('#audience'), AUD, 'aud'); mk($('#chapters'), CHAPTERS, 'chap'); mk($('#assets'), ASSETS, 'asset'); mk($('#options'), OPTIONS, 'opt');
+  $('#venues input').checked = true; $('#audience input').checked = true;
+
+  const checked = (name) => [...document.querySelectorAll(`input[name=${name}]:checked`)].map((i) => i.value);
+  const yen = (man) => '¥' + (Math.round(man) * 10000).toLocaleString('ja-JP');
+  const fmtDate = (s) => { if (!s) return ''; const d = new Date(s + 'T00:00:00'); return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日` + '（' + '日月火水木金土'[d.getDay()] + '）'; };
+  const addDays = (s, n) => { const d = new Date(s + 'T00:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+  const mmss = (sec) => `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')}`;
+
+  function state() {
+    return {
+      company: $('#company').value, years: +$('#years').value || 0, date: $('#date').value, venues: checked('venue'), aud: checked('aud'),
+      duration: +$('#duration').value, tone: $('#tone').value, chap: checked('chap'), interviews: +$('#interviews').value || 0, sites: +$('#sites').value || 1,
+      assets: checked('asset'), shootDays: +$('#shootDays').value, deadline: $('#deadline').value, opt: checked('opt'), budget: $('#budget').value, memo: $('#memo').value,
+      contact: $('#contact').value, contactUrl: $('#contactUrl').value,
+    };
+  }
+  function apply(s) {
+    if (!s) return;
+    $('#company').value = s.company || ''; $('#years').value = s.years || 30; $('#date').value = s.date || ''; $('#duration').value = s.duration || 5; $('#tone').value = s.tone || '感動・エモーショナル';
+    $('#interviews').value = s.interviews ?? 4; $('#sites').value = s.sites || 1; $('#shootDays').value = s.shootDays || 2; $('#deadline').value = s.deadline || ''; $('#budget').value = s.budget || ''; $('#memo').value = s.memo || '';
+    if (s.contact) $('#contact').value = s.contact; $('#contactUrl').value = s.contactUrl || '';
+    const set = (name, vals) => document.querySelectorAll(`input[name=${name}]`).forEach((i) => { if (!i.disabled) i.checked = (vals || []).includes(i.value); });
+    set('venue', s.venues); set('aud', s.aud); set('chap', s.chap); set('asset', s.assets); set('opt', s.opt);
+  }
+
+  // ---- 計算 ----
+  function plan(s) {
+    const chaps = CHAPTERS.filter((c) => c.fixed || s.chap.includes(c.id));
+    const total = s.duration * 60; const wsum = chaps.reduce((a, c) => a + c.w, 0);
+    const rows = chaps.map((c) => ({ ...c, sec: Math.round(total * c.w / wsum) }));
+    // 見積
+    const lines = [];
+    lines.push(['企画・構成・ディレクション', 10 + (s.duration >= 8 ? 3 : 0)]);
+    lines.push([`撮影（${s.shootDays}日 × カメラマン＋ディレクター）`, 10 * s.shootDays]);
+    if (s.sites > 1) lines.push([`複数拠点の移動・段取り（${s.sites}拠点）`, 4 * (s.sites - 1)]);
+    lines.push([`編集・MA（${s.duration}分）`, 8 + 4 * s.duration]);
+    if (s.interviews > 0) lines.push([`インタビュー編集（${s.interviews}名・文字起こし込み）`, 1.5 * s.interviews]);
+    if (s.chap.includes('his')) lines.push(['年表・写真アニメーション制作', 6]);
+    if (s.chap.includes('vis')) lines.push(['ビジョン用グラフィック', 4]);
+    for (const o of OPTIONS) if (s.opt.includes(o.id)) lines.push([o.name, o.cost]);
+    const sum = lines.reduce((a, l) => a + l[1], 0);
+    const est = { lines, sum, low: Math.round(sum * 0.85 / 5) * 5, high: Math.round(sum * 1.2 / 5) * 5 };
+    // スケジュール（週）
+    const hasArchive = s.assets.some((a) => /過去/.test(a)) || s.chap.includes('his');
+    const sched = [
+      ['ヒアリング・企画構成', 2], ['素材収集・出演調整', hasArchive ? 3 : 2], ['撮影', s.shootDays >= 3 ? 2 : 1], ['編集（初稿）', 3 + (s.duration >= 8 ? 1 : 0) + (s.duration >= 15 ? 1 : 0)], ['修正（2回）・MA', 2], ['納品・上映準備', 1],
+    ];
+    const weeks = sched.reduce((a, x) => a + x[1], 0);
+    let start = null; if (s.deadline) start = addDays(s.deadline, -weeks * 7);
+    return { rows, est, sched, weeks, start };
+  }
+
+  // ---- 描画 ----
+  function render() {
+    const s = state(); const p = plan(s); localStorage.setItem(KEY, JSON.stringify(s));
+    const co = s.company || '（会社名）';
+    const badge = s.budget ? ({ '30': '〜30万円', '60': '30〜60万円', '100': '60〜100万円', '150': '100〜150万円', '151': '150万円以上' })[s.budget] : '未定・相談';
+    const gap = s.budget ? (+s.budget < p.est.low ? '<span style="color:#b00">ご予算より高めの構成です。尺・撮影日数・インタビュー人数を減らすか、素材提供型（撮影なし）をご検討ください。</span>' : 'ご予算内で組める構成です。') : '';
+    $('#sheet').innerHTML = `
+      <h1>${co} ${s.years}周年記念動画　ヒアリングシート＆構成案</h1>
+      <div class="lead"><span>作成日 ${fmtDate(new Date().toISOString().slice(0, 10))}${s.date ? '　／　上映予定 ' + fmtDate(s.date) : ''}</span><span>${s.contact}</span></div>
+      <h2>1. ヒアリング内容</h2>
+      <table class="kv">
+        <tr><th>上映する場</th><td>${s.venues.join('、') || '—'}</td><th>伝えたい相手</th><td>${s.aud.join('、') || '—'}</td></tr>
+        <tr><th>希望の尺・トーン</th><td>${s.duration}分 ／ ${s.tone}</td><th>撮影条件</th><td>撮影 ${s.shootDays}日・${s.sites}拠点・インタビュー ${s.interviews}名</td></tr>
+        <tr><th>手元の素材</th><td>${s.assets.join('、') || '（なし・要収集）'}</td><th>予算感・納期</th><td>${badge}${s.deadline ? ' ／ ' + fmtDate(s.deadline) : ''}</td></tr>
+        <tr><th>オプション</th><td colspan="3">${OPTIONS.filter((o) => s.opt.includes(o.id)).map((o) => o.name).join('、') || '—'}</td></tr>
+      </table>
+      ${s.memo ? `<div style="margin-top:2mm"><div class="memo">${s.memo.replace(/</g, '&lt;')}</div></div>` : ''}
+      <h2>2. 構成案（${s.duration}分・全${p.rows.length}章）</h2>
+      <table class="chap"><tr><th>#</th><th>章</th><th>尺</th><th>必要な素材・準備</th><th>作り方</th></tr>
+        ${p.rows.map((r, i) => `<tr><td>${i + 1}</td><td>${r.name}</td><td>${mmss(r.sec)}</td><td>${r.need}</td><td>${r.how}</td></tr>`).join('')}
+      </table>
+      <div class="bar">${p.rows.map((r, i) => `<div style="flex:${r.sec}" title="${r.name}">${i + 1}章 ${mmss(r.sec)}</div>`).join('')}</div>
+      <h2>3. 制作スケジュールの目安（約${p.weeks}週間）</h2>
+      <table><tr>${p.sched.map((x) => `<th>${x[0]}</th>`).join('')}</tr><tr>${p.sched.map((x) => `<td>${x[1]}週</td>`).join('')}</tr></table>
+      <div style="font-size:9.5pt;margin-top:1.5mm">${s.deadline ? `納期 ${fmtDate(s.deadline)} に間に合わせるには <b>${fmtDate(p.start)}</b> までに着手が目安です。` : '納期を入力すると、着手の目安日を表示します。'}${s.date && s.deadline && s.date < s.deadline ? '<span style="color:#b00"> ※上映日が納期より前になっています。</span>' : ''}</div>
+      <h2>4. 費用の目安</h2>
+      <div class="est">
+        <div class="big"><div class="s">概算レンジ（税別）</div><div class="n">${yen(p.est.low)}〜${yen(p.est.high)}</div><div class="s">この構成・条件での目安。正式見積は相談後</div></div>
+        <table>${p.est.lines.map((l) => `<tr><td>${l[0]}</td><td style="text-align:right;white-space:nowrap">${yen(l[1])}</td></tr>`).join('')}<tr><th>合計（中央値）</th><th style="text-align:right">${yen(p.est.sum)}</th></tr></table>
+      </div>
+      ${gap ? `<div style="font-size:9.5pt;margin-top:2mm">${gap}</div>` : ''}
+      <div class="cta"><div class="t">この構成で相談する →</div><div class="d">${s.contact}${s.contactUrl ? '　' + s.contactUrl : ''}<br>このシートを PDF で送っていただければ、構成の調整と正式なお見積りをお返しします。</div></div>
+      <div class="foot"><span>周年記念動画 ヒアリングシート＆構成案ジェネレーター</span><span>© Chain-Movies Inc.</span></div>`;
+  }
+  function toText() {
+    const s = state(), p = plan(s); const co = s.company || '（会社名）';
+    return [`【${co} ${s.years}周年記念動画 構成案】`, `尺: ${s.duration}分 / トーン: ${s.tone}`, `上映: ${s.venues.join('、')} / 対象: ${s.aud.join('、')}`, '',
+      ...p.rows.map((r, i) => `${i + 1}. ${r.name}（${mmss(r.sec)}）\n   準備: ${r.need}\n   作り方: ${r.how}`), '',
+      `制作期間の目安: 約${p.weeks}週間${s.deadline ? `（納期 ${s.deadline} → 着手目安 ${p.start}）` : ''}`,
+      `費用の目安: ${yen(p.est.low)}〜${yen(p.est.high)}（税別）`, ...p.est.lines.map((l) => `  - ${l[0]}: ${yen(l[1])}`), '', s.memo ? `メモ: ${s.memo}` : '', `相談窓口: ${s.contact} ${s.contactUrl}`].join('\n');
+  }
+  function toast(m) { const t = $('#toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._t); t._t = setTimeout(() => (t.style.display = 'none'), 1800); }
+
+  document.querySelector('aside').addEventListener('input', render);
+  document.querySelector('aside').addEventListener('change', render);
+  $('#btnPrint').addEventListener('click', () => window.print());
+  $('#btnTxt').addEventListener('click', async () => { const t = toText(); try { await navigator.clipboard.writeText(t); toast('構成案をコピーしました'); } catch (e) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([t], { type: 'text/plain' })); a.download = 'kouseian.txt'; a.click(); } });
+  $('#btnJsonSave').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(state(), null, 2)], { type: 'application/json' })); a.download = `${(state().company || 'anniversary')}_${state().years}th_hearing.json`; a.click(); });
+  $('#btnJsonLoad').addEventListener('click', () => $('#fileJson').click());
+  $('#fileJson').addEventListener('change', (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { apply(JSON.parse(r.result)); render(); toast('読み込みました'); } catch (err) { toast('JSON を読めませんでした'); } }; r.readAsText(f); e.target.value = ''; });
+  $('#btnReset').addEventListener('click', () => { if (!confirm('入力を全部クリアしますか？')) return; localStorage.removeItem(KEY); location.reload(); });
+  try { apply(JSON.parse(localStorage.getItem(KEY) || 'null')); } catch (e) { /* ignore */ }
+  render();
+  window.__plan = () => plan(state()); window.__text = toText; // テスト用
+})();
+</script>
+</body>
+</html>

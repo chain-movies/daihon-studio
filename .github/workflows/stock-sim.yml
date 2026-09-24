@@ -1,0 +1,89 @@
+name: stock-sim (仮想トレード)
+
+on:
+  schedule:
+    # JST 9:00〜15:30 の30分ごと（UTC 0:00〜6:30）平日。Actions の cron は数分遅れることがある
+    - cron: '0,30 0-6 * * 1-5'
+    # 大引け後の確定評価（JST 15:45）
+    - cron: '45 6 * * 1-5'
+  push:
+    paths:
+      - 'stocks/engine.mjs'
+      - 'stocks/config.json'
+      - 'stocks/manual_orders.json'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '市場時間外でも売買判定を実行する（テスト）'
+        type: boolean
+        default: false
+      reset:
+        description: '状態を初期化して30万円からやり直す'
+        type: boolean
+        default: false
+
+concurrency:
+  group: stock-sim
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    outputs:
+      fetched: ${{ steps.engine.outputs.fetched }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run engine
+        id: engine
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
+          if [ "${{ github.event.inputs.reset }}" = "true" ]; then ARGS="$ARGS --reset"; fi
+          set +e; node stocks/engine.mjs $ARGS; code=$?; set -e
+          if [ $code -eq 3 ]; then echo "fetched=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          [ $code -eq 0 ] || exit $code
+          echo "fetched=true" >> "$GITHUB_OUTPUT"
+      - name: Commit state
+        if: steps.engine.outputs.fetched == 'true'
+        run: |
+          git config user.name "stock-sim bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add stocks/data stocks/manual_orders.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "stock-sim: $(date -u +'%Y-%m-%d %H:%M UTC') [skip ci]"
+          for i in 1 2 3; do git pull --rebase && git push && break || sleep 5; done
+
+  # Yahoo が最初のランナーのIPを制限していた場合、別ランナー（別IP）でもう一度
+  retry:
+    needs: run
+    if: needs.run.outputs.fetched == 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run engine (retry)
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
+          if [ "${{ github.event.inputs.reset }}" = "true" ]; then ARGS="$ARGS --reset"; fi
+          set +e; node stocks/engine.mjs $ARGS; code=$?; set -e
+          if [ $code -eq 3 ]; then echo "::warning::データ取得に2回失敗（レート制限）。次回の定期実行で再試行"; exit 0; fi
+          exit $code
+      - name: Commit state
+        run: |
+          git config user.name "stock-sim bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add stocks/data stocks/manual_orders.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "stock-sim: $(date -u +'%Y-%m-%d %H:%M UTC') [skip ci]"
+          for i in 1 2 3; do git pull --rebase && git push && break || sleep 5; done

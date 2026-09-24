@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a1a19">
+<title>仮想トレード30万円チャレンジ</title>
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#3987e5;--good:#2fb36b;--bad:#e5484d;--radius:14px;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;font-size:14px;line-height:1.6;padding-block:24px;padding-inline:20px;max-width:1100px;margin:0 auto}
+h1{font-size:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+h1 small{font-size:12px;color:var(--muted);font-weight:400}
+h2{font-size:13px;color:var(--muted);letter-spacing:.1em;margin:26px 0 10px;font-weight:600}
+.hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.tile .l{font-size:11.5px;color:var(--muted)}
+.tile .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.tile .s{font-size:12px;color:var(--ink2)}
+.up{color:var(--good)}.down{color:var(--bad)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+th{color:var(--muted);font-weight:500;text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n,th.n{text-align:right}
+.wrap{overflow-x:auto}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--surface2);color:var(--ink2)}
+.tag.buy{background:rgba(47,179,107,.15);color:#7fe0a6}.tag.sell{background:rgba(229,72,77,.15);color:#ff9a9e}
+.muted{color:var(--muted);font-size:12px}
+#chart{width:100%;height:260px;display:block}
+.tip{position:absolute;pointer-events:none;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;white-space:nowrap;display:none}
+.rel{position:relative}
+.reason{color:var(--ink2);font-size:12px}
+footer{margin-top:30px;color:var(--muted);font-size:12px;line-height:1.7}
+@media (max-width:600px){.tile .v{font-size:20px}}
+</style>
+</head>
+<body>
+<h1>📈 仮想トレード 30万円チャレンジ <small id="updated">読み込み中…</small></h1>
+<div class="muted">実在の株価で、ルール通りに機械的に売買したらどうなるかを検証する実験。<b>実際のお金は動いていません。</b></div>
+
+<div class="hero" id="hero"></div>
+
+<h2>資産推移</h2>
+<div class="card rel"><svg id="chart"></svg><div class="tip" id="tip"></div></div>
+
+<h2>保有銘柄</h2>
+<div class="card wrap"><table id="pos"></table></div>
+
+<h2>売買履歴（新しい順）</h2>
+<div class="card wrap"><table id="trades"></table></div>
+
+<h2>いま見ている候補（リスク調整モメンタム上位）</h2>
+<div class="card wrap"><table id="signals"></table></div>
+
+<h2>ルール</h2>
+<div class="card" id="rules"></div>
+
+<footer>
+データ: Yahoo Finance（15〜20分遅延の場合あり）。GitHub Actions が平日 9:00〜15:30 JST に30分ごとに実行。<br>
+このページは投資助言ではありません。実際の取引はご自身の判断で。
+</footer>
+
+<script>
+const yen = (n) => '¥' + Math.round(n).toLocaleString('ja-JP');
+const pct = (x) => (x >= 0 ? '+' : '') + (x * 100).toFixed(2) + '%';
+const cls = (x) => x > 0 ? 'up' : x < 0 ? 'down' : '';
+const sign = (n) => (n >= 0 ? '+' : '') + yen(n).replace('¥', '¥');
+async function main() {
+  const r = await fetch('data/state.json?t=' + Date.now());
+  if (!r.ok) { document.getElementById('updated').textContent = 'まだデータがありません（最初の実行待ち）'; return; }
+  const s = await r.json();
+  const st = s.stats || {};
+  document.getElementById('updated').textContent = `更新: ${s.last_run ? s.last_run.jst + ' JST（' + s.last_run.mode + '）' : '—'}`;
+  // hero
+  const tiles = [
+    ['評価額', yen(st.equity), `${sign(st.pnl)}（${pct(st.pnl_pct)}）`, cls(st.pnl)],
+    ['現金', yen(st.cash), `株式 ${yen(st.market_value)}`, ''],
+    ['実現損益', sign(st.realized || 0), `${st.closed || 0}回決済 / 勝率 ${st.win_rate == null ? '—' : (st.win_rate * 100).toFixed(0) + '%'}`, cls(st.realized || 0)],
+    ['最大ドローダウン', pct(st.max_drawdown || 0), `運用 ${st.days_running || 0}日目 / 売買 ${st.trades || 0}回`, ''],
+  ];
+  document.getElementById('hero').innerHTML = tiles.map(([l, v, s2, c]) => `<div class="tile"><div class="l">${l}</div><div class="v ${c}">${v}</div><div class="s">${s2}</div></div>`).join('');
+  // chart
+  drawChart(s.equity_curve || [], s.initial_cash);
+  // positions
+  const pos = Object.entries(s.positions || {});
+  document.getElementById('pos').innerHTML = pos.length ? `<tr><th>銘柄</th><th class="n">株数</th><th class="n">取得単価</th><th class="n">現在値</th><th class="n">評価額</th><th class="n">損益</th><th>取得日</th></tr>` +
+    pos.map(([sym, p]) => `<tr><td><b>${sym}</b> ${p.name || ''}</td><td class="n">${p.shares}</td><td class="n">${yen(p.avg_price)}</td><td class="n">${yen(p.price)}</td><td class="n">${yen(p.value)}</td><td class="n ${cls(p.pnl)}">${sign(p.pnl)}<br><small>${pct(p.pnl_pct)}</small></td><td>${p.opened_jst || ''}</td></tr>`).join('')
+    : '<tr><td class="muted">保有なし（全額現金）。条件を満たす銘柄が出たら自動で買います。</td></tr>';
+  // trades
+  const tr = (s.trades || []).filter((t) => !t.rejected).slice(-40).reverse();
+  document.getElementById('trades').innerHTML = tr.length ? `<tr><th>日時</th><th>売買</th><th>銘柄</th><th class="n">株数</th><th class="n">単価</th><th class="n">損益</th><th>理由</th></tr>` +
+    tr.map((t) => `<tr><td style="white-space:nowrap">${t.jst}</td><td><span class="tag ${t.action}">${t.action === 'buy' ? '買い' : '売り'}</span>${t.source === 'manual' ? ' <span class="tag">手動</span>' : ''}</td><td><b>${t.symbol}</b> ${t.name || ''}</td><td class="n">${t.shares}</td><td class="n">${yen(t.price)}</td><td class="n ${t.pnl != null ? cls(t.pnl) : ''}">${t.pnl != null ? sign(t.pnl) + '<br><small>' + pct(t.pnl_pct) + '</small>' : '—'}</td><td class="reason">${t.reason || ''}</td></tr>`).join('')
+    : '<tr><td class="muted">まだ売買はありません。</td></tr>';
+  // signals
+  const sg = s.signals || [];
+  document.getElementById('signals').innerHTML = `<tr><th>銘柄</th><th class="n">株価</th><th class="n">前日比</th><th class="n">20日騰落</th><th class="n">RSI</th><th class="n">スコア</th><th>判定</th></tr>` +
+    sg.map((x) => `<tr><td><b>${x.sym}</b> ${x.name}</td><td class="n">${yen(x.price)}</td><td class="n ${cls(x.chg)}">${pct(x.chg)}</td><td class="n ${cls(x.ret20)}">${pct(x.ret20)}</td><td class="n">${x.rsi.toFixed(0)}</td><td class="n">${x.score.toFixed(2)}</td><td class="reason">${x.ok ? '✅ 買い候補' : '—'}${x.affordable === false ? '（1単元買えない）' : ''}<br>${x.reason}</td></tr>`).join('');
+  // rules
+  const c = s.config || {}; const S = c.strategy || {};
+  document.getElementById('rules').innerHTML = `
+    <div><b>${S.name || ''}</b></div>
+    <ul style="margin:8px 0 0 18px;color:var(--ink2);font-size:13px">
+      <li>元本 ${yen(c.initial_cash || 300000)}・${c.lot_size}株単位（${c.lot_size === 100 ? '単元株＝現実のルール' : '単元未満株モード'}）・同時保有 最大${c.max_positions}銘柄・手数料0円・スリッページ0.1%</li>
+      <li>買い: 20日騰落 ≥ ${(S.min_ret20 * 100).toFixed(0)}%、直近5日で${(S.max_ret5_drawdown * 100).toFixed(0)}%より急落していない、RSI(${S.rsi_period}) ≤ ${S.rsi_max}、20日移動平均の上、出来高十分。この条件を満たす銘柄を「20日騰落 ÷ 日次ボラティリティ」の高い順に、現金で1単元買えるものから買う</li>
+      <li>売り: 損切り ${(S.stop_loss * 100).toFixed(0)}% ／ 利確 +${(S.take_profit * 100).toFixed(0)}% ／ +${(S.trailing_arm * 100).toFixed(0)}%到達後は高値から${(S.trailing_stop * 100).toFixed(0)}%下落で利益確保 ／ 20日線割れ＋含み損 ／ ${S.max_hold_days}日経過</li>
+      <li>売買は取引時間（9:00〜11:30・12:30〜15:30）のみ。休場日は評価のみ</li>
+    </ul>
+    <div class="muted" style="margin-top:8px">手動で売買したい時は リポジトリの stocks/manual_orders.json に注文を書くと次回実行で約定します。</div>`;
+}
+function drawChart(curve, base) {
+  const svg = document.getElementById('chart'); const tip = document.getElementById('tip');
+  const W = svg.clientWidth || 800, H = 260, padL = 64, padR = 14, padT = 14, padB = 28;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  if (curve.length < 2) { svg.innerHTML = `<text x="${W / 2}" y="${H / 2}" fill="#898781" text-anchor="middle" font-size="13">データが2点以上たまるとグラフが出ます</text>`; return; }
+  const ys = curve.map((c) => c.equity);
+  let lo = Math.min(...ys, base), hi = Math.max(...ys, base); const span = Math.max(hi - lo, base * 0.01); lo -= span * 0.1; hi += span * 0.1;
+  const x = (i) => padL + (i / (curve.length - 1)) * (W - padL - padR);
+  const y = (v) => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB);
+  const ticks = 4; let g = '';
+  for (let k = 0; k <= ticks; k++) { const v = lo + (hi - lo) * (k / ticks); g += `<line x1="${padL}" x2="${W - padR}" y1="${y(v)}" y2="${y(v)}" stroke="#2c2c2a" stroke-width="1"/><text x="${padL - 8}" y="${y(v) + 4}" fill="#898781" font-size="11" text-anchor="end">${Math.round(v / 1000)}k</text>`; }
+  const d = curve.map((c, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(c.equity).toFixed(1)}`).join(' ');
+  const area = d + ` L${x(curve.length - 1).toFixed(1)},${y(lo)} L${x(0)},${y(lo)} Z`;
+  const last = curve[curve.length - 1];
+  const up = last.equity >= base; const col = up ? '#2fb36b' : '#e5484d';
+  const labels = [0, Math.floor(curve.length / 2), curve.length - 1].map((i) => `<text x="${x(i)}" y="${H - 8}" fill="#898781" font-size="11" text-anchor="${i === 0 ? 'start' : i === curve.length - 1 ? 'end' : 'middle'}">${(curve[i].jst || '').slice(5)}</text>`).join('');
+  svg.innerHTML = `${g}<line x1="${padL}" x2="${W - padR}" y1="${y(base)}" y2="${y(base)}" stroke="#898781" stroke-dasharray="4 4"/><text x="${W - padR}" y="${y(base) - 5}" fill="#898781" font-size="11" text-anchor="end">元本 ${Math.round(base / 1000)}k</text>
+    <path d="${area}" fill="${col}" opacity=".08"/><path d="${d}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="${x(curve.length - 1)}" cy="${y(last.equity)}" r="4" fill="${col}" stroke="#1a1a19" stroke-width="2"/>${labels}
+    <line id="xh" x1="0" x2="0" y1="${padT}" y2="${H - padB}" stroke="#c3c2b7" stroke-width="1" opacity="0"/><circle id="hp" r="4" fill="#fff" opacity="0"/>
+    <rect x="${padL}" y="${padT}" width="${W - padL - padR}" height="${H - padT - padB}" fill="transparent" id="hit"/>`;
+  const hit = svg.querySelector('#hit'), xh = svg.querySelector('#xh'), hp = svg.querySelector('#hp');
+  hit.addEventListener('mousemove', (e) => {
+    const rect = svg.getBoundingClientRect(); const px = (e.clientX - rect.left) * (W / rect.width);
+    const i = Math.max(0, Math.min(curve.length - 1, Math.round(((px - padL) / (W - padL - padR)) * (curve.length - 1))));
+    const c = curve[i]; xh.setAttribute('x1', x(i)); xh.setAttribute('x2', x(i)); xh.setAttribute('opacity', '.5');
+    hp.setAttribute('cx', x(i)); hp.setAttribute('cy', y(c.equity)); hp.setAttribute('opacity', '1');
+    tip.style.display = 'block'; tip.style.left = Math.min(e.clientX - rect.left + 12, rect.width - 160) + 'px'; tip.style.top = (e.clientY - rect.top - 40) + 'px';
+    tip.innerHTML = `<b>${yen(c.equity)}</b> <span class="${cls(c.equity - base)}">${pct(c.equity / base - 1)}</span><br><span class="muted">${c.jst} 現金 ${yen(c.cash)}</span>`;
+  });
+  hit.addEventListener('mouseleave', () => { tip.style.display = 'none'; xh.setAttribute('opacity', '0'); hp.setAttribute('opacity', '0'); });
+}
+main().catch((e) => { document.getElementById('updated').textContent = '読み込みエラー: ' + e.message; });
+</script>
+</body>
+</html>

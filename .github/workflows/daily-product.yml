@@ -1,0 +1,68 @@
+name: daily-product (テロップパック生成 → Release)
+
+on:
+  schedule:
+    # JST 6:00（UTC 21:00）毎日。Claude の日次ルーティン（5:00 JST）が新デザインを push した後に走る
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+    inputs:
+      pack:
+        description: 'パックID（空なら factory/calendar.json の今日の分）'
+        default: ''
+  push:
+    paths:
+      - 'telop/designs.js'
+      - 'factory/calendar.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright Chromium
+        run: |
+          npm i --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Resolve pack
+        id: pack
+        run: |
+          PACK="${{ github.event.inputs.pack }}"
+          if [ -z "$PACK" ]; then PACK=$(node factory/calendar.mjs today); fi
+          echo "pack=$PACK" >> "$GITHUB_OUTPUT"
+          echo "date=$(TZ=Asia/Tokyo date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+      - name: Fetch fonts (cache)
+        if: steps.pack.outputs.pack != ''
+        run: node factory/fetch_fonts.mjs
+      - name: Build pack
+        if: steps.pack.outputs.pack != ''
+        run: node factory/build_pack.mjs --pack "${{ steps.pack.outputs.pack }}" --date "${{ steps.pack.outputs.date }}"
+      - name: Release
+        if: steps.pack.outputs.pack != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACK: ${{ steps.pack.outputs.pack }}
+          DATE: ${{ steps.pack.outputs.date }}
+        run: |
+          TAG="product-$PACK-$DATE"
+          NAME=$(node -e "console.log(require('./telop/designs.js').PACKS['$PACK'].name)")
+          gh release delete "$TAG" -y 2>/dev/null || true
+          gh release create "$TAG" \
+            "factory/out/${PACK}_${DATE}.zip#販売用ZIP（BASE/BOOTHにアップロード）" \
+            "factory/out/$PACK/preview/contact_sheet.jpg#商品トップ画像" \
+            "factory/out/$PACK/listing.md#商品説明文" \
+            --title "$NAME ($DATE)" --notes-file "factory/out/$PACK/listing.md"
+      - name: Mark calendar as built
+        if: steps.pack.outputs.pack != ''
+        run: |
+          node factory/calendar.mjs built "${{ steps.pack.outputs.pack }}" "${{ steps.pack.outputs.date }}"
+          git config user.name "product bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add factory/calendar.json
+          git diff --cached --quiet || (git commit -m "calendar: built ${{ steps.pack.outputs.pack }} [skip ci]" && git pull --rebase && git push)

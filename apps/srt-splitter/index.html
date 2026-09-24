@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a1a19">
+<title>台本→SRT 字幕分割｜文字数・尺を自動配分</title>
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--surface3:#2b2b29;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#2ec27e;--accent-soft:rgba(46,194,126,.16);--warn:#fab219;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:13.5px;line-height:1.6}
+#app{display:grid;grid-template-columns:420px 1fr;grid-template-rows:52px 1fr;height:100vh}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+header .logo{display:flex;align-items:center;gap:9px;font-weight:700}
+header .logo .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#2ec27e,#3987e5);display:flex;align-items:center;justify-content:center;font-size:14px;color:#000}
+header .sp{flex:1}
+header .demo{font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:2px 8px}
+aside{background:var(--surface);border-right:1px solid var(--line);overflow:auto;padding:12px 14px 40px}
+main{overflow:auto;padding:16px 20px 60px}
+.label{font-size:10.5px;color:var(--muted);letter-spacing:.1em;margin:14px 0 6px}
+.label:first-child{margin-top:0}
+select,input[type=text],input[type=number],textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit}
+input[type=number]{text-align:right}
+textarea{resize:vertical;min-height:200px;line-height:1.6}
+.row{display:flex;align-items:center;gap:8px}
+.row>*{flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;width:100%}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#04160c;font-weight:700}
+.btn.sm{padding:4px 8px;font-size:12px;width:auto}
+.tabs{display:flex;gap:4px;background:var(--surface2);padding:3px;border-radius:8px}
+.tabs button{flex:1;border:none;background:transparent;color:var(--ink2);padding:6px;border-radius:6px;cursor:pointer;font:inherit;font-size:12.5px}
+.tabs button.on{background:var(--accent-soft);color:#9fe7c3;font-weight:600}
+.check{display:flex;align-items:center;gap:8px;font-size:12.5px;cursor:pointer}
+.check input{accent-color:var(--accent)}
+.mini{font-size:11.5px;color:var(--muted)}
+hr{border:none;border-top:1px solid var(--line);margin:14px 0}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-width:110px}
+.stat .k{font-size:10.5px;color:var(--muted);letter-spacing:.08em}
+.stat .v{font-size:18px;font-weight:700}
+.stat .v small{font-size:11px;color:var(--muted);font-weight:400;margin-left:3px}
+table.cues{width:100%;border-collapse:collapse;font-size:13px}
+table.cues th{position:sticky;top:0;background:var(--surface);color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.08em;text-align:left;padding:8px 8px;border-bottom:1px solid var(--line)}
+table.cues td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.cues td.n{color:var(--muted);width:44px;text-align:right}
+table.cues td.t{font-variant-numeric:tabular-nums;white-space:nowrap;width:120px;color:var(--ink2)}
+table.cues td.d{width:64px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+table.cues td.x textarea{min-height:0;padding:4px 8px;line-height:1.45;font-size:13.5px;background:transparent;border-color:transparent}
+table.cues td.x textarea:focus{background:var(--surface2);border-color:var(--line)}
+table.cues tr.over td.x textarea{border-color:#e5484d55}
+.warn{color:var(--warn);font-size:12px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--line);padding:8px 14px;border-radius:8px;font-size:12.5px;opacity:0;transition:.2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+.pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;white-space:pre;overflow:auto;max-height:260px;color:var(--ink2)}
+@media (max-width:1000px){#app{grid-template-columns:1fr;grid-template-rows:52px auto auto;height:auto}header{grid-column:1}aside{border-right:none;border-bottom:1px solid var(--line)}main{padding:12px}table.cues td.t{white-space:normal;width:auto}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo"><span class="mark">S</span><span>台本→SRT 字幕分割</span><span style="color:var(--muted);font-weight:400;font-size:11.5px">文字数・尺を自動配分</span></div>
+    <div class="sp"></div>
+    <span class="demo" id="demoBadge" hidden>デモ版：書き出しは先頭30字幕まで</span>
+  </header>
+
+  <aside>
+    <div class="label">台本（貼り付け）</div>
+    <textarea id="src" placeholder="ここに台本を貼り付けてください。&#10;句点（。！？）→読点（、）→文字数の順で自然に分割します。&#10;空行は段落の区切りとして扱います。"></textarea>
+    <div class="row" style="margin-top:6px"><button class="btn sm" id="sample">サンプル台本を入れる</button><button class="btn sm" id="clear">クリア</button></div>
+
+    <div class="label">1字幕の形</div>
+    <div class="grid3">
+      <div><div class="mini">1行の文字数</div><input type="number" id="maxChars" value="16" min="6" max="40"></div>
+      <div><div class="mini">行数（最大）</div><select id="maxLines"><option value="1">1行</option><option value="2" selected>2行</option></select></div>
+      <div><div class="mini">句読点</div><select id="punct"><option value="keep">残す</option><option value="strip" selected>行末の「。」を消す</option><option value="space">「。」→スペース</option></select></div>
+    </div>
+    <div style="margin-top:8px"><label class="check"><input type="checkbox" id="splitComma" checked> 長い文は「、」でも分ける</label></div>
+
+    <div class="label">尺の決め方</div>
+    <div class="tabs" id="mode"><button data-m="speed" class="on">読み速度から自動</button><button data-m="total">総尺を指定して配分</button></div>
+    <div id="speedBox" style="margin-top:8px">
+      <div class="grid2">
+        <div><div class="mini">読み速度（文字/秒）</div><input type="number" id="cps" value="4" min="1" max="12" step="0.5"></div>
+        <div><div class="mini">プリセット</div><select id="cpsPreset"><option value="4">映画・配信（4文字/秒）</option><option value="5">YouTube 標準（5文字/秒）</option><option value="6">バリアフリー字幕（6文字/秒）</option><option value="7">早口・情報系（7文字/秒）</option></select></div>
+      </div>
+    </div>
+    <div id="totalBox" hidden style="margin-top:8px">
+      <div class="mini">総尺（字幕が終わる時刻）</div>
+      <div class="row"><input type="number" id="totMin" value="1" min="0" placeholder="分"><span class="mini" style="flex:0">分</span><input type="number" id="totSec" value="30" min="0" max="59" placeholder="秒"><span class="mini" style="flex:0">秒</span></div>
+      <div class="mini" style="margin-top:4px">各字幕の長さは文字数の比率で配分します（ナレーション尺に合わせる時に）</div>
+    </div>
+    <div class="grid3" style="margin-top:8px">
+      <div><div class="mini">開始（秒）</div><input type="number" id="offset" value="0" min="0" step="0.1"></div>
+      <div><div class="mini">最短表示（秒）</div><input type="number" id="minDur" value="1.2" min="0.3" step="0.1"></div>
+      <div><div class="mini">字幕間の空き（秒）</div><input type="number" id="gap" value="0.1" min="0" step="0.05"></div>
+    </div>
+
+    <hr>
+    <button class="btn primary" id="dlSrt">⬇ SRT を書き出す</button>
+    <div class="grid2" style="margin-top:8px">
+      <button class="btn" id="dlCsv">⬇ CSV（No,開始,終了,文字）</button>
+      <button class="btn" id="dlTxt">⬇ TXT（1行=1字幕）</button>
+      <button class="btn" id="copySrt">📋 SRT をコピー</button>
+      <button class="btn" id="dlJson">⬇ 設定+台本を保存</button>
+    </div>
+    <div class="mini" style="margin-top:10px">SRT は Premiere Pro（キャプション読み込み）／CapCut／DaVinci Resolve／YouTube Studio にそのまま読み込めます。TXT はテロップメーカーの「台本一括書き出し」に貼れます。</div>
+    <div class="mini" style="margin-top:8px">© Chain-Movies. データはこのブラウザ内にだけ保存され、外部には送信されません。</div>
+  </aside>
+
+  <main>
+    <div class="stats" id="stats"></div>
+    <table class="cues"><thead><tr><th>No</th><th>開始 → 終了</th><th>秒</th><th>字幕（直接編集できます）</th></tr></thead><tbody id="rows"></tbody></table>
+    <div class="label" style="margin-top:18px">SRT プレビュー</div>
+    <div class="pre" id="preview"></div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  const DEMO = /* @DEMO */ true; /* @DEMO */
+  const DEMO_LIMIT = 30;
+  const $ = (s) => document.querySelector(s);
+  if (DEMO) $('#demoBadge').hidden = false;
+  const KEY = 'srtsplitter';
+  const SAMPLE = `こんにちは、チェーンムービーズの山田です。今日は、動画のテロップを作るときに一番時間がかかる「字幕の尺合わせ」を、台本を貼るだけで終わらせる方法を紹介します。
+やることは3つだけ。台本を貼る、1行の文字数を決める、書き出す。これで、Premiere でもCapCutでも読み込めるSRTファイルができます。
+最後に、読みやすい字幕の目安も紹介するので、ぜひ最後まで見てください！`;
+  const state = { src: '', maxChars: 16, maxLines: 2, punct: 'strip', splitComma: true, mode: 'speed', cps: 4, totMin: 1, totSec: 30, offset: 0, minDur: 1.2, gap: 0.1, edits: {} };
+  try { Object.assign(state, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+  const toast = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2000); };
+
+  /* ---------- 分割 ---------- */
+  const NO_HEAD = '、。，．・！？!?」』）〕】〉》〟ー〜～…‥,.)]}';  // 行頭に来てはいけない
+  const NO_TAIL = '「『（〔【〈《〝([{';                       // 行末に来てはいけない
+  function normalize(s) { return String(s || '').replace(/\r\n?/g, '\n').replace(/[ \t　]+/g, ' ').replace(/\n{3,}/g, '\n\n'); }
+  function sentences(text) {  // 段落→文
+    const out = [];
+    for (const para of normalize(text).split(/\n\s*\n/)) {
+      for (const line of para.split('\n')) {
+        const t = line.trim(); if (!t) continue;
+        const parts = t.split(/(?<=[。！？!?])/).map((x) => x.trim()).filter(Boolean);
+        out.push(...parts);
+      }
+    }
+    return out;
+  }
+  const W = (ch) => (/[\x20-\x7e\uff61-\uff9f]/.test(ch) ? 0.5 : 1);   // 半角は 0.5 字
+  const width = (s) => Array.from(s).reduce((a, c) => a + W(c), 0);
+  const isAlnum = (c) => /[A-Za-z0-9]/.test(c);
+  const PARTICLE = 'はがをにでとのもへやかね';
+  const OPEN = '「『（〔【〈《', CLOSE = '」』）〕】〉》';
+  const isHira = (c) => /[\u3041-\u309f]/.test(c);
+  const balanced = (arr) => { let d = 0; for (const c of arr) { if (OPEN.includes(c)) d++; else if (CLOSE.includes(c)) d--; } return d === 0; };
+  function wrapLines(s, maxChars, plain) {  // 読点・助詞の後・カッコの前を優先し、禁則と英単語を守って折り返す
+    const ch = Array.from(s); const lines = []; let i = 0;
+    while (i < ch.length) {
+      let end = i, w = 0;
+      while (end < ch.length && w + W(ch[end]) <= maxChars) { w += W(ch[end]); end++; }
+      if (end < ch.length) {
+        let e = -1;
+        for (let k = plain ? 0 : end; k > i + 1; k--) {
+          const seg = ch.slice(i, k);
+          if (width(seg.join('')) < maxChars * 0.45) break;
+          if (!balanced(seg)) continue;
+          const prev = ch[k - 1], next = ch[k];
+          if ('、，,。！？!?'.includes(prev) || OPEN.includes(next) || (PARTICLE.includes(prev) && !isHira(next) && !NO_HEAD.includes(next) && !PARTICLE.includes(next))) { e = k; break; }
+        }
+        if (e < 0) {
+          e = end;
+          while (e > i + 1 && (NO_HEAD.includes(ch[e]) || NO_TAIL.includes(ch[e - 1]) || PARTICLE.includes(ch[e]) || (isAlnum(ch[e - 1]) && isAlnum(ch[e])))) e--;
+          if (e <= i + 1) { e = end; while (e < ch.length && NO_HEAD.includes(ch[e])) e++; }
+        }
+        end = e;
+      }
+      lines.push(ch.slice(i, end).join('')); i = end;
+    }
+    return lines;
+  }
+  function packSentence(sent, maxChars, maxLines) {  // 1文 → 字幕に収まる塊の配列（均等寄せ・短い末尾は前と再配分）
+    const cap = maxChars * maxLines;
+    if (width(sent) <= cap) return [sent];
+    const parts = state.splitComma ? sent.split(/(?<=[、，,])/).filter(Boolean) : [sent];
+    const units = []; for (const p of parts) units.push(...(width(p) > maxChars ? wrapLines(p, maxChars) : [p]));
+    const total = width(sent), n = Math.ceil(total / cap), target = total / n;
+    const groups = []; let cur = [];
+    for (const u of units) {
+      const cw = width(cur.join(''));
+      if (cur.length && (cw + width(u) > cap || cw >= target * 0.95)) { groups.push(cur); cur = [u]; } else cur.push(u);
+    }
+    if (cur.length) groups.push(cur);
+    for (let g = groups.length - 1; g > 0; g--) {  // 末尾が短ければ前の塊から1ユニット移す
+      while (width(groups[g].join('')) < maxChars * 0.6 && groups[g - 1].length > 1) {
+        const last = groups[g - 1][groups[g - 1].length - 1];
+        if (width(last + groups[g].join('')) > cap) break;
+        groups[g].unshift(groups[g - 1].pop());
+      }
+    }
+    return groups.map((g) => g.join(''));
+  }
+  function cleanPunct(t) {
+    if (state.punct === 'keep') return t;
+    if (state.punct === 'space') return t.replace(/[。]/g, ' ').trim();
+    return t.replace(/[。]+$/g, '');
+  }
+  function buildCues() {
+    const maxChars = +state.maxChars || 16, maxLines = +state.maxLines || 2, cap = maxChars * maxLines;
+    const cues = [];
+    for (const sent0 of sentences(state.src)) {
+      const sent = cleanPunct(sent0);  // 折り返しの前に句点を処理（末尾1文字だけ溢れるのを防ぐ）
+      for (const p of packSentence(sent, maxChars, maxLines)) {
+        let lines = wrapLines(p, maxChars);
+        if (lines.length > maxLines && width(p) <= cap) lines = wrapLines(p, maxChars, true);  // 優先切りで行数が溢れたら禁則のみで折り返す
+        for (let i = 0; i < lines.length; i += maxLines) {
+          const chunk = lines.slice(i, i + maxLines);
+          const txt = chunk.join('\n').trim(); if (txt) cues.push({ text: txt });
+        }
+      }
+    }
+    // 手直しの反映（テキスト差し替え）
+    cues.forEach((c, i) => { if (state.edits[i] != null) c.text = state.edits[i]; c.chars = width(c.text.replace(/\s/g, '')); });
+    return cues;
+  }
+  function timeCues(cues) {
+    const gap = +state.gap || 0, minDur = +state.minDur || 0.3, offset = +state.offset || 0;
+    let durs = cues.map((c) => Math.max(minDur, c.chars / (+state.cps || 4)));
+    if (state.mode === 'total') {
+      const total = (+state.totMin || 0) * 60 + (+state.totSec || 0) - offset - gap * Math.max(0, cues.length - 1);
+      const sumChars = cues.reduce((a, c) => a + c.chars, 0) || 1;
+      durs = cues.map((c) => Math.max(minDur, total * (c.chars / sumChars)));
+      const over = durs.reduce((a, b) => a + b, 0) - total;  // minDur で溢れた分を長い字幕から削る
+      if (over > 0 && total > 0) { const adj = durs.filter((d) => d > minDur); const adjSum = adj.reduce((a, b) => a + b, 0); durs = durs.map((d) => d > minDur ? Math.max(minDur, d - over * (d / adjSum)) : d); }
+    }
+    let t = offset;
+    cues.forEach((c, i) => { c.start = t; c.end = t + durs[i]; t = c.end + gap; });
+    return cues;
+  }
+  const ts = (s) => { const ms = Math.round(s * 1000); const h = Math.floor(ms / 3600000), m = Math.floor(ms / 60000) % 60, sec = Math.floor(ms / 1000) % 60, mm = ms % 1000; return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')},${String(mm).padStart(3, '0')}`; };
+  const toSrt = (cues) => cues.map((c, i) => `${i + 1}\n${ts(c.start)} --> ${ts(c.end)}\n${c.text}\n`).join('\n');
+
+  /* ---------- 描画 ---------- */
+  let cues = [];
+  function render() {
+    cues = timeCues(buildCues());
+    const total = cues.length ? cues[cues.length - 1].end : 0;
+    const chars = cues.reduce((a, c) => a + c.chars, 0);
+    const maxChars = +state.maxChars, maxLines = +state.maxLines;
+    const overs = cues.filter((c) => c.text.split('\n').length > maxLines || c.text.split('\n').some((l) => width(l) > maxChars)).length;
+    const fast = cues.filter((c) => c.chars / (c.end - c.start) > 7).length;
+    $('#stats').innerHTML = [['字幕数', cues.length, '枚'], ['総文字数', chars, '字'], ['終了時刻', ts(total).slice(0, 8), ''], ['平均速度', cues.length ? (chars / Math.max(0.1, cues.reduce((a, c) => a + (c.end - c.start), 0))).toFixed(1) : '0', '字/秒'], ['要確認', overs + fast, '枚']]
+      .map((s) => `<div class="stat"><div class="k">${s[0]}</div><div class="v">${s[1]}<small>${s[2]}</small></div></div>`).join('')
+      + (fast ? `<div class="warn" style="align-self:center">⚠ 7文字/秒を超える字幕が ${fast} 枚あります（読み切れない可能性）</div>` : '');
+    $('#rows').innerHTML = cues.map((c, i) => `<tr class="${c.text.split('\n').some((l) => width(l) > maxChars) || c.text.split('\n').length > maxLines ? 'over' : ''}"><td class="n">${i + 1}</td><td class="t">${ts(c.start).slice(0, 12)}<br>${ts(c.end).slice(0, 12)}</td><td class="d">${(c.end - c.start).toFixed(1)}</td><td class="x"><textarea data-i="${i}" rows="${Math.max(1, c.text.split('\n').length)}">${esc(c.text)}</textarea></td></tr>`).join('') || '<tr><td colspan="4" class="mini" style="padding:20px">左に台本を貼り付けると、ここに字幕が並びます</td></tr>';
+    const shown = DEMO ? cues.slice(0, DEMO_LIMIT) : cues;
+    $('#preview').textContent = toSrt(shown) + (DEMO && cues.length > DEMO_LIMIT ? `\n… デモ版は先頭 ${DEMO_LIMIT} 字幕まで（残り ${cues.length - DEMO_LIMIT} 枚は製品版で）` : '');
+  }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  $('#rows').addEventListener('input', (e) => { const i = e.target.dataset.i; if (i == null) return; state.edits[i] = e.target.value; save(); const c = cues[+i]; // 軽量更新（時間再計算）
+    cues = timeCues(buildCues()); $('#preview').textContent = toSrt(DEMO ? cues.slice(0, DEMO_LIMIT) : cues); });
+  $('#rows').addEventListener('change', () => render());
+
+  /* ---------- 入力 ---------- */
+  const F = ['maxChars', 'punct', 'cps', 'totMin', 'totSec', 'offset', 'minDur', 'gap'];
+  function sync() {
+    $('#src').value = state.src; $('#maxLines').value = state.maxLines; $('#splitComma').checked = !!state.splitComma;
+    F.forEach((f) => { $('#' + f).value = state[f]; });
+    document.querySelectorAll('#mode button').forEach((b) => b.classList.toggle('on', b.dataset.m === state.mode));
+    $('#speedBox').hidden = state.mode !== 'speed'; $('#totalBox').hidden = state.mode !== 'total';
+  }
+  const resetEdits = () => { state.edits = {}; };
+  $('#src').addEventListener('input', (e) => { state.src = e.target.value; resetEdits(); save(); render(); });
+  $('#maxLines').addEventListener('change', (e) => { state.maxLines = +e.target.value; resetEdits(); save(); render(); });
+  $('#splitComma').addEventListener('change', (e) => { state.splitComma = e.target.checked; resetEdits(); save(); render(); });
+  F.forEach((f) => $('#' + f).addEventListener('input', (e) => { state[f] = e.target.type === 'number' ? +e.target.value : e.target.value; if (f === 'maxChars' || f === 'punct') resetEdits(); save(); render(); }));
+  $('#cpsPreset').addEventListener('change', (e) => { state.cps = +e.target.value; sync(); save(); render(); });
+  document.querySelectorAll('#mode button').forEach((b) => b.onclick = () => { state.mode = b.dataset.m; sync(); save(); render(); });
+  $('#sample').onclick = () => { state.src = SAMPLE; resetEdits(); sync(); save(); render(); };
+  $('#clear').onclick = () => { state.src = ''; resetEdits(); sync(); save(); render(); };
+
+  /* ---------- 書き出し ---------- */
+  const download = (text, name, type) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+  const exportable = () => { if (!cues.length) { toast('台本を貼り付けてください'); return null; } if (DEMO && cues.length > DEMO_LIMIT) toast(`デモ版は先頭 ${DEMO_LIMIT} 字幕まで書き出します`); return DEMO ? cues.slice(0, DEMO_LIMIT) : cues; };
+  const base = () => 'subtitles_' + new Date().toISOString().slice(0, 10);
+  $('#dlSrt').onclick = () => { const c = exportable(); if (c) { download(toSrt(c), base() + '.srt', 'text/plain'); toast('SRT を書き出しました'); } };
+  $('#dlTxt').onclick = () => { const c = exportable(); if (c) download(c.map((x) => x.text.replace(/\n/g, ' ')).join('\n'), base() + '.txt', 'text/plain'); };
+  $('#dlCsv').onclick = () => { const c = exportable(); if (!c) return; const q = (s) => `"${String(s).replace(/"/g, '""')}"`; download('﻿' + ['No,開始,終了,秒,文字'].concat(c.map((x, i) => [i + 1, ts(x.start), ts(x.end), (x.end - x.start).toFixed(2), x.text.replace(/\n/g, ' ')].map(q).join(','))).join('\r\n'), base() + '.csv', 'text/csv'); };
+  $('#copySrt').onclick = async () => { const c = exportable(); if (!c) return; try { await navigator.clipboard.writeText(toSrt(c)); toast('コピーしました'); } catch (e) { toast('コピーできませんでした（プレビューから選択してください）'); } };
+  $('#dlJson').onclick = () => download(JSON.stringify({ app: 'srt-splitter', v: 1, state }, null, 2), base() + '.json', 'application/json');
+  window.addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); $('#dlSrt').click(); } });
+
+  if (!state.src) state.src = SAMPLE;
+  sync(); render();
+})();
+</script>
+</body>
+</html>

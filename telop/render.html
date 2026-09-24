@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>telop render harness</title>
+<script src="designs.js"></script>
+<script>
+  // ローカルキャッシュ (fontcache/fonts.css) があればそれを、無ければ Google Fonts を読み込む
+  (function () {
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'fontcache/fonts.css';
+    l.onerror = () => { const g = document.createElement('link'); g.rel = 'stylesheet'; g.href = TelopDesigns.googleFontsHref(); document.head.appendChild(g); };
+    document.head.appendChild(l);
+  })();
+</script>
+<script src="renderer.js"></script>
+<style>body{margin:0;background:#222}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+  const canvas = document.getElementById('c');
+  window.designs = TelopDesigns.DESIGNS;
+  /** Playwright から呼ぶ。dataURL(PNG) を返す */
+  window.renderOne = async function (opt) {
+    const d = TelopDesigns.DESIGNS.find((x) => x.id === opt.designId);
+    if (!d) throw new Error('design not found: ' + opt.designId);
+    const spec = TelopRenderer.resolve(d, opt.variant || 0);
+    await TelopRenderer.ensureFonts(spec, [opt.text || d.sample || '', opt.sub || d.sampleSub || '', spec.tag ? spec.tag.text : '']);
+    TelopRenderer.render(canvas, d, opt);
+    if (opt.crop) {
+      const b = TelopRenderer.contentBounds(canvas, opt.cropPad == null ? 24 : opt.cropPad);
+      if (b) {
+        const c2 = document.createElement('canvas'); c2.width = b.w; c2.height = b.h;
+        c2.getContext('2d').drawImage(canvas, b.x, b.y, b.w, b.h, 0, 0, b.w, b.h);
+        return c2.toDataURL('image/png');
+      }
+    }
+    return canvas.toDataURL('image/png');
+  };
+  window.recipeOf = (id, v) => TelopRenderer.recipe(TelopDesigns.DESIGNS.find((x) => x.id === id), v);
+  window.harnessReady = true;
+</script>
+</body>
+</html>

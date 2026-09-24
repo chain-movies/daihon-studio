@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chain-Movies ツール一覧</title>
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#3987e5;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;padding-block:32px;padding-inline:20px;max-width:900px;margin:0 auto;line-height:1.6}
+h1{font-size:22px;margin-bottom:6px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+a.card{display:block;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;color:inherit;text-decoration:none}
+a.card:hover{border-color:var(--accent)}
+.card .t{font-weight:700;font-size:15px}
+.card .d{color:var(--ink2);font-size:13px;margin-top:4px}
+.card .p{color:var(--muted);font-size:12px;margin-top:8px}
+</style>
+</head>
+<body>
+<h1>Chain-Movies ツール一覧</h1>
+<div class="sub">動画制作の現場から生まれた小さなツール。デモ版はここで試せます。製品版は BASE で販売しています。</div>
+<div class="grid">
+  <a class="card" href="../telop/"><div class="t">テロップメーカー</div><div class="d">テレビ番組風テロップを自分の文字で透過PNGに書き出し。台本を貼れば一括生成。</div><div class="p">デモ版（透かしあり）／製品版はテロップ素材集に同梱</div></a>
+  <a class="card" href="thumb-maker/"><div class="t">サムネ文字メーカー</div><div class="d">YouTubeサムネの文字をテレビ番組風に。3レイヤー・背景画像・ドラッグ配置・1280×720書き出し。</div><div class="p">デモ版（透かしあり）／製品版 ¥1,980</div></a>
+  <a class="card" href="invoice-maker/"><div class="t">見積書・請求書ジェネレーター</div><div class="d">映像制作の項目テンプレ入り。インボイス（税率別消費税）・源泉徴収・端数処理を自動計算、A4 PDF 出力。</div><div class="p">デモ版（透かしあり）／製品版 ¥1,980</div></a>
+  <a class="card" href="srt-splitter/"><div class="t">台本→SRT 字幕分割</div><div class="d">台本を貼るだけで 1行16文字・1秒4文字の字幕に自動分割。読み速度か総尺から表示時間を配分し、SRT/CSV/TXT で書き出し。</div><div class="p">無料デモ（30字幕まで）／Pro ¥980</div></a>
+  <a class="card" href="call-sheet/"><div class="t">香盤表ジェネレーター</div><div class="d">所要時間を入れるだけで撮影の時刻表が揃う。タイムテーブルと「シーン×出演者」の香盤表を A4 横で印刷、CSV 書き出し。</div><div class="p">デモ版（10行まで）／製品版 ¥1,480</div></a>
+  <a class="card" href="anniversary-sheet/"><div class="t">周年記念動画 ヒアリングシート＆構成案</div><div class="d">周年数・上映の場・入れたい内容・素材・撮影日数を選ぶだけで、章立て（尺配分）・必要素材・スケジュール・費用の目安レンジを A4 1枚に。</div><div class="p">無料（相談導線）</div></a>
+  <a class="card" href="base-gallery/"><div class="t">BASE 商品ギャラリー画像ジェネレーター</div><div class="d">テロップパックを選ぶだけで、表紙・デザイン一覧・使い方・比較表・FAQ の 1280×1280 商品画像を7枚生成。</div><div class="p">社内ツール（無料）</div></a>
+  <a class="card" href="../stocks/"><div class="t">仮想トレード30万円チャレンジ</div><div class="d">実在の株価でルール通りに機械売買したらどうなるか、毎日自動で検証。</div><div class="p">無料公開・実験</div></a>
+  <a class="card" href="../"><div class="t">ショートドラマ台本スタジオ</div><div class="d">縦型ショートドラマの脚本制作アプリ。プロット設計・台本エディタ・分析。</div><div class="p">PWA</div></a>
+</div>
+</body>
+</html>

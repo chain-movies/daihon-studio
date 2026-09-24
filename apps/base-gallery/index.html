@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BASE 商品ギャラリー画像ジェネレーター（社内ツール）</title>
+<script src="../../telop/designs.js"></script>
+<script>
+  (function () { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = TelopDesigns.googleFontsHref(); document.head.appendChild(l); })();
+</script>
+<script src="../../telop/renderer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--surface3:#2b2b29;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#e5484d;--accent-soft:rgba(229,72,77,.16);--warn:#fab219;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:13.5px;line-height:1.6}
+.app{display:grid;grid-template-columns:1fr 340px;grid-template-rows:56px 1fr;height:100%}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+header h1{font-size:15px;margin:0;font-weight:700}
+header .tag{font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:999px;padding:1px 8px}
+header .sp{flex:1}
+main{overflow:auto;padding:16px}
+aside{background:var(--surface);border-left:1px solid var(--line);overflow:auto;padding:12px}
+label{display:block;font-size:12px;color:var(--ink2);margin:10px 0 4px}
+select,input[type=text],input[type=number],textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;width:100%;margin-top:8px}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.card canvas{width:100%;height:auto;display:block;background:#111}
+.card .cap{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;font-size:12px;color:var(--ink2)}
+.card .cap a{color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:2px 8px}
+.card .cap a:hover{border-color:var(--accent)}
+.note{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+.status{font-size:12px;color:var(--ink2);margin-top:8px;min-height:18px}
+.chk{display:flex;align-items:center;gap:6px;font-size:12.5px;margin:4px 0;color:var(--ink)}
+.chk input{margin:0}
+.empty{color:var(--muted);text-align:center;padding:60px 0}
+@media (max-width:900px){.app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr}header{grid-column:1}aside{border-left:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>BASE 商品ギャラリー画像ジェネレーター</h1>
+    <span class="tag">社内ツール</span>
+    <span class="sp"></span>
+    <span style="font-size:12px;color:var(--muted)">パックを選んで「生成」→ 1280×1280 PNG を BASE の商品画像にそのまま登録</span>
+  </header>
+  <main id="main"><div class="empty">右のパネルでパックを選び「生成」を押してください</div></main>
+  <aside>
+    <label>パック</label>
+    <select id="pack"></select>
+    <div class="row">
+      <div><label>価格（円）</label><input type="number" id="price" value="1980" min="0" step="10"></div>
+      <div><label>相場（表記用）</label><input type="text" id="market" value="2,000〜3,000円"></div>
+    </div>
+    <label>キャッチ（表紙の1行）</label>
+    <input type="text" id="catch" value="貼るだけで「テレビのあのテロップ」">
+    <label>バンドル（比較表の下に表示）</label>
+    <div class="row">
+      <div><input type="text" id="bundleName" value="全部入りバンドル"></div>
+      <div><input type="number" id="bundlePrice" value="9980" min="0" step="10"></div>
+    </div>
+    <label>生成する画像</label>
+    <div class="chk"><input type="checkbox" id="c1" checked><span>1. 表紙（商品トップ）</span></div>
+    <div class="chk"><input type="checkbox" id="c2" checked><span>2. デザイン一覧（全デザイン）</span></div>
+    <div class="chk"><input type="checkbox" id="c3" checked><span>3. 縦動画対応（9:16 サンプル）</span></div>
+    <div class="chk"><input type="checkbox" id="c4" checked><span>4. 使い方 3ステップ</span></div>
+    <div class="chk"><input type="checkbox" id="c5" checked><span>5. 同梱物</span></div>
+    <div class="chk"><input type="checkbox" id="c6" checked><span>6. 全パック比較表</span></div>
+    <div class="chk"><input type="checkbox" id="c7" checked><span>7. FAQ・ライセンス</span></div>
+    <button class="btn primary" id="gen">生成</button>
+    <button class="btn" id="zip" disabled>PNG をまとめて ZIP でダウンロード</button>
+    <div class="status" id="status"></div>
+    <div class="note">
+      ・デザインはこのリポジトリの telop/designs.js から直接描画します（画像のアップロード不要）。フォントは Google Fonts から読み込むので通信が必要です<br>
+      ・BASE の商品画像は正方形が崩れません。1枚目に「表紙」を置き、2枚目以降に一覧・使い方・比較表の順で登録してください<br>
+      ・価格・キャッチを変えたら再度「生成」を押してください
+    </div>
+  </aside>
+</div>
+<script>
+(() => {
+  const D = TelopDesigns, R = TelopRenderer;
+  const $ = (s) => document.querySelector(s);
+  const S = 1280; // 正方形
+  const BG = ['linear-gradient(135deg,#1c2541,#3a506b)', 'linear-gradient(135deg,#2b2d42,#8d99ae)', 'linear-gradient(135deg,#0b3d2e,#1e6f5c)', 'linear-gradient(135deg,#4a1942,#893168)', 'linear-gradient(135deg,#1a1a1a,#4b4b4b)', 'linear-gradient(135deg,#0f3460,#16213e)'];
+  const BGC = [['#1c2541', '#3a506b'], ['#2b2d42', '#8d99ae'], ['#0b3d2e', '#1e6f5c'], ['#4a1942', '#893168'], ['#1a1a1a', '#4b4b4b'], ['#0f3460', '#16213e']];
+  const FONT = '"Noto Sans JP", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif';
+  const packIds = Object.keys(D.PACKS);
+  const sel = $('#pack');
+  for (const id of packIds) { const o = document.createElement('option'); o.value = id; o.textContent = `${D.PACKS[id].short} — ${D.PACKS[id].name}`; sel.appendChild(o); }
+  sel.value = packIds[packIds.length - 1];
+  sel.addEventListener('change', () => { $('#price').value = D.PACKS[sel.value].price; });
+  $('#price').value = D.PACKS[sel.value].price;
+
+  const yen = (n) => '¥' + Number(n || 0).toLocaleString('ja-JP');
+  const designsOf = (id) => D.DESIGNS.filter((d) => d.pack === id);
+  const variantsOf = (ds) => ds.reduce((a, d) => a + (d.variants ? d.variants.length : 1), 0);
+
+  // ---------- Canvas ヘルパー ----------
+  function ctx2d(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d')]; }
+  function gradBg(ctx, w, h, i, x = 0, y = 0) {
+    const [a, b] = BGC[i % BGC.length]; const g = ctx.createLinearGradient(x, y, x + w, y + h); g.addColorStop(0, a); g.addColorStop(1, b);
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+    const rg = ctx.createRadialGradient(x + w * 0.3, y + h * 0.2, 0, x + w * 0.3, y + h * 0.2, w * 0.6); rg.addColorStop(0, 'rgba(255,255,255,.12)'); rg.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = rg; ctx.fillRect(x, y, w, h);
+  }
+  function pageBg(ctx) {
+    const g = ctx.createLinearGradient(0, 0, S, S); g.addColorStop(0, '#141416'); g.addColorStop(1, '#232326');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+  }
+  function text(ctx, str, x, y, { size = 40, weight = 700, color = '#fff', align = 'left', ls = 0, font = FONT, maxW = 0 } = {}) {
+    ctx.save(); ctx.font = `${weight} ${size}px ${font}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'alphabetic';
+    if (ctx.letterSpacing !== undefined) ctx.letterSpacing = (ls * size) + 'px';
+    if (maxW) { let w = ctx.measureText(str).width; if (w > maxW) { ctx.save(); ctx.scale(maxW / w, 1); ctx.fillText(str, x / (maxW / w), y); ctx.restore(); ctx.restore(); return; } }
+    ctx.fillText(str, x, y); ctx.restore();
+  }
+  function wrap(ctx, str, maxW, size, weight = 500) {
+    ctx.save(); ctx.font = `${weight} ${size}px ${FONT}`; const out = [];
+    for (const para of String(str).split('\n')) { let line = ''; for (const ch of para) { if (ctx.measureText(line + ch).width > maxW && line) { out.push(line); line = ch; } else line += ch; } out.push(line); }
+    ctx.restore(); return out;
+  }
+  function paragraph(ctx, str, x, y, maxW, { size = 30, weight = 500, color = '#ddd', lh = 1.6 } = {}) {
+    const lines = wrap(ctx, str, maxW, size, weight); lines.forEach((l, i) => text(ctx, l, x, y + i * size * lh, { size, weight, color })); return y + lines.length * size * lh;
+  }
+  function rrect(ctx, x, y, w, h, r, fill, stroke) {
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); } if (stroke) { ctx.strokeStyle = stroke.color; ctx.lineWidth = stroke.width; ctx.stroke(); }
+  }
+  function badge(ctx, str, x, y, { size = 30, bg = '#e5484d', color = '#fff', padX = 22, padY = 10, weight = 900 } = {}) {
+    ctx.save(); ctx.font = `${weight} ${size}px ${FONT}`; const w = ctx.measureText(str).width + padX * 2, h = size + padY * 2;
+    rrect(ctx, x, y, w, h, h / 2, bg); ctx.fillStyle = color; ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillText(str, x + padX, y + h / 2 + size * 0.06); ctx.restore(); return w;
+  }
+  function footer(ctx, pack) {
+    ctx.fillStyle = 'rgba(255,255,255,.08)'; ctx.fillRect(0, S - 70, S, 70);
+    text(ctx, pack.name, 40, S - 26, { size: 22, weight: 700, color: 'rgba(255,255,255,.7)', maxW: 880 });
+    text(ctx, 'Chain-Movies', S - 40, S - 26, { size: 22, weight: 700, color: 'rgba(255,255,255,.45)', align: 'right', ls: 0.2 });
+  }
+
+  // 1デザインを 16:9 / 9:16 で描いた Canvas（キャッシュ）
+  const cache = new Map();
+  async function renderDesign(d, portrait) {
+    const key = d.id + (portrait ? 'p' : 'l'); if (cache.has(key)) return cache.get(key);
+    await R.ensureFonts(R.resolve(d, 0), [d.sample || '', d.sampleSub || '']);
+    const c = document.createElement('canvas');
+    R.render(c, d, { width: portrait ? 1080 : 1920, height: portrait ? 1920 : 1080, variant: 0 });
+    cache.set(key, c); return c;
+  }
+  function tile(ctx, img, x, y, w, h, i, label, r = 14) {
+    ctx.save(); rrect(ctx, x, y, w, h, r, '#000'); ctx.clip(); gradBg(ctx, w, h, i, x, y); ctx.drawImage(img, x, y, w, h);
+    if (label) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(x, y, w, 34); text(ctx, label, x + 10, y + 24, { size: 17, weight: 700, color: 'rgba(255,255,255,.9)', maxW: w - 20 }); }
+    ctx.restore();
+  }
+
+  // ---------- 各画像 ----------
+  async function imgCover(pack, ds, opt) {
+    const [c, ctx] = ctx2d(S, S); pageBg(ctx);
+    text(ctx, opt.catch, 60, 110, { size: 34, weight: 700, color: '#fab219', maxW: 1160 });
+    const nameLines = wrap(ctx, pack.name, 1160, 64, 900); nameLines.slice(0, 2).forEach((l, i) => text(ctx, l, 60, 200 + i * 80, { size: 64, weight: 900 }));
+    let y = 200 + Math.min(nameLines.length, 2) * 80 - 20;
+    text(ctx, `${ds.length}デザイン × 色違い ${variantsOf(ds)}種｜透過PNG（16:9・9:16）＋ 帯のみ ＋ テロップメーカー`, 60, y + 24, { size: 28, weight: 500, color: '#c3c2b7', maxW: 1160 });
+    y += 70;
+    // サンプル 6枚（2列×3段）
+    const tw = 570, th = Math.round(tw * 9 / 16), gap = 20; const picks = ds.slice(0, 4);
+    for (let i = 0; i < picks.length; i++) { const img = await renderDesign(picks[i], false); tile(ctx, img, 60 + (i % 2) * (tw + gap), y + Math.floor(i / 2) * (th + gap), tw, th, i, ''); }
+    const by = y + 2 * (th + gap) + 16;
+    let bx = 60; bx += badge(ctx, yen(opt.price), bx, by, { size: 44, bg: '#e5484d', padX: 30, padY: 14 }) + 16;
+    bx += badge(ctx, '商用利用OK', bx, by + 10, { size: 26, bg: 'rgba(255,255,255,.14)' }) + 12;
+    bx += badge(ctx, 'クレジット不要', bx, by + 10, { size: 26, bg: 'rgba(255,255,255,.14)' }) + 12;
+    badge(ctx, 'Premiere / CapCut / DaVinci 対応', bx, by + 10, { size: 26, bg: 'rgba(255,255,255,.14)' });
+    footer(ctx, pack); return c;
+  }
+  async function imgList(pack, ds, opt) {
+    const [c, ctx] = ctx2d(S, S); pageBg(ctx);
+    text(ctx, `収録デザイン ${ds.length}種（各 色違い付き）`, 60, 92, { size: 44, weight: 900 });
+    text(ctx, '同梱のテロップメーカーで文字を差し替えて書き出せます', 60, 136, { size: 24, weight: 500, color: '#c3c2b7' });
+    const cols = 4, rows = Math.ceil(ds.length / cols), gap = 14; const tw = Math.floor((S - 120 - gap * (cols - 1)) / cols), th = Math.round(tw * 9 / 16);
+    const top = 170, avail = S - 70 - top - 20; const rh = Math.min(th + gap, Math.floor(avail / rows)); const th2 = rh - gap;
+    for (let i = 0; i < ds.length; i++) { const img = await renderDesign(ds[i], false); const x = 60 + (i % cols) * (tw + gap), y = top + Math.floor(i / cols) * rh; tile(ctx, img, x, y, tw, th2, i, `${String(i + 1).padStart(2, '0')} ${ds[i].name}`, 10); }
+    footer(ctx, pack); return c;
+  }
+  async function imgPortrait(pack, ds, opt) {
+    const [c, ctx] = ctx2d(S, S); pageBg(ctx);
+    text(ctx, '縦動画（ショート・リール）にもそのまま', 60, 92, { size: 44, weight: 900 });
+    text(ctx, '9:16（1080×1920）の透過PNGも全デザイン同梱。縮小率は自動調整済み', 60, 136, { size: 24, weight: 500, color: '#c3c2b7' });
+    const n = 3, gap = 24, tw = Math.floor((S - 120 - gap * (n - 1)) / n), th = Math.round(tw * 16 / 9); const total = n * tw + (n - 1) * gap; const x0 = (S - total) / 2;
+    const picks = [ds[0], ds[Math.floor(ds.length / 2)], ds[ds.length - 1]].filter(Boolean);
+    for (let i = 0; i < picks.length; i++) { const img = await renderDesign(picks[i], true); tile(ctx, img, x0 + i * (tw + gap), 190 + Math.max(0, (S - 70 - 190 - 20 - th) / 2), tw, th, i + 1, '', 18); }
+    footer(ctx, pack); return c;
+  }
+  async function imgHowto(pack, ds, opt) {
+    const [c, ctx] = ctx2d(S, S); pageBg(ctx);
+    text(ctx, '使い方は3ステップ', 60, 92, { size: 44, weight: 900 });
+    text(ctx, 'インストール不要。画像を置けるソフトなら何でも使えます', 60, 136, { size: 24, weight: 500, color: '#c3c2b7' });
+    const steps = [
+      ['ZIP を解凍', 'png/16x9・png/9x16・plates（帯のみ）の3フォルダと、テロップメーカー（HTML）が入っています。'],
+      ['透過PNG を動画の上に置く', 'Premiere Pro / CapCut / DaVinci Resolve / Final Cut / iMovie / Canva など。タイムラインの上のトラックにドラッグするだけ。'],
+      ['文字を変えたいときはテロップメーカー', '同梱の HTML をブラウザで開き、文字を入力して PNG 書き出し。台本を貼れば全行を一括で書き出せます。'],
+    ];
+    const img = await renderDesign(ds[0], false);
+    for (let i = 0; i < 3; i++) {
+      const y = 190 + i * 320; rrect(ctx, 60, y, 1160, 290, 20, 'rgba(255,255,255,.06)');
+      rrect(ctx, 90, y + 30, 90, 90, 45, '#e5484d'); text(ctx, String(i + 1), 135, y + 105, { size: 56, weight: 900, align: 'center' });
+      text(ctx, steps[i][0], 210, y + 80, { size: 38, weight: 900, maxW: 620 });
+      paragraph(ctx, steps[i][1], 210, y + 140, 640, { size: 24, weight: 500, color: '#d6d5cc', lh: 1.55 });
+      if (i === 1) tile(ctx, img, 890, y + 40, 300, 169, 3, '', 12);
+      if (i === 0) { text(ctx, '📁 png/16x9', 900, y + 90, { size: 26, color: '#c3c2b7' }); text(ctx, '📁 png/9x16', 900, y + 140, { size: 26, color: '#c3c2b7' }); text(ctx, '📁 plates', 900, y + 190, { size: 26, color: '#c3c2b7' }); text(ctx, '🖥 テロップメーカー', 900, y + 240, { size: 26, color: '#c3c2b7' }); }
+      if (i === 2) { rrect(ctx, 890, y + 50, 300, 190, 12, '#111', { color: '#444', width: 2 }); text(ctx, '文字を入力', 910, y + 100, { size: 22, color: '#999' }); rrect(ctx, 910, y + 120, 260, 44, 8, '#222'); text(ctx, ds[0].sample || 'サンプル', 922, y + 150, { size: 22, color: '#fff', maxW: 240 }); badge(ctx, 'PNG 書き出し', 910, y + 180, { size: 18, bg: '#e5484d', padX: 14, padY: 8 }); }
+    }
+    footer(ctx, pack); return c;
+  }
+  async function imgContents(pack, ds, opt) {
+    const [c, ctx] = ctx2d(S, S); pageBg(ctx);
+    const v = variantsOf(ds), pv = variantsOf(ds.filter((d) => d.box));
+    text(ctx, '同梱物', 60, 92, { size: 44, weight: 900 });
+    text(ctx, `合計 約${v * 2 + pv + 3}ファイル（デザイン ${ds.length} × 色違い ${v}）`, 60, 136, { size: 24, weight: 500, color: '#c3c2b7' });
+    const items = [
+      ['16:9 透過PNG', `1920×1080・${v}枚`, '横動画・YouTube 用'],
+      ['9:16 透過PNG', `1080×1920・${v}枚`, 'ショート・リール・TikTok 用'],
+      ['帯・ボックスのみ PNG', `文字なし・${pv}枚（帯付きデザインのみ）`, '自分のフォントで文字を載せたい時に'],
+      ['テロップメーカー（HTML）', '全デザイン対応・製品版', '好きな文字で同デザインを書き出し／台本一括'],
+      ['RECIPE.txt', 'Premiere 再現用の設定値', 'エッセンシャルグラフィックスで自作したい人向け'],
+      ['README / LICENSE', '使い方・利用条件', '商用利用OK・クレジット不要・再配布は禁止'],
+    ];
+    items.forEach((it, i) => {
+      const y = 180 + i * 160; rrect(ctx, 60, y, 1160, 140, 18, 'rgba(255,255,255,.06)');
+      rrect(ctx, 84, y + 30, 80, 80, 14, i < 3 ? '#1e6f5c' : '#3a506b'); text(ctx, i < 2 ? 'PNG' : i === 2 ? '帯' : i === 3 ? 'HTML' : 'TXT', 124, y + 82, { size: i === 2 ? 34 : 22, weight: 900, align: 'center' });
+      text(ctx, it[0], 190, y + 62, { size: 34, weight: 900 }); text(ctx, it[1], 190, y + 108, { size: 24, weight: 500, color: '#fab219' });
+      text(ctx, it[2], 1190, y + 85, { size: 24, weight: 500, color: '#c3c2b7', align: 'right', maxW: 560 });
+    });
+    footer(ctx, pack); return c;
+  }
+  async function imgCompare(pack, ds, opt) {
+    const [c, ctx] = ctx2d(S, S); pageBg(ctx);
+    text(ctx, 'シリーズ比較表', 60, 92, { size: 44, weight: 900 });
+    text(ctx, 'どのパックも同じ形式（透過PNG＋テロップメーカー）。ジャンルで選べます', 60, 136, { size: 24, weight: 500, color: '#c3c2b7' });
+    const rows = packIds.map((id) => ({ id, p: D.PACKS[id], n: designsOf(id).length }));
+    const top = 176, rh = Math.min(74, Math.floor((S - 70 - top - 130) / (rows.length + 1)));
+    const cols = [[60, 'パック'], [760, 'デザイン数'], [960, '価格'], [1130, '']];
+    ctx.fillStyle = 'rgba(255,255,255,.1)'; ctx.fillRect(60, top, 1160, rh);
+    cols.forEach(([x, h]) => text(ctx, h, x + 16, top + rh / 2 + 9, { size: 24, weight: 700, color: '#c3c2b7' }));
+    rows.forEach((r, i) => {
+      const y = top + rh * (i + 1); const me = r.id === opt.packId;
+      if (me) { rrect(ctx, 60, y + 3, 1160, rh - 6, 10, 'rgba(229,72,77,.22)', { color: '#e5484d', width: 2 }); } else if (i % 2) { ctx.fillStyle = 'rgba(255,255,255,.04)'; ctx.fillRect(60, y, 1160, rh); }
+      text(ctx, r.p.name, 76, y + rh / 2 + 9, { size: Math.min(26, rh * 0.38), weight: me ? 900 : 500, maxW: 660 });
+      text(ctx, `${r.n}`, 776, y + rh / 2 + 9, { size: 26, weight: 700 });
+      text(ctx, yen(r.p.price), 976, y + rh / 2 + 9, { size: 26, weight: 700 });
+      if (me) text(ctx, 'この商品', 1146, y + rh / 2 + 9, { size: 22, weight: 900, color: '#e5484d' });
+    });
+    const y2 = top + rh * (rows.length + 1) + 30;
+    const sum = rows.reduce((a, r) => a + r.p.price, 0), all = rows.reduce((a, r) => a + r.n, 0);
+    rrect(ctx, 60, y2, 1160, 96, 16, 'rgba(250,178,25,.14)', { color: '#fab219', width: 2 });
+    text(ctx, `${opt.bundleName}（${rows.length}パック・${all}デザイン）`, 84, y2 + 58, { size: 30, weight: 900, color: '#fab219', maxW: 760 });
+    text(ctx, `${yen(opt.bundlePrice)}（単品合計 ${yen(sum)}）`, 1196, y2 + 58, { size: 28, weight: 900, align: 'right' });
+    footer(ctx, pack); return c;
+  }
+  async function imgFaq(pack, ds, opt) {
+    const [c, ctx] = ctx2d(S, S); pageBg(ctx);
+    text(ctx, 'よくある質問・ライセンス', 60, 92, { size: 44, weight: 900 });
+    const qa = [
+      ['商用利用できますか？', 'はい。YouTube 収益化・クライアント納品・広告動画まで OK。クレジット表記も不要です。'],
+      ['どのソフトで使えますか？', '画像を読み込めるソフトすべて。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut / iMovie / Canva で動作確認済み。'],
+      ['文字は変えられますか？', '同梱のテロップメーカー（ブラウザで動く HTML）で好きな文字に差し替えて PNG 書き出しできます。フォント読み込みに通信が必要です。'],
+      ['特定の番組のデザインですか？', 'いいえ。ジャンルの「雰囲気」を再現した汎用デザインで、実在の番組・局のロゴやデザインを複製したものではありません。'],
+      ['やってはいけないことは？', '素材そのもの（PNG・テロップメーカー）の再配布・転売・素材集としての二次販売。動画に使う分は自由です。'],
+    ];
+    let y = 176;
+    for (const [q, a] of qa) {
+      rrect(ctx, 60, y, 1160, 180, 18, 'rgba(255,255,255,.06)');
+      badge(ctx, 'Q', 84, y + 24, { size: 26, bg: '#3a506b', padX: 16, padY: 8 }); text(ctx, q, 150, y + 58, { size: 30, weight: 900, maxW: 1040 });
+      badge(ctx, 'A', 84, y + 90, { size: 26, bg: '#e5484d', padX: 16, padY: 8 }); paragraph(ctx, a, 150, y + 120, 1040, { size: 23, weight: 500, color: '#d6d5cc', lh: 1.5 });
+      y += 196;
+    }
+    footer(ctx, pack); return c;
+  }
+
+  // ---------- 生成 ----------
+  const outputs = [];
+  async function generate() {
+    const packId = sel.value, pack = D.PACKS[packId], ds = designsOf(packId);
+    const opt = { packId, price: Number($('#price').value) || pack.price, market: $('#market').value, catch: $('#catch').value, bundleName: $('#bundleName').value, bundlePrice: Number($('#bundlePrice').value) || 0 };
+    const jobs = [['01_cover', '表紙', $('#c1').checked, imgCover], ['02_designs', 'デザイン一覧', $('#c2').checked, imgList], ['03_portrait', '縦動画対応', $('#c3').checked, imgPortrait], ['04_howto', '使い方', $('#c4').checked, imgHowto], ['05_contents', '同梱物', $('#c5').checked, imgContents], ['06_compare', '比較表', $('#c6').checked, imgCompare], ['07_faq', 'FAQ', $('#c7').checked, imgFaq]].filter((j) => j[2]);
+    const main = $('#main'); main.innerHTML = '<div class="grid" id="grid"></div>'; const grid = $('#grid'); outputs.length = 0; $('#zip').disabled = true; $('#gen').disabled = true;
+    try {
+      for (const [file, label, , fn] of jobs) {
+        $('#status').textContent = `生成中… ${label}`;
+        const cv = await fn(pack, ds, opt);
+        const card = document.createElement('div'); card.className = 'card'; card.appendChild(cv);
+        const cap = document.createElement('div'); cap.className = 'cap'; const a = document.createElement('a'); a.textContent = 'PNG'; a.download = `${packId}_${file}.png`; a.href = cv.toDataURL('image/png');
+        cap.innerHTML = `<span>${file}（${label}）</span>`; cap.appendChild(a); card.appendChild(cap); grid.appendChild(card);
+        outputs.push({ name: `${packId}_${file}.png`, canvas: cv });
+      }
+      $('#status').textContent = `完了: ${outputs.length}枚（1280×1280）`; $('#zip').disabled = outputs.length === 0;
+    } catch (e) { $('#status').textContent = 'エラー: ' + (e && e.message || e); console.error(e); }
+    $('#gen').disabled = false;
+  }
+  async function zipAll() {
+    if (!window.JSZip) { $('#status').textContent = 'JSZip が読み込めません（通信を確認）'; return; }
+    const z = new JSZip(); const packId = sel.value;
+    for (const o of outputs) { const blob = await new Promise((r) => o.canvas.toBlob(r, 'image/png')); z.file(o.name, blob); }
+    const blob = await z.generateAsync({ type: 'blob' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${packId}_gallery.zip`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }
+  $('#gen').addEventListener('click', generate); $('#zip').addEventListener('click', zipAll);
+  window.__gen = generate; // 自動テスト用
+})();
+</script>
+</body>
+</html>

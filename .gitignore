@@ -1,0 +1,7 @@
+factory/out/
+node_modules/
+*.zip
+.DS_Store
+telop/fontcache/
+stocks/.cache/
+stocks/data/.yjar
