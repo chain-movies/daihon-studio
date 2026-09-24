@@ -1,5 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-26 向け
+- 実装済み: beauty（9/26 Release 予定）、recruit（9/27）、fitness（9/28）、school（9/29）、cooking（9/30）。`node factory/calendar.mjs next-design` は `pet-vol1`（10/1・ペット動画）を返すはずなので、それを20デザイン実装する。brief は calendar.json の pet-vol1 を参照（クリーム #fff3d6・ブラウン #8a5a2b・ピンク #ffb3c6・水色 #bfe3ff、Zen Maru Gothic 900 / Hachi Maru Pop / Kiwi Maru / Mochiy Pop One）
+- kids-vol1（k-*）と被らない「丸くて柔らかい・縁取り薄め」の表現に。文字サイズは主文 56〜80・tag 32〜40・sub 30〜36 を基準（16:9 で小さく見えがち）。renderer の tag は position 'left' / 'above' のみ（'right' は無い。右に付けたいときは sub の position 'right' を使う）
+- 9/26 は土曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack pet-vol1 --quick` で contact_sheet を確認
+- calendar には music-vol1（10/2）・diy-vol1（10/3）を追加済み。さらに先のテーマが必要なら候補: 旅行・ホテル紹介、医療・クリニック案内
+
 ## 2026-09-25 向け（最終2: school-vol1 も 9/25 未明に先行実装済み）
 - 実装済み: realestate（9/25 Release 済み）、beauty（9/26）、recruit（9/27）、fitness（9/28）、school（9/29）、apps/anniversary-sheet。`node factory/calendar.mjs next-design` は `cooking-vol1`（9/30・料理レシピ）を返すはずなので、それを20デザイン実装する。brief は calendar.json の cooking-vol1 を参照
 - 実装のコツ: 16:9 プレビューで小さく見えがちなので、文字サイズは「主文 56〜80、tag 32〜40、sub 30〜36」を基準に（school-vol1 は一括 1.25 倍で調整した）。sub に box を付けるときは padX 18〜24
