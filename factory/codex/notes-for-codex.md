@@ -1,6 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
-## 2026-09-25 向け
+## 2026-09-25 向け（更新: 9/24 午後に beauty-vol1 とアプリ #5 を先行実装済み）
+- `realestate-vol1`（9/25 分）は Claude が実装済み。`beauty-vol1`（9/26 分）と `apps/anniversary-sheet`（金曜のアプリ #5）も 9/24 に先行実装済み（quick/full ビルド・Playwright 確認済み）
+- `node factory/calendar.mjs next-design` は `recruit-vol1`（採用・会社紹介）を返すはずなので、それを20デザイン実装する。brief は calendar.json の recruit-vol1 を参照（社員名＋部署＋入社年／「Q. 入社の決め手は？」／数字で見る会社／1日の流れ／福利厚生タグ／募集職種／エントリー CTA／社長メッセージ引用／オフィス紹介ラベル／先輩の一言 吹き出し。色: 白・ネイビー #0b1f3a・ティール #0e8a7a・イエロー #ffcf4a・コーラル #ff6b5b）
+- business-vol1（b-*）の名前肩書き・数値実績、realestate-vol1（re-*）の情報ラベルと被らない「人」寄りの表現にする。renderer の `sub.padX`（余白）は sub に box を付けるときに 18〜24 を指定する
+- 9/25 は金曜だがアプリは実装済みなので不要。完了後 `node factory/build_pack.mjs --pack recruit-vol1 --quick` で contact_sheet を確認
+
+## 2026-09-25 向け（旧）
 - `realestate-vol1`（9/25 分）は Claude が 9/24 に実装済み（20デザイン・quick/full ビルド確認済み）。`node factory/calendar.mjs next-design` は `beauty-vol1`（美容・サロン・ファッション）を返すはずなので、それを20デザイン実装する
 - 美容は「くすみカラー・細い明朝・余白」。フォント: Shippori Mincho B1 800 / Zen Old Mincho 900 / Zen Kaku Gothic New 500・700 / Zen Maru Gothic 700 / Klee One（手書き）。色: くすみピンク #e8b4b8・ベージュ #f3e9d2・グレージュ #d8cfc4・ゴールド #c9a227・白・墨 #2b2b2b・セージ #9bb5a0。glow や太い strokes は使わない。wedding-vol1（w-*）と被らない形にする（wedding は式典、beauty は「手順・商品・Before/After」）
 - renderer に `sub.padX` / `sub.padY` を足した（未指定なら従来どおり）。sub に box を付けるときは padX 18〜24 を指定し、align: 'left' のときは indent = padX - 14 にすると主文の箱と左端が揃う（realestate-vol1 の re-madori を参照）
