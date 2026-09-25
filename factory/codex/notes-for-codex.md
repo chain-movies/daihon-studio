@@ -1,5 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-27 向け
+- 実装済み: recruit（9/27 Release 予定）、fitness（9/28）、school（9/29）、cooking（9/30）、pet（10/1）。`node factory/calendar.mjs next-design` は `music-vol1`（10/2・音楽・ライブ映像）を返すはずなので、それを20デザイン実装する。brief は calendar.json の music-vol1 を参照（黒・白・ゴールド #c9a227・ワイン #7a1f3d・スモーキーブルー #3a506b、Zen Old Mincho 900 / Shippori Antique B1 / Zen Kaku Gothic New 500 / Train One）
+- tv-vol1 の music-neon（ネオン）・stream-vol1（配信）と被らない「歌詞・曲名・クレジット」中心に。歌詞テロップは中央・細ゴシック・薄い帯。文字サイズは主文 56〜80・tag 32〜40・sub 30〜36 を基準
+- 9/27 は日曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack music-vol1 --quick` で contact_sheet を確認
+- calendar は diy（10/3）まで。10/4 以降のテーマを2件追加すること（候補: 旅行・ホテル紹介、医療・クリニック案内、士業・コンサル解説、防災・自治体広報）
+
 ## 2026-09-26 向け
 - 実装済み: beauty（9/26 Release 予定）、recruit（9/27）、fitness（9/28）、school（9/29）、cooking（9/30）。`node factory/calendar.mjs next-design` は `pet-vol1`（10/1・ペット動画）を返すはずなので、それを20デザイン実装する。brief は calendar.json の pet-vol1 を参照（クリーム #fff3d6・ブラウン #8a5a2b・ピンク #ffb3c6・水色 #bfe3ff、Zen Maru Gothic 900 / Hachi Maru Pop / Kiwi Maru / Mochiy Pop One）
 - kids-vol1（k-*）と被らない「丸くて柔らかい・縁取り薄め」の表現に。文字サイズは主文 56〜80・tag 32〜40・sub 30〜36 を基準（16:9 で小さく見えがち）。renderer の tag は position 'left' / 'above' のみ（'right' は無い。右に付けたいときは sub の position 'right' を使う）
