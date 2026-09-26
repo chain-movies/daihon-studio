@@ -1,5 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-28 向け
+- 実装済み: fitness（9/28 Release 予定）、school（9/29）、cooking（9/30）、pet（10/1）、music（10/2）。`node factory/calendar.mjs next-design` は `diy-vol1`（10/3・DIY・ハンドメイド）を返すはずなので、それを20デザイン実装する。brief は calendar.json の diy-vol1 を参照（木目ブラウン #8a5a2b・クラフト紙 #d9c39a・工具オレンジ #ff7a00・ボード緑 #3f8f3f、Zen Kaku Gothic New 700 / M PLUS 1p 900 / Kiwi Maru / Yusei Magic）。cooking-vol1（ck-*）と被らない形に
+- 文字サイズは主文 60〜84・tag 36〜44・sub 32〜38 を基準（16:9 で小さく見えがち。ブロックを書いたら size を一括 1.2〜1.25 倍にするのが早い）。tag は position 'left' / 'above' のみ
+- 9/28 は月曜なのでアプリも1本。roadmap の未着手は #6（単価計算）・#7（SNS 投稿カレンダー）・#9（ナレーション尺計算）。**#9 を推奨**（apps/narration-timer/、原稿を貼ると文字数→秒数を読み上げ速度別（ゆっくり 250字/分・標準 300・速め 350）に計算、段落ごとの尺表、目標尺に対する過不足、SRT 分割ツールへの受け渡し（同じ分割ロジックで字幕枚数の目安）、無料デモ=1,000字まで／Pro ¥980）。listing.md・README.txt・apps/index.html のカード追加を忘れずに
+- 完了後 `node factory/build_pack.mjs --pack diy-vol1 --quick` で contact_sheet を確認
+
 ## 2026-09-27 向け
 - 実装済み: recruit（9/27 Release 予定）、fitness（9/28）、school（9/29）、cooking（9/30）、pet（10/1）。`node factory/calendar.mjs next-design` は `music-vol1`（10/2・音楽・ライブ映像）を返すはずなので、それを20デザイン実装する。brief は calendar.json の music-vol1 を参照（黒・白・ゴールド #c9a227・ワイン #7a1f3d・スモーキーブルー #3a506b、Zen Old Mincho 900 / Shippori Antique B1 / Zen Kaku Gothic New 500 / Train One）
 - tv-vol1 の music-neon（ネオン）・stream-vol1（配信）と被らない「歌詞・曲名・クレジット」中心に。歌詞テロップは中央・細ゴシック・薄い帯。文字サイズは主文 56〜80・tag 32〜40・sub 30〜36 を基準
