@@ -1,5 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-29 向け
+- 実装済み: school（9/29 Release 予定）、cooking（9/30）、pet（10/1）、music（10/2）、diy（10/3）、apps/narration-timer（月曜のアプリ #9）。`node factory/calendar.mjs next-design` は `travel-vol1`（10/4・旅行・ホテル紹介）を返すはずなので、それを20デザイン実装する。brief は calendar.json の travel-vol1 を参照（白・ネイビー #0b1f3a・空色 #7cc4ff・サンド #e8dcc5・価格だけ赤 #d7263d、Noto Sans JP 700/900 / Zen Maru Gothic 700 / Shippori Mincho B1 / M PLUS 1p 900）
+- gourmet-vol1（g-*）の旅要素と被らない「宿・移動・行程」中心に。文字サイズは主文 60〜84・tag 36〜44・sub 32〜38（ブロックを書いたら size を一括 1.2 倍）。tag は position 'left' / 'above' のみ
+- 9/29 は火曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack travel-vol1 --quick` で contact_sheet を確認
+- calendar は clinic（10/5）まで。10/6 以降のテーマを2件追加すること（候補: 士業・コンサル解説、防災・自治体広報、農業・産直、ゲーム攻略）
+
 ## 2026-09-28 向け
 - 実装済み: fitness（9/28 Release 予定）、school（9/29）、cooking（9/30）、pet（10/1）、music（10/2）。`node factory/calendar.mjs next-design` は `diy-vol1`（10/3・DIY・ハンドメイド）を返すはずなので、それを20デザイン実装する。brief は calendar.json の diy-vol1 を参照（木目ブラウン #8a5a2b・クラフト紙 #d9c39a・工具オレンジ #ff7a00・ボード緑 #3f8f3f、Zen Kaku Gothic New 700 / M PLUS 1p 900 / Kiwi Maru / Yusei Magic）。cooking-vol1（ck-*）と被らない形に
 - 文字サイズは主文 60〜84・tag 36〜44・sub 32〜38 を基準（16:9 で小さく見えがち。ブロックを書いたら size を一括 1.2〜1.25 倍にするのが早い）。tag は position 'left' / 'above' のみ
