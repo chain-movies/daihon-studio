@@ -1,5 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-09-30 向け
+- 実装済み: cooking（9/30 Release 予定）、pet（10/1）、music（10/2）、diy（10/3）、travel（10/4）。`node factory/calendar.mjs next-design` は `clinic-vol1`（10/5・医療・クリニック案内）を返すはずなので、それを20デザイン実装する。brief は calendar.json の clinic-vol1 を参照（白・清潔ブルー #2b6cb0・ミント #9bd3c7・グレー #6b7a90・注意のみ赤、BIZ UDPGothic 700 / Noto Sans JP 700 / Zen Kaku Gothic New）。効果を断定する文言は入れない
+- 文字サイズは主文 60〜84・tag 36〜44・sub 32〜38（ブロックを書いたら size を一括 1.2 倍）。tag は position 'left' / 'above' のみ
+- 9/30 は水曜なのでアプリも1本。roadmap の未着手は #6（動画編集 単価計算・時給見える化 ¥980）と #7（SNS 投稿カレンダー ¥980）。**#6 を推奨**（apps/rate-calc/、案件の見積額と実作業時間を入れると時給・月商換算・目標時給に対する適正単価を表示。案件テンプレ（YouTube 1本・企業VP・ショートドラマ・結婚式）、複数案件の一覧と月間集計、CSV、DEMO は案件3件まで）。listing.md・README.txt・apps/index.html のカード追加を忘れずに
+- 完了後 `node factory/build_pack.mjs --pack clinic-vol1 --quick` で contact_sheet を確認
+- calendar には consult-vol1（10/6）・bousai-vol1（10/7）を追加済み
+
 ## 2026-09-29 向け
 - 実装済み: school（9/29 Release 予定）、cooking（9/30）、pet（10/1）、music（10/2）、diy（10/3）、apps/narration-timer（月曜のアプリ #9）。`node factory/calendar.mjs next-design` は `travel-vol1`（10/4・旅行・ホテル紹介）を返すはずなので、それを20デザイン実装する。brief は calendar.json の travel-vol1 を参照（白・ネイビー #0b1f3a・空色 #7cc4ff・サンド #e8dcc5・価格だけ赤 #d7263d、Noto Sans JP 700/900 / Zen Maru Gothic 700 / Shippori Mincho B1 / M PLUS 1p 900）
 - gourmet-vol1（g-*）の旅要素と被らない「宿・移動・行程」中心に。文字サイズは主文 60〜84・tag 36〜44・sub 32〜38（ブロックを書いたら size を一括 1.2 倍）。tag は position 'left' / 'above' のみ
