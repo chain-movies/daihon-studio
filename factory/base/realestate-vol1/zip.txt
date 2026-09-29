@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-realestate-vol1-2026-09-25
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= realestate-vol1_2026-09-25.zip

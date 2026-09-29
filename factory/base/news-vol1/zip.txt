@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-news-vol1-2026-09-16
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= news-vol1_2026-09-16.zip
