@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-kids-vol1-2026-09-20
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= kids-vol1_2026-09-20.zip

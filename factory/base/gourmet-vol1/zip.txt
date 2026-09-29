@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-gourmet-vol1-2026-09-19
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= gourmet-vol1_2026-09-19.zip
