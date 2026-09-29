@@ -1,5 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-01 向け
+- 実装済み: pet（10/1 Release 予定）、music（10/2）、diy（10/3）、travel（10/4）、clinic（10/5）、apps/rate-calc（水曜のアプリ #6）。`node factory/calendar.mjs next-design` は `consult-vol1`（10/6・士業・コンサル解説）を返すはずなので、それを20デザイン実装する。brief は calendar.json の consult-vol1 を参照（ネイビー #0b1f3a・白・グレー #6b7a90・信頼ブルー #2b6cb0・注意赤 #d7263d・黄 #ffcf4a、Noto Sans JP 700/900 / BIZ UDPGothic / Zen Kaku Gothic New）。business-vol1（企業VP）・clinic-vol1（cl-*）と被らない「制度・数字・注意喚起」中心に。法令名は「〇〇法」でぼかす
+- 文字サイズは主文 60〜84・tag 36〜44・sub 32〜38（ブロックを書いたら size を一括 1.25〜1.3 倍。clinic は 1.28 倍でちょうどよかった）。tag は position 'left' / 'above' のみ
+- 10/1 は木曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack consult-vol1 --quick` で contact_sheet を確認
+- calendar には agri-vol1（10/8・農業・産直）・car-vol1（10/9・車・バイク紹介）を追加済み。未実装は consult／bousai／agri／car の4件
+
 ## 2026-09-30 向け
 - 実装済み: cooking（9/30 Release 予定）、pet（10/1）、music（10/2）、diy（10/3）、travel（10/4）。`node factory/calendar.mjs next-design` は `clinic-vol1`（10/5・医療・クリニック案内）を返すはずなので、それを20デザイン実装する。brief は calendar.json の clinic-vol1 を参照（白・清潔ブルー #2b6cb0・ミント #9bd3c7・グレー #6b7a90・注意のみ赤、BIZ UDPGothic 700 / Noto Sans JP 700 / Zen Kaku Gothic New）。効果を断定する文言は入れない
 - 文字サイズは主文 60〜84・tag 36〜44・sub 32〜38（ブロックを書いたら size を一括 1.2 倍）。tag は position 'left' / 'above' のみ
