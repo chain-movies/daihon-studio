@@ -1,6 +1,52 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
-## 2026-09-25 向け（更新: 9/24 午後に beauty-vol1 とアプリ #5 を先行実装済み）
+## 2026-09-30 向け
+- 実装済み: cooking（9/30 Release 予定）、pet（10/1）、music（10/2）、diy（10/3）、travel（10/4）。`node factory/calendar.mjs next-design` は `clinic-vol1`（10/5・医療・クリニック案内）を返すはずなので、それを20デザイン実装する。brief は calendar.json の clinic-vol1 を参照（白・清潔ブルー #2b6cb0・ミント #9bd3c7・グレー #6b7a90・注意のみ赤、BIZ UDPGothic 700 / Noto Sans JP 700 / Zen Kaku Gothic New）。効果を断定する文言は入れない
+- 文字サイズは主文 60〜84・tag 36〜44・sub 32〜38（ブロックを書いたら size を一括 1.2 倍）。tag は position 'left' / 'above' のみ
+- 9/30 は水曜なのでアプリも1本。roadmap の未着手は #6（動画編集 単価計算・時給見える化 ¥980）と #7（SNS 投稿カレンダー ¥980）。**#6 を推奨**（apps/rate-calc/、案件の見積額と実作業時間を入れると時給・月商換算・目標時給に対する適正単価を表示。案件テンプレ（YouTube 1本・企業VP・ショートドラマ・結婚式）、複数案件の一覧と月間集計、CSV、DEMO は案件3件まで）。listing.md・README.txt・apps/index.html のカード追加を忘れずに
+- 完了後 `node factory/build_pack.mjs --pack clinic-vol1 --quick` で contact_sheet を確認
+- calendar には consult-vol1（10/6）・bousai-vol1（10/7）を追加済み
+
+## 2026-09-29 向け
+- 実装済み: school（9/29 Release 予定）、cooking（9/30）、pet（10/1）、music（10/2）、diy（10/3）、apps/narration-timer（月曜のアプリ #9）。`node factory/calendar.mjs next-design` は `travel-vol1`（10/4・旅行・ホテル紹介）を返すはずなので、それを20デザイン実装する。brief は calendar.json の travel-vol1 を参照（白・ネイビー #0b1f3a・空色 #7cc4ff・サンド #e8dcc5・価格だけ赤 #d7263d、Noto Sans JP 700/900 / Zen Maru Gothic 700 / Shippori Mincho B1 / M PLUS 1p 900）
+- gourmet-vol1（g-*）の旅要素と被らない「宿・移動・行程」中心に。文字サイズは主文 60〜84・tag 36〜44・sub 32〜38（ブロックを書いたら size を一括 1.2 倍）。tag は position 'left' / 'above' のみ
+- 9/29 は火曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack travel-vol1 --quick` で contact_sheet を確認
+- calendar は clinic（10/5）まで。10/6 以降のテーマを2件追加すること（候補: 士業・コンサル解説、防災・自治体広報、農業・産直、ゲーム攻略）
+
+## 2026-09-28 向け
+- 実装済み: fitness（9/28 Release 予定）、school（9/29）、cooking（9/30）、pet（10/1）、music（10/2）。`node factory/calendar.mjs next-design` は `diy-vol1`（10/3・DIY・ハンドメイド）を返すはずなので、それを20デザイン実装する。brief は calendar.json の diy-vol1 を参照（木目ブラウン #8a5a2b・クラフト紙 #d9c39a・工具オレンジ #ff7a00・ボード緑 #3f8f3f、Zen Kaku Gothic New 700 / M PLUS 1p 900 / Kiwi Maru / Yusei Magic）。cooking-vol1（ck-*）と被らない形に
+- 文字サイズは主文 60〜84・tag 36〜44・sub 32〜38 を基準（16:9 で小さく見えがち。ブロックを書いたら size を一括 1.2〜1.25 倍にするのが早い）。tag は position 'left' / 'above' のみ
+- 9/28 は月曜なのでアプリも1本。roadmap の未着手は #6（単価計算）・#7（SNS 投稿カレンダー）・#9（ナレーション尺計算）。**#9 を推奨**（apps/narration-timer/、原稿を貼ると文字数→秒数を読み上げ速度別（ゆっくり 250字/分・標準 300・速め 350）に計算、段落ごとの尺表、目標尺に対する過不足、SRT 分割ツールへの受け渡し（同じ分割ロジックで字幕枚数の目安）、無料デモ=1,000字まで／Pro ¥980）。listing.md・README.txt・apps/index.html のカード追加を忘れずに
+- 完了後 `node factory/build_pack.mjs --pack diy-vol1 --quick` で contact_sheet を確認
+
+## 2026-09-27 向け
+- 実装済み: recruit（9/27 Release 予定）、fitness（9/28）、school（9/29）、cooking（9/30）、pet（10/1）。`node factory/calendar.mjs next-design` は `music-vol1`（10/2・音楽・ライブ映像）を返すはずなので、それを20デザイン実装する。brief は calendar.json の music-vol1 を参照（黒・白・ゴールド #c9a227・ワイン #7a1f3d・スモーキーブルー #3a506b、Zen Old Mincho 900 / Shippori Antique B1 / Zen Kaku Gothic New 500 / Train One）
+- tv-vol1 の music-neon（ネオン）・stream-vol1（配信）と被らない「歌詞・曲名・クレジット」中心に。歌詞テロップは中央・細ゴシック・薄い帯。文字サイズは主文 56〜80・tag 32〜40・sub 30〜36 を基準
+- 9/27 は日曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack music-vol1 --quick` で contact_sheet を確認
+- calendar は diy（10/3）まで。10/4 以降のテーマを2件追加すること（候補: 旅行・ホテル紹介、医療・クリニック案内、士業・コンサル解説、防災・自治体広報）
+
+## 2026-09-26 向け
+- 実装済み: beauty（9/26 Release 予定）、recruit（9/27）、fitness（9/28）、school（9/29）、cooking（9/30）。`node factory/calendar.mjs next-design` は `pet-vol1`（10/1・ペット動画）を返すはずなので、それを20デザイン実装する。brief は calendar.json の pet-vol1 を参照（クリーム #fff3d6・ブラウン #8a5a2b・ピンク #ffb3c6・水色 #bfe3ff、Zen Maru Gothic 900 / Hachi Maru Pop / Kiwi Maru / Mochiy Pop One）
+- kids-vol1（k-*）と被らない「丸くて柔らかい・縁取り薄め」の表現に。文字サイズは主文 56〜80・tag 32〜40・sub 30〜36 を基準（16:9 で小さく見えがち）。renderer の tag は position 'left' / 'above' のみ（'right' は無い。右に付けたいときは sub の position 'right' を使う）
+- 9/26 は土曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack pet-vol1 --quick` で contact_sheet を確認
+- calendar には music-vol1（10/2）・diy-vol1（10/3）を追加済み。さらに先のテーマが必要なら候補: 旅行・ホテル紹介、医療・クリニック案内
+
+## 2026-09-25 向け（最終2: school-vol1 も 9/25 未明に先行実装済み）
+- 実装済み: realestate（9/25 Release 済み）、beauty（9/26）、recruit（9/27）、fitness（9/28）、school（9/29）、apps/anniversary-sheet。`node factory/calendar.mjs next-design` は `cooking-vol1`（9/30・料理レシピ）を返すはずなので、それを20デザイン実装する。brief は calendar.json の cooking-vol1 を参照
+- 実装のコツ: 16:9 プレビューで小さく見えがちなので、文字サイズは「主文 56〜80、tag 32〜40、sub 30〜36」を基準に（school-vol1 は一括 1.25 倍で調整した）。sub に box を付けるときは padX 18〜24
+- 9/25 は金曜だがアプリは実装済みなので不要。完了後 `node factory/build_pack.mjs --pack cooking-vol1 --quick` で contact_sheet を確認
+
+## 2026-09-25 向け（最終: 9/24 夜に fitness-vol1 も先行実装済み・旧）
+- 実装済み: realestate（9/25 Release）、beauty（9/26）、recruit（9/27）、fitness（9/28）、apps/anniversary-sheet。`node factory/calendar.mjs next-design` は `school-vol1`（9/29・学校・塾・オンライン講座）を返すはずなので、それを20デザイン実装する。brief は calendar.json の school-vol1 を参照（黒板緑 #2e5a4a＋チョーク文字 Klee One、ノート罫線風、「例題」「解答」「レベル: 基礎／標準／応用」は tag 差し替え）
+- kids-vol1（k-*）と被らない「中高生〜社会人向けの板書・ノート風」にする。business-vol1 の b-point／b-agenda とも別の形に
+- 9/25 は金曜だがアプリは実装済みなので不要。完了後 `node factory/build_pack.mjs --pack school-vol1 --quick` で contact_sheet を確認
+
+## 2026-09-25 向け（再更新: 9/24 夜に recruit-vol1 も先行実装済み・旧）
+- 実装済み: realestate-vol1（9/25 Release）、beauty-vol1（9/26）、recruit-vol1（9/27）、apps/anniversary-sheet（金曜のアプリ）。`node factory/calendar.mjs next-design` は `fitness-vol1`（9/28）を返すはずなので、それを20デザイン実装する。brief は calendar.json の fitness-vol1 を参照
+- フィットネスは「ライム #b6ff00・オレンジ #ff7a00・黒・白・ティール #0e8a7a」、Noto Sans JP 900 / M PLUS 1p 900 / Dela Gothic One / Zen Kaku Gothic New。数字（レップ数・秒・kcal・kg）を M PLUS 1p 900 で大きく。sports-vol1 の sp-time（タイム大数字）・sp-streak（連勝）と被らない形にする
+- 9/25 は金曜だがアプリは実装済みなので不要。完了後 `node factory/build_pack.mjs --pack fitness-vol1 --quick` で contact_sheet を確認
+
+## 2026-09-25 向け（更新: 9/24 午後に beauty-vol1 とアプリ #5 を先行実装済み・旧）
 - `realestate-vol1`（9/25 分）は Claude が実装済み。`beauty-vol1`（9/26 分）と `apps/anniversary-sheet`（金曜のアプリ #5）も 9/24 に先行実装済み（quick/full ビルド・Playwright 確認済み）
 - `node factory/calendar.mjs next-design` は `recruit-vol1`（採用・会社紹介）を返すはずなので、それを20デザイン実装する。brief は calendar.json の recruit-vol1 を参照（社員名＋部署＋入社年／「Q. 入社の決め手は？」／数字で見る会社／1日の流れ／福利厚生タグ／募集職種／エントリー CTA／社長メッセージ引用／オフィス紹介ラベル／先輩の一言 吹き出し。色: 白・ネイビー #0b1f3a・ティール #0e8a7a・イエロー #ffcf4a・コーラル #ff6b5b）
 - business-vol1（b-*）の名前肩書き・数値実績、realestate-vol1（re-*）の情報ラベルと被らない「人」寄りの表現にする。renderer の `sub.padX`（余白）は sub に box を付けるときに 18〜24 を指定する

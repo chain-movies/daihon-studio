@@ -1,0 +1,104 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<style>
+@page{size:A4;margin:16mm 16mm 18mm}
+body{font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;color:#1a1a1a;font-size:11pt;line-height:1.6;margin:0}
+h1{font-size:19pt;margin:0 0 2mm;letter-spacing:.02em}
+.lead{color:#555;font-size:9.5pt;margin-bottom:6mm}
+h2{font-size:13.5pt;margin:7mm 0 2.5mm;padding:2mm 3mm;background:#1B2A4A;color:#fff;border-radius:3px}
+h2 small{font-weight:400;font-size:9.5pt;margin-left:6px;color:#cfd8e6}
+h3{font-size:11pt;margin:4mm 0 1.5mm;color:#1B2A4A;border-left:4px solid #F5A623;padding-left:2.5mm}
+ol{margin:0 0 2mm 5.5mm;padding:0}ol li{margin:1.2mm 0}
+ul{margin:0 0 2mm 5mm;padding:0}ul li{margin:1mm 0}
+a{color:#0b5fd0;word-break:break-all}
+.chk{list-style:none;margin-left:0}.chk li::before{content:"☐ ";font-size:12pt}
+.box{border:1.5px solid #1B2A4A;border-radius:4px;padding:3mm 4mm;margin:3mm 0;background:#f7f9fc}
+.kv{display:grid;grid-template-columns:32mm 1fr;gap:1mm 3mm;font-size:10pt}
+.kv b{color:#1B2A4A}
+.note{font-size:9.5pt;color:#555}
+.foot{margin-top:6mm;font-size:8.5pt;color:#777;border-top:1px solid #ccc;padding-top:2mm;display:flex;justify-content:space-between}
+.pb{page-break-before:always}
+code{background:#eef1f6;padding:0 3px;border-radius:2px;font-size:9.5pt}
+</style></head><body>
+<h1>マッキーがやること 手順書（2026-09-29 版）</h1>
+<div class="lead">所要 約40分。上から順に。リンクは PDF 上でクリックできます。詰まったら画面のスクショをチャットに貼ってください。</div>
+
+<h2>① main にマージ <small>3分・最初にやる</small></h2>
+<div class="note">販売ページ・アプリ2本・先行パック8本を公開するため。衝突はありません。</div>
+<ol>
+<li>ここを開く → <a href="https://github.com/chain-movies/daihon-studio/compare/main...claude/monetization-tool-rebuild-qp828g">github.com/chain-movies/daihon-studio/compare/main...claude/monetization-tool-rebuild-qp828g</a></li>
+<li>緑の <b>Create pull request</b> → もう一度 <b>Create pull request</b></li>
+<li><b>Merge pull request</b> → <b>Confirm merge</b>（「Create a merge commit」のまま。Squash は選ばない）</li>
+<li>5分後にここが開けば完了 → <a href="https://chain-movies.github.io/daihon-studio/shop/">chain-movies.github.io/daihon-studio/shop/</a></li>
+</ol>
+
+<h2>② BASE に最初の1本を登録 <small>15分・「配信・ゲーム実況テロップ集」から</small></h2>
+<h3>(a) ファイルと説明文を取る</h3>
+<ol>
+<li>Release を開く → <a href="https://github.com/chain-movies/daihon-studio/releases/tag/product-stream-vol1-2026-09-24">github.com/chain-movies/daihon-studio/releases/tag/product-stream-vol1-2026-09-24</a></li>
+<li>一番下の <b>Assets</b> から <code>stream-vol1_2026-09-24.zip</code> をダウンロード</li>
+<li>同じページの本文（「商品名（BASE/BOOTH用）」から下）を全部コピー</li>
+</ol>
+<h3>(b) 商品画像を取る</h3>
+<ol>
+<li>ここを開く（①のマージ後に有効） → <a href="https://chain-movies.github.io/daihon-studio/apps/base-gallery/">chain-movies.github.io/daihon-studio/apps/base-gallery/</a></li>
+<li>パックで「配信 Vol.1」を選ぶ → <b>生成</b> → <b>PNG をまとめて ZIP でダウンロード</b>（7枚。01 が表紙）</li>
+<li>マージ前なら GitHub 上の生成済み画像でも可 → <a href="https://github.com/chain-movies/daihon-studio/tree/claude/monetization-tool-rebuild-qp828g/factory/gallery/stream-vol1">factory/gallery/stream-vol1</a></li>
+</ol>
+<h3>(c) BASE に登録</h3>
+<ol>
+<li>BASE 管理画面 → <a href="https://admin.thebase.com/">admin.thebase.com</a></li>
+<li>初回だけ: 左メニュー <b>Apps</b> → 「デジタルコンテンツ販売」を検索してインストール（無料）</li>
+<li>左メニュー <b>商品管理</b> → <b>商品を登録</b></li>
+</ol>
+<div class="box"><div class="kv">
+<b>商品名</b><span>コピーした本文の「商品名（BASE/BOOTH用）」の行</span>
+<b>商品画像</b><span>01_cover から順に 7 枚</span>
+<b>価格</b><span>1980</span>
+<b>商品説明</b><span>コピーした本文の「キャッチ」から下を貼る</span>
+<b>販売方法</b><span><b>デジタルコンテンツ</b> を選び、(a) の ZIP をアップロード</span>
+<b>公開設定</b><span>公開 にして保存</span>
+</div></div>
+<h3>(d) 商品 URL をチャットに貼る</h3>
+<p>公開した商品ページの URL（<code>https://〇〇.base.shop/items/12345678</code> の形）をチャットに貼る → 販売ページの「BASEで購入」ボタンに繋ぎます。</p>
+<h3>2本目以降（同じ手順）</h3>
+<ul>
+<li>ショート → <a href="https://github.com/chain-movies/daihon-studio/releases/tag/product-shorts-vol1-2026-09-17">…/releases/tag/product-shorts-vol1-2026-09-17</a></li>
+<li>バラエティ → <a href="https://github.com/chain-movies/daihon-studio/releases/tag/product-variety-vol1-2026-09-15">…/releases/tag/product-variety-vol1-2026-09-15</a></li>
+<li>全部の一覧 → <a href="https://github.com/chain-movies/daihon-studio/releases">github.com/chain-movies/daihon-studio/releases</a></li>
+</ul>
+
+<h2 class="pb">③ note を公開 <small>10分 × 2本</small></h2>
+<h3>No.25 周年動画の費用（経営者向け・先にこちら）</h3>
+<ol>
+<li>本文を開いて全文コピー → <a href="https://docs.google.com/document/d/1gUHm442gaW8t5T5YnCyzBa3P4NyCYrLDLpCVrUEvQtQ/edit">docs.google.com/document/d/1gUHm442gaW8t5T5YnCyzBa3P4NyCYrLDLpCVrUEvQtQ/edit</a></li>
+<li>note の新規記事を開いて貼る → <a href="https://editor.note.com/new">editor.note.com/new</a></li>
+<li>タイトル欄: <b>周年動画、いくらかかる？——「5分で65〜90万円」の内訳と、構成案をA4 1枚にする無料ツールを経営者向けに作った話</b></li>
+<li>■で始まる5行を選んで「大見出し」にする（目次が自動で付く）</li>
+<li>［ ］の場所に画像を入れて、［ ］の行は消す
+<ul>
+<li>［挿絵①］ → <a href="https://drive.google.com/file/d/1mHcs9zQp5oU1vSzu8BG5mVdYYkUW9mkX/view">drive.google.com/file/d/1mHcs9zQp5oU1vSzu8BG5mVdYYkUW9mkX/view</a></li>
+<li>［図解①］ → <a href="https://raw.githubusercontent.com/chain-movies/daihon-studio/claude/monetization-tool-rebuild-qp828g/content/note/2026-09-24-anniversary/illust1_reasons.png">…/2026-09-24-anniversary/illust1_reasons.png</a></li>
+<li>［図解②］ → <a href="https://raw.githubusercontent.com/chain-movies/daihon-studio/claude/monetization-tool-rebuild-qp828g/content/note/2026-09-24-anniversary/illust2_cost.png">…/2026-09-24-anniversary/illust2_cost.png</a></li>
+<li>［図解③］ → <a href="https://raw.githubusercontent.com/chain-movies/daihon-studio/claude/monetization-tool-rebuild-qp828g/content/note/2026-09-24-anniversary/illust3_five.png">…/2026-09-24-anniversary/illust3_five.png</a></li>
+<li>［画面］ → <a href="https://raw.githubusercontent.com/chain-movies/daihon-studio/claude/monetization-tool-rebuild-qp828g/content/note/2026-09-24-anniversary/illust4_screen.png">…/2026-09-24-anniversary/illust4_screen.png</a></li>
+</ul></li>
+<li>見出し画像 → <a href="https://raw.githubusercontent.com/chain-movies/daihon-studio/claude/monetization-tool-rebuild-qp828g/content/note/2026-09-24-anniversary/header.jpg">…/2026-09-24-anniversary/header.jpg</a></li>
+<li>タグ: <b>#周年 #動画制作 #経営者 #映像制作 #AI活用</b> → 公開</li>
+</ol>
+<h3>No.24 SRT ツール（編集者向け）</h3>
+<ol>
+<li>本文 → <a href="https://docs.google.com/document/d/1yidKaR878e_sEyINn8fOjozaThvcd5QuzJRjUZqTV0g/edit">docs.google.com/document/d/1yidKaR878e_sEyINn8fOjozaThvcd5QuzJRjUZqTV0g/edit</a></li>
+<li>画像とタグの一覧はこのガイド → <a href="https://docs.google.com/document/d/1ZLlfMhCtoy75-qHE7scXTD5Sx-pJo8nsaY6RVhuCrx4/edit">docs.google.com/document/d/1ZLlfMhCtoy75-qHE7scXTD5Sx-pJo8nsaY6RVhuCrx4/edit</a></li>
+<li>本文中の「今日の午前に上がってきた」を「先週」に直してから公開</li>
+</ol>
+<p class="note">告知文（X / Threads）は各ガイドの末尾に2案ずつ。公開したら記事 URL をチャットに貼ってください。</p>
+
+<h2>④ 終わったらチャットに貼るもの</h2>
+<ul class="chk">
+<li>BASE の商品 URL</li>
+<li>note の記事 URL（2本）</li>
+<li>「マージ済み」の一言</li>
+</ul>
+<p class="note">これで販売ページの購入ボタンが有効になり、月曜から BASE のアクセス数と note の数字で PDCA を回せます。</p>
+<div class="foot"><span>Chain-Movies キャッシュポイント工場 — 手順書 2026-09-29</span><span>作成: 常駐セッション</span></div>
+</body></html>

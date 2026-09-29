@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ナレーション尺計算・原稿タイマー｜文字数から秒数を読み上げ速度別に計算</title>
+<meta name="description" content="ナレーション原稿を貼るだけで、文字数から読み上げ時間を速度別（ゆっくり・標準・速め）に計算。段落ごとの尺表、目標尺との過不足、字幕枚数の目安、読み上げタイマー付き。">
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--surface3:#2b2b29;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#e5484d;--accent-soft:rgba(229,72,77,.16);--warn:#fab219;--ok:#3fb950;--blue:#3987e5;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:13.5px;line-height:1.6}
+#app{display:grid;grid-template-columns:1fr 360px;grid-template-rows:56px 1fr;height:100%}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+header .logo{display:flex;align-items:center;gap:9px;font-weight:700}
+header .logo .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#3987e5,#9085e9);display:flex;align-items:center;justify-content:center;font-size:14px}
+header .sp{flex:1}
+header .demo{font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:2px 8px}
+main{display:grid;grid-template-rows:auto 1fr;overflow:hidden}
+.editor{padding:14px 16px 0;display:flex;flex-direction:column;gap:8px;min-height:0}
+textarea{width:100%;flex:1;min-height:200px;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:12px 14px;font:inherit;font-size:15px;line-height:1.8;resize:none}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px 16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.kpi .l{font-size:11px;color:var(--muted)}
+.kpi .v{font-size:24px;font-weight:900;margin-top:2px}
+.kpi .s{font-size:11px;color:var(--ink2)}
+.kpi.ok .v{color:var(--ok)}.kpi.warn .v{color:var(--warn)}.kpi.bad .v{color:var(--accent)}
+.paras{overflow:auto;padding:0 16px 16px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--bg)}
+td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.t{color:var(--ink2);max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr.cur td{background:var(--accent-soft)}
+aside{background:var(--surface);border-left:1px solid var(--line);overflow:auto;padding:12px}
+label{display:block;font-size:12px;color:var(--ink2);margin:10px 0 3px}
+select,input[type=number],input[type=text]{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;width:100%;margin-top:8px}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.timer{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;text-align:center}
+.timer .big{font-size:38px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.timer .sub{font-size:11.5px;color:var(--muted)}
+.timer .bar{height:6px;background:var(--surface3);border-radius:3px;margin:8px 0;overflow:hidden}
+.timer .bar i{display:block;height:100%;background:var(--blue);width:0%}
+.note{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+.chk{display:flex;align-items:center;gap:7px;font-size:12.5px;margin:6px 0}
+.chk input{margin:0}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--line);padding:8px 14px;border-radius:8px;font-size:12px;display:none}
+@media (max-width:900px){#app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr}header{grid-column:1}aside{border-left:0;border-bottom:1px solid var(--line)}.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo"><span class="mark">⏱</span><span>ナレーション尺計算・原稿タイマー</span><span style="color:var(--muted);font-weight:400;font-size:11.5px">文字数→秒数・速度別</span></div>
+    <div class="sp"></div>
+    <a class="demo" href="../../shop/" style="text-decoration:none;color:var(--ink);border-color:var(--line)">素材集・製品版 →</a>
+    <span class="demo" id="demoBadge" hidden>デモ版：計算は先頭1,000字まで</span>
+  </header>
+  <main>
+    <div class="editor">
+      <textarea id="src" placeholder="ナレーション原稿を貼り付けてください。段落（空行）ごとに尺を出します。&#10;例:&#10;私たちは、映像で企業の想いを届ける会社です。&#10;&#10;創業から10年。結婚式のエンドロールから企業のブランド映像まで、1,000本以上を制作してきました。"></textarea>
+      <div class="kpis">
+        <div class="kpi"><div class="l">文字数（読む文字）</div><div class="v" id="kChars">0</div><div class="s" id="kCharsSub">記号・空白を除く</div></div>
+        <div class="kpi"><div class="l">読み上げ時間（選択速度）</div><div class="v" id="kTime">0:00</div><div class="s" id="kTimeSub">—</div></div>
+        <div class="kpi" id="kGoalBox"><div class="l">目標尺との差</div><div class="v" id="kGoal">—</div><div class="s" id="kGoalSub">目標尺を入力</div></div>
+        <div class="kpi"><div class="l">字幕枚数の目安</div><div class="v" id="kCues">0</div><div class="s" id="kCuesSub">1行16字・2行まで</div></div>
+      </div>
+    </div>
+    <div class="paras"><table id="tbl"><thead><tr><th>#</th><th>段落（先頭）</th><th style="text-align:right">文字</th><th style="text-align:right">ゆっくり</th><th style="text-align:right">標準</th><th style="text-align:right">速め</th><th style="text-align:right">累計（標準）</th></tr></thead><tbody></tbody></table></div>
+  </main>
+  <aside>
+    <label>読み上げ速度</label>
+    <select id="speed">
+      <option value="250">ゆっくり（250字/分・約4.2字/秒）— 企業VP・シニア向け</option>
+      <option value="300" selected>標準（300字/分・5字/秒）— ナレーション一般</option>
+      <option value="350">速め（350字/分・約5.8字/秒）— YouTube 解説</option>
+      <option value="400">早口（400字/分・約6.7字/秒）— 情報系・ショート</option>
+      <option value="custom">カスタム</option>
+    </select>
+    <div class="row"><div><label>カスタム（字/分）</label><input type="number" id="cpm" value="300" min="100" max="800" step="10"></div><div><label>句読点の間（秒）</label><input type="number" id="pause" value="0.3" min="0" max="2" step="0.1"></div></div>
+    <div class="row"><div><label>目標尺（分）</label><input type="number" id="goalMin" value="" min="0" max="120" step="1" placeholder="1"></div><div><label>（秒）</label><input type="number" id="goalSec" value="" min="0" max="59" step="1" placeholder="30"></div></div>
+    <label>字幕の目安（1行の文字数）</label>
+    <div class="row"><div><input type="number" id="maxChars" value="16" min="8" max="30"></div><div><select id="maxLines"><option value="1">1行まで</option><option value="2" selected>2行まで</option></select></div></div>
+    <label class="chk" style="margin-top:10px"><input type="checkbox" id="countPunct"><span>句読点も文字数に含める</span></label>
+    <div class="timer">
+      <div class="sub">読み上げタイマー（原稿を読みながら計測）</div>
+      <div class="big" id="tDisp">0:00.0</div>
+      <div class="bar"><i id="tBar"></i></div>
+      <div class="sub" id="tSub">スタートで計測。停止すると「実測の字/分」を表示</div>
+      <div class="row"><button class="btn" id="tStart">スタート</button><button class="btn" id="tStop" disabled>停止</button><button class="btn" id="tReset">リセット</button></div>
+    </div>
+    <button class="btn" id="btnCsv">段落表を CSV で保存</button>
+    <button class="btn" id="btnCopy">結果をテキストでコピー</button>
+    <a class="btn" href="../srt-splitter/" style="text-decoration:none">この原稿を字幕（SRT）に分割 →</a>
+    <div class="note">
+      ・文字数は「読む文字」で数えます（空白・記号・改行は除外。句読点は設定で切替）。半角英数は0.5字として数えます<br>
+      ・秒数 = 文字数 ÷（字/分 ÷ 60）＋ 句読点の間 × 句読点の数。ナレーターや口調で ±15% 程度ぶれます<br>
+      ・字幕枚数は「1行の文字数 × 行数」で割った概算。正確な分割は SRT 分割ツールで<br>
+      ・入力はこのブラウザに自動保存されます（外部送信なし）
+    </div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(() => {
+  const DEMO = /* @DEMO */ true; /* @DEMO */
+  const DEMO_LIMIT = 1000;
+  const $ = (s) => document.querySelector(s);
+  const KEY = 'narration-timer-v1';
+  if (DEMO) $('#demoBadge').hidden = false;
+  const W = (ch) => (/[\x20-\x7e｡-ﾟ]/.test(ch) ? 0.5 : 1);
+  const PUNCT = '、。，．・！？!?,.…‥「」『』（）()〔〕【】〈〉《》"\'“”‘’：:；;－—ー〜～・';
+  const isSpace = (ch) => /\s/.test(ch);
+  const state = { src: '', speed: '300', cpm: 300, pause: 0.3, goalMin: '', goalSec: '', maxChars: 16, maxLines: 2, countPunct: false };
+
+  function countText(t) {
+    let chars = 0, punct = 0;
+    for (const ch of t) { if (isSpace(ch)) continue; if (PUNCT.includes(ch)) { if ('、。，．！？!?,.'.includes(ch)) punct++; if (state.countPunct) chars += 0.5; continue; } chars += W(ch); }
+    return { chars: Math.round(chars * 10) / 10, punct };
+  }
+  const cpmOf = () => state.speed === 'custom' ? (+state.cpm || 300) : +state.speed;
+  const secs = (chars, punct, cpm) => chars / (cpm / 60) + punct * (+state.pause || 0);
+  const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  const mmssd = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}.${Math.floor((s % 1) * 10)}`;
+
+  function compute() {
+    let src = state.src; let truncated = false;
+    if (DEMO && [...src].length > DEMO_LIMIT) { src = [...src].slice(0, DEMO_LIMIT).join(''); truncated = true; }
+    const paras = src.split(/\n\s*\n/).map((p) => p.replace(/\s+/g, ' ').trim()).filter(Boolean);
+    const cpm = cpmOf(); const rows = []; let acc = 0, tc = 0, tp = 0;
+    for (const p of paras) { const c = countText(p); const std = secs(c.chars, c.punct, 300); acc += secs(c.chars, c.punct, cpm); tc += c.chars; tp += c.punct; rows.push({ text: p, chars: c.chars, punct: c.punct, slow: secs(c.chars, c.punct, 250), std, fast: secs(c.chars, c.punct, 350), sel: secs(c.chars, c.punct, cpm), acc }); }
+    const total = secs(tc, tp, cpm);
+    const cap = (+state.maxChars || 16) * (+state.maxLines || 2);
+    const cues = rows.reduce((a, r) => a + Math.max(1, Math.ceil(r.chars / (cap * 0.85))), 0);
+    return { rows, total, tc, tp, cpm, cues, truncated };
+  }
+  function render() {
+    const r = compute();
+    $('#kChars').textContent = Math.round(r.tc).toLocaleString('ja-JP'); $('#kCharsSub').textContent = `${r.rows.length}段落 ・ 句読点 ${r.tp}` + (r.truncated ? `（デモ: 先頭${DEMO_LIMIT}字まで）` : '');
+    $('#kTime').textContent = mmss(r.total); $('#kTimeSub').textContent = `${r.cpm}字/分 ・ ゆっくり ${mmss(secs(r.tc, r.tp, 250))} ／ 速め ${mmss(secs(r.tc, r.tp, 350))}`;
+    const g = (+state.goalMin || 0) * 60 + (+state.goalSec || 0); const gb = $('#kGoalBox'); gb.className = 'kpi';
+    if (g > 0) { const d = r.total - g; const need = Math.round(Math.abs(d) * r.cpm / 60); $('#kGoal').textContent = (d >= 0 ? '+' : '-') + mmss(Math.abs(d)); $('#kGoalSub').textContent = d > 0 ? `約${need}字 削ると収まります` : d < 0 ? `約${need}字 まで足せます` : 'ぴったりです'; gb.classList.add(Math.abs(d) <= g * 0.05 ? 'ok' : d > 0 ? 'bad' : 'warn'); }
+    else { $('#kGoal').textContent = '—'; $('#kGoalSub').textContent = '目標尺を入力'; }
+    $('#kCues').textContent = r.cues; $('#kCuesSub').textContent = `1行${state.maxChars}字・${state.maxLines}行まで（概算）`;
+    const tb = $('#tbl tbody'); tb.innerHTML = r.rows.map((x, i) => `<tr><td>${i + 1}</td><td class="t" title="${x.text.replace(/"/g, '&quot;')}">${x.text.slice(0, 40)}${x.text.length > 40 ? '…' : ''}</td><td class="n">${x.chars}</td><td class="n">${mmss(x.slow)}</td><td class="n"><b>${mmss(x.std)}</b></td><td class="n">${mmss(x.fast)}</td><td class="n">${mmss(x.acc)}</td></tr>`).join('') || '<tr><td colspan="7" style="color:var(--muted)">原稿を貼ると段落ごとの尺が出ます</td></tr>';
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+    return r;
+  }
+  function readInputs() { state.src = $('#src').value; state.speed = $('#speed').value; state.cpm = $('#cpm').value; state.pause = $('#pause').value; state.goalMin = $('#goalMin').value; state.goalSec = $('#goalSec').value; state.maxChars = $('#maxChars').value; state.maxLines = $('#maxLines').value; state.countPunct = $('#countPunct').checked; render(); }
+  function toast(m) { const t = $('#toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._t); t._t = setTimeout(() => (t.style.display = 'none'), 1800); }
+
+  // タイマー
+  let t0 = 0, tid = null, elapsed = 0;
+  function tick() { const e = elapsed + (Date.now() - t0) / 1000; $('#tDisp').textContent = mmssd(e); const r = compute(); if (r.total > 0) $('#tBar').style.width = Math.min(100, e / r.total * 100) + '%'; }
+  $('#tStart').addEventListener('click', () => { if (tid) return; t0 = Date.now(); tid = setInterval(tick, 100); $('#tStart').disabled = true; $('#tStop').disabled = false; $('#tSub').textContent = '計測中… 読み終わったら停止'; });
+  $('#tStop').addEventListener('click', () => { if (!tid) return; clearInterval(tid); tid = null; elapsed += (Date.now() - t0) / 1000; $('#tStart').disabled = false; $('#tStop').disabled = true; const r = compute(); const cpm = elapsed > 0 ? Math.round(r.tc / (elapsed / 60)) : 0; $('#tSub').textContent = `実測 ${mmssd(elapsed)} ＝ 約${cpm}字/分（計算値 ${mmss(r.total)} との差 ${elapsed - r.total >= 0 ? '+' : '-'}${mmss(Math.abs(elapsed - r.total))}）`; });
+  $('#tReset').addEventListener('click', () => { clearInterval(tid); tid = null; elapsed = 0; $('#tDisp').textContent = '0:00.0'; $('#tBar').style.width = '0%'; $('#tStart').disabled = false; $('#tStop').disabled = true; $('#tSub').textContent = 'スタートで計測。停止すると「実測の字/分」を表示'; });
+
+  $('#btnCsv').addEventListener('click', () => { const r = compute(); const lines = [['#', '段落', '文字数', 'ゆっくり(秒)', '標準(秒)', '速め(秒)', '選択速度(秒)', '累計(秒)'].join(',')]; r.rows.forEach((x, i) => lines.push([i + 1, '"' + x.text.replace(/"/g, '""') + '"', x.chars, x.slow.toFixed(1), x.std.toFixed(1), x.fast.toFixed(1), x.sel.toFixed(1), x.acc.toFixed(1)].join(','))); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv' })); a.download = 'narration_timing.csv'; a.click(); });
+  $('#btnCopy').addEventListener('click', async () => { const r = compute(); const t = [`ナレーション尺計算（${r.cpm}字/分）`, `文字数 ${Math.round(r.tc)} ／ 段落 ${r.rows.length} ／ 句読点 ${r.tp}`, `読み上げ時間: ${mmss(r.total)}（ゆっくり ${mmss(secs(r.tc, r.tp, 250))} ／ 標準 ${mmss(secs(r.tc, r.tp, 300))} ／ 速め ${mmss(secs(r.tc, r.tp, 350))}）`, `字幕枚数の目安: ${r.cues}枚`, '', ...r.rows.map((x, i) => `${i + 1}. ${mmss(x.sel)}（${x.chars}字） ${x.text.slice(0, 30)}${x.text.length > 30 ? '…' : ''}`)].join('\n'); try { await navigator.clipboard.writeText(t); toast('コピーしました'); } catch (e) { toast('コピーできませんでした'); } });
+
+  ['src', 'speed', 'cpm', 'pause', 'goalMin', 'goalSec', 'maxChars', 'maxLines', 'countPunct'].forEach((id) => { $('#' + id).addEventListener('input', readInputs); $('#' + id).addEventListener('change', readInputs); });
+  try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) { Object.assign(state, s); $('#src').value = state.src || ''; $('#speed').value = state.speed || '300'; $('#cpm').value = state.cpm || 300; $('#pause').value = state.pause ?? 0.3; $('#goalMin').value = state.goalMin || ''; $('#goalSec').value = state.goalSec || ''; $('#maxChars').value = state.maxChars || 16; $('#maxLines').value = state.maxLines || 2; $('#countPunct').checked = !!state.countPunct; } } catch (e) { /* ignore */ }
+  render();
+  window.__compute = () => compute(); // テスト用
+})();
+</script>
+</body>
+</html>
