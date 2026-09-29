@@ -29,3 +29,16 @@
 - 比較表画像（06_compare）は全パック共通なので、パックが増えたら週1で差し替え
 - サブ文字の箱余白は新パックから `sub.padX` で改善済み。旧パックは見た目固定のまま
 - Codex は9/14以降未稼働。動かす予定が無ければ codex-daily を止めて Actions の実行時間を節約（本人判断）
+
+## 2026-09-29（月）夜 — 初商品が BASE に載った
+- **Do**: 配信 Vol.1 が BASE に公開（chaincreate.base.shop/items/160094664）。shop ページに「BASEで購入」を接続
+- **Check**: Release の販売用 ZIP が公開状態で誰でも無料 DL できた（リポジトリ公開のため）。shop の「サンプルを見る」も Release に飛んでいた
+- **Act**:
+  - shop の「サンプルを見る」を商品画像（factory/gallery）に変更 → 販売用 ZIP への導線を断った
+  - 出品を半自動化: `node factory/base_kit.mjs` で CSV商品管理 App 用の items.csv とコピペ用テキストを生成（factory/base/）
+  - ショップ説明・About・特商法メモを shop/base-shop-profile.md に用意
+- **本人（Claude ではできない）**:
+  1. 既存 Release 16 件を Edit → 「Save draft」（ZIP を非公開に）
+  2. `.github/workflows/daily-product.yml` の `gh release create` に `--draft` を追加（Claude はワークフロー編集不可）
+  3. ブランチを main にマージ（画像 URL が main 参照のため CSV 登録の前に）
+  4. BASE: CSV商品管理 App に factory/base/items.csv → 各商品にデジタルコンテンツ販売 App で ZIP → 商品 URL を Claude に送る
