@@ -81,7 +81,7 @@ footer a{color:var(--ink2)}
 </head>
 <body>
 <div class="wrap">
-  <nav><span class="brand">Chain-Movies テロップ工房</span><span class="sp"></span><a href="#packs">素材集</a><a href="#sets">セット</a><a href="#free">無料ツール</a><a href="#faq">FAQ</a><a href="../apps/">ツール一覧</a></nav>
+  <nav><span class="brand">Chain-Movies テロップ工房</span><span class="sp"></span><a id="shopLink" href="#packs" hidden>BASEショップ</a><a href="#packs">素材集</a><a href="#sets">セット</a><a href="#free">無料ツール</a><a href="#faq">FAQ</a><a href="../apps/">ツール一覧</a></nav>
 
   <section class="hero">
     <div>
@@ -143,10 +143,11 @@ footer a{color:var(--ink2)}
   const D = TelopDesigns; const yen = (n) => '¥' + Number(n).toLocaleString('ja-JP');
   let L = { packs: {}, sets: {}, bundle: {}, shopUrl: '' };
   try { L = await (await fetch('links.json', { cache: 'no-store' })).json(); } catch (e) { /* ignore */ }
+  if (L.shopUrl) { const sl = document.getElementById('shopLink'); sl.href = L.shopUrl; sl.target = '_blank'; sl.rel = 'noopener'; sl.hidden = false; }
   const ids = Object.keys(D.PACKS); const grid = document.getElementById('packGrid'); let pending = 0;
   ids.slice().reverse().forEach((id, i) => {
     const p = D.PACKS[id]; const n = D.DESIGNS.filter((d) => d.pack === id).length; const v = D.DESIGNS.filter((d) => d.pack === id).reduce((a, d) => a + (d.variants ? d.variants.length : 1), 0);
-    const lk = (L.packs && L.packs[id]) || {}; const buy = lk.base || L.shopUrl;
+    const lk = (L.packs && L.packs[id]) || {}; const buy = lk.base;
     const card = document.createElement('div'); card.className = 'card' + (i < 2 ? ' new' : '');
     card.innerHTML = `<img src="../factory/gallery/${id}/${id}_01_cover.jpg" alt="${p.name}" loading="lazy" onerror="this.style.display='none'">
       <div class="b"><div class="t">${p.name}</div><div class="d">${n}デザイン × 色違い ${v}種。透過PNG（16:9・9:16）＋帯のみ＋テロップメーカー。</div>
