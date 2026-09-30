@@ -1,5 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-02 向け
+- 実装済み: music（10/2 Release 予定）、diy（10/3）、travel（10/4）、clinic（10/5）、consult（10/6）。`node factory/calendar.mjs next-design` は `bousai-vol1`（10/7・防災・自治体広報）を返すはずなので、それを20デザイン実装する。brief は calendar.json の bousai-vol1 を参照（白・黒・防災オレンジ #ff7a00・警戒黄 #ffcf4a・危険赤 #d7263d・紫 #7a3cff・自治体ブルー #2b6cb0、BIZ UDPGothic 700 / Noto Sans JP 900 / M PLUS 1p 900）。「警戒レベル」は tag 差し替えで 3/4/5 → 黄/赤/紫。「訓練です」常時表示ラベルを忘れずに。実在の自治体名・学校名は不可
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40 で最初から書く（consult はこのサイズで一発で通った）。tag は position 'left' / 'above' のみ。tag を 'above' にする時は anchor y を 'bottom' にする（'top' だと画面上端にかかる）。box type 'bar' は align: 'center' を付けないと左寄せになる
+- 10/2 は金曜なのでアプリも1本。roadmap の未着手は #7（SNS 投稿カレンダー ¥980）。**#7 を実装**（apps/sns-calendar/、月間カレンダーに投稿予定（媒体・タイトル・素材の有無・担当）を入れて、週次一覧・媒体別の本数・CSV／ICS 出力、テンプレ（週3投稿・毎日ショート）、DEMO は当月のみ）。listing.md・README.txt・apps/index.html のカード追加を忘れずに
+- 完了後 `node factory/build_pack.mjs --pack bousai-vol1 --quick` で contact_sheet を確認
+- calendar は car-vol1（10/9）まで。10/10 以降のテーマを2件追加すること（候補: インタビュー・対談、展示会・イベントレポート、ゲーム攻略・解説、英語学習）
+
 ## 2026-10-01 向け
 - 実装済み: pet（10/1 Release 予定）、music（10/2）、diy（10/3）、travel（10/4）、clinic（10/5）、apps/rate-calc（水曜のアプリ #6）。`node factory/calendar.mjs next-design` は `consult-vol1`（10/6・士業・コンサル解説）を返すはずなので、それを20デザイン実装する。brief は calendar.json の consult-vol1 を参照（ネイビー #0b1f3a・白・グレー #6b7a90・信頼ブルー #2b6cb0・注意赤 #d7263d・黄 #ffcf4a、Noto Sans JP 700/900 / BIZ UDPGothic / Zen Kaku Gothic New）。business-vol1（企業VP）・clinic-vol1（cl-*）と被らない「制度・数字・注意喚起」中心に。法令名は「〇〇法」でぼかす
 - 文字サイズは主文 60〜84・tag 36〜44・sub 32〜38（ブロックを書いたら size を一括 1.25〜1.3 倍。clinic は 1.28 倍でちょうどよかった）。tag は position 'left' / 'above' のみ
