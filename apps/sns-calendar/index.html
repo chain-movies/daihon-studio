@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SNS 投稿カレンダー｜月間の投稿予定を媒体別に管理、CSV・ICS 出力</title>
+<meta name="description" content="月間カレンダーに投稿予定（媒体・タイトル・素材の有無・担当）を入れて、週ごとの一覧と媒体別の本数を確認。テンプレで一括配置、CSV・ICS（カレンダー登録）で書き出し。">
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--surface3:#2b2b29;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#e5484d;--accent-soft:rgba(229,72,77,.16);--warn:#fab219;--ok:#3fb950;--blue:#3987e5;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:13.5px;line-height:1.6}
+#app{display:grid;grid-template-columns:1fr 360px;grid-template-rows:56px 1fr;height:100%}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+header .logo{display:flex;align-items:center;gap:9px;font-weight:700}
+header .logo .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#e5484d,#fab219);display:flex;align-items:center;justify-content:center;font-size:14px}
+header .sp{flex:1}
+header .demo{font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:2px 8px}
+main{display:grid;grid-template-rows:auto auto 1fr;overflow:hidden;min-width:0}
+.toolbar{display:flex;gap:8px;align-items:center;padding:10px 16px;flex-wrap:wrap}
+.toolbar .month{font-size:18px;font-weight:900;min-width:150px;text-align:center}
+.toolbar .sp{flex:1}
+.stats{display:flex;gap:8px;padding:0 16px 8px;flex-wrap:wrap}
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--ink2)}
+.chip b{color:var(--ink)}
+.calwrap{overflow:auto;padding:0 16px 16px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;min-width:700px}
+.cal .dow{font-size:11px;color:var(--muted);text-align:center;padding:2px 0}
+.cal .dow.sat{color:var(--blue)}.cal .dow.sun{color:var(--accent)}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:8px;min-height:92px;padding:4px 5px;cursor:pointer;position:relative}
+.day:hover{background:var(--surface2)}
+.day.other{opacity:.35}
+.day.today{border-color:var(--warn)}
+.day .n{font-size:11px;color:var(--muted)}
+.day.sat .n{color:var(--blue)}.day.sun .n{color:var(--accent)}
+.post{font-size:11px;line-height:1.35;border-radius:5px;padding:2px 5px;margin-top:3px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid rgba(255,255,255,.4)}
+.post.done{opacity:.55;text-decoration:line-through}
+.post .m{font-weight:700;margin-right:3px}
+.post.nomat{border-left-color:var(--warn)}
+.week{display:none}
+.list{overflow:auto;padding:0 16px 16px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle}
+th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--bg)}
+tr:hover td{background:var(--surface2)}
+.tag{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:5px;color:#fff;font-weight:700}
+aside{background:var(--surface);border-left:1px solid var(--line);overflow:auto;padding:12px}
+h3{font-size:12px;color:var(--muted);margin:14px 0 4px;text-transform:uppercase;letter-spacing:.06em}
+label{display:block;font-size:12px;color:var(--ink2);margin:8px 0 3px}
+select,input[type=text],input[type=date],input[type=time],textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit}
+textarea{min-height:60px;resize:vertical}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;width:100%;margin-top:8px}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.btn.sm{width:auto;margin:0;padding:6px 10px;font-size:12px}
+.chk{display:flex;align-items:center;gap:7px;font-size:12.5px;margin:6px 0}
+.chk input{margin:0}
+.note{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--line);padding:8px 14px;border-radius:8px;font-size:12px;display:none}
+.mini{border:0;background:transparent;color:var(--muted);cursor:pointer;font:inherit;padding:2px 4px}
+.mini:hover{color:var(--ink)}
+@media (max-width:900px){#app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr}header{grid-column:1}aside{border-left:0;border-bottom:1px solid var(--line)}}
+@media print{aside,header .demo,.toolbar .btn,.toolbar select{display:none}#app{display:block}body{background:#fff;color:#000}.day{border-color:#ccc;background:#fff;break-inside:avoid}.day .n{color:#333}.post{color:#000;background:#eee!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo"><span class="mark">📅</span><span>SNS 投稿カレンダー</span><span style="color:var(--muted);font-weight:400;font-size:11.5px">月間の投稿予定・媒体別・CSV/ICS</span></div>
+    <div class="sp"></div>
+    <a class="demo" href="../../shop/" style="text-decoration:none;color:var(--ink);border-color:var(--line)">素材集・製品版 →</a>
+    <span class="demo" id="demoBadge" hidden>無料デモ（当月のみ）</span>
+  </header>
+  <main>
+    <div class="toolbar">
+      <button class="btn sm" id="prev">‹</button><div class="month" id="monthLabel"></div><button class="btn sm" id="next">›</button>
+      <button class="btn sm" id="todayBtn">今月</button>
+      <select id="view" style="width:auto"><option value="cal">カレンダー</option><option value="list">週別リスト</option></select>
+      <span class="sp"></span>
+      <button class="btn sm" id="btnCsv">CSV</button>
+      <button class="btn sm" id="btnIcs">ICS（カレンダー登録）</button>
+      <button class="btn sm" id="btnJson">バックアップ</button>
+      <label class="btn sm" style="margin:0">復元<input type="file" id="fileJson" accept="application/json" hidden></label>
+      <button class="btn sm" id="btnPrint">印刷</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="calwrap" id="calwrap"><div class="cal" id="cal"></div></div>
+    <div class="list" id="list" hidden><table id="tbl"><thead><tr><th>週</th><th>日付</th><th>媒体</th><th>タイトル</th><th>素材</th><th>担当</th><th>状態</th><th></th></tr></thead><tbody></tbody></table></div>
+  </main>
+  <aside>
+    <h3 id="formTitle">投稿を追加</h3>
+    <div class="row">
+      <div><label>日付</label><input type="date" id="date"></div>
+      <div><label>時刻</label><input type="time" id="time" value="19:00"></div>
+    </div>
+    <label>媒体</label>
+    <select id="media"></select>
+    <label>タイトル／内容</label><input type="text" id="title" placeholder="例: 新商品の使い方（60秒）">
+    <label>メモ（台本・ハッシュタグなど）</label><textarea id="memo"></textarea>
+    <div class="row">
+      <div><label>担当</label><input type="text" id="owner" placeholder="担当者"></div>
+      <div><label>素材</label><select id="material"><option value="none">未着手</option><option value="shooting">撮影済み</option><option value="editing">編集中</option><option value="ready">完成</option></select></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="done"> 投稿済み</label>
+    <button class="btn primary" id="btnSave">保存</button>
+    <button class="btn" id="btnDelete" hidden>削除</button>
+    <button class="btn" id="btnClear" hidden>編集をやめる</button>
+    <h3>テンプレで一括配置（表示中の月）</h3>
+    <select id="tpl">
+      <option value="">選ぶ…</option>
+      <option value="w3">週3投稿（月・水・金 19:00）</option>
+      <option value="short">毎日ショート（毎日 18:00）</option>
+      <option value="biz">企業アカウント標準（火・木 12:00 ＋ 土 10:00）</option>
+      <option value="launch">新商品ローンチ（告知→当日→振り返りの3本）</option>
+    </select>
+    <div class="row"><div><label>テンプレの媒体</label><select id="tplMedia"></select></div></div>
+    <button class="btn" id="btnTpl">配置する</button>
+    <h3>媒体の設定</h3>
+    <div id="mediaList"></div>
+    <div class="row"><input type="text" id="newMedia" placeholder="媒体名を追加"><button class="btn sm" id="addMedia" style="margin-top:0">追加</button></div>
+    <div class="note">・データはこのブラウザ（localStorage）にだけ保存され、外部には送信されません。<br>・ICS はスマホ／PC のカレンダーアプリに読み込めます（投稿の 30 分前に通知）。</div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(() => {
+  const DEMO = /* @DEMO */ true; /* @DEMO */
+  const KEY = 'sns-calendar.v1';
+  const $ = (s) => document.querySelector(s);
+  const COLORS = ['#e5484d', '#3987e5', '#3fb950', '#fab219', '#9085e9', '#e5742d', '#2db3c0', '#c94fa0'];
+  const DEFAULT_MEDIA = [{ name: 'Instagram', color: '#c94fa0' }, { name: 'X', color: '#3987e5' }, { name: 'YouTube', color: '#e5484d' }, { name: 'TikTok', color: '#2db3c0' }, { name: 'note', color: '#3fb950' }, { name: 'LINE', color: '#fab219' }];
+  const MAT = { none: '未着手', shooting: '撮影済み', editing: '編集中', ready: '完成' };
+  let state = { media: DEFAULT_MEDIA, posts: [] };
+  const now = new Date(); let ym = { y: now.getFullYear(), m: now.getMonth() };
+  let editing = null;
+  if (DEMO) $('#demoBadge').hidden = false;
+
+  const pad = (n) => String(n).padStart(2, '0');
+  const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const monthKey = () => `${ym.y}-${pad(ym.m + 1)}`;
+  const curMonthKey = () => `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
+  const colorOf = (name) => (state.media.find((m) => m.name === name) || {}).color || '#666';
+  const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const toast = (m) => { const t = $('#toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._t); t._t = setTimeout(() => (t.style.display = 'none'), 1800); };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ } };
+  const demoBlock = (dateStr) => DEMO && !dateStr.startsWith(curMonthKey());
+  const weekOf = (d) => Math.ceil((d.getDate() + new Date(d.getFullYear(), d.getMonth(), 1).getDay()) / 7);
+
+  function renderMedia() {
+    const opts = state.media.map((m) => `<option value="${esc(m.name)}">${esc(m.name)}</option>`).join('');
+    const v1 = $('#media').value, v2 = $('#tplMedia').value;
+    $('#media').innerHTML = opts; $('#tplMedia').innerHTML = opts;
+    if (v1) $('#media').value = v1; if (v2) $('#tplMedia').value = v2;
+    $('#mediaList').innerHTML = state.media.map((m, i) => `<div class="chk"><span class="tag" style="background:${m.color}">${esc(m.name)}</span><span style="flex:1"></span><input type="color" value="${m.color}" data-i="${i}" style="width:28px;height:22px;border:0;background:none;padding:0"><button class="mini" data-del="${i}">削除</button></div>`).join('');
+  }
+  function render() {
+    $('#monthLabel').textContent = `${ym.y}年${ym.m + 1}月`;
+    const posts = state.posts.filter((p) => p.date.startsWith(monthKey())).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    const byMedia = {}; posts.forEach((p) => (byMedia[p.media] = (byMedia[p.media] || 0) + 1));
+    const done = posts.filter((p) => p.done).length, nomat = posts.filter((p) => !p.done && p.material === 'none').length;
+    $('#stats').innerHTML = `<span class="chip">今月 <b>${posts.length}</b> 本</span><span class="chip">投稿済み <b>${done}</b></span><span class="chip" style="${nomat ? 'border-color:var(--warn)' : ''}">素材未着手 <b>${nomat}</b></span>` + Object.entries(byMedia).map(([m, n]) => `<span class="chip"><span class="tag" style="background:${colorOf(m)};margin-right:4px">${esc(m)}</span><b>${n}</b></span>`).join('');
+    // calendar
+    const first = new Date(ym.y, ym.m, 1), start = new Date(first); start.setDate(1 - first.getDay());
+    const todayStr = ymd(now);
+    let html = ['日', '月', '火', '水', '木', '金', '土'].map((d, i) => `<div class="dow ${i === 0 ? 'sun' : i === 6 ? 'sat' : ''}">${d}</div>`).join('');
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start); d.setDate(start.getDate() + i); const ds = ymd(d);
+      if (i >= 35 && d.getMonth() !== ym.m) break;
+      const dayPosts = state.posts.filter((p) => p.date === ds).sort((a, b) => a.time.localeCompare(b.time));
+      html += `<div class="day ${d.getMonth() !== ym.m ? 'other' : ''} ${ds === todayStr ? 'today' : ''} ${d.getDay() === 0 ? 'sun' : d.getDay() === 6 ? 'sat' : ''}" data-date="${ds}"><div class="n">${d.getDate()}</div>` +
+        dayPosts.map((p) => `<div class="post ${p.done ? 'done' : ''} ${p.material === 'none' ? 'nomat' : ''}" style="background:${colorOf(p.media)}" data-id="${p.id}" title="${esc(p.media)} ${p.time} ${esc(p.title)}"><span class="m">${esc(p.media.slice(0, 2))}</span>${esc(p.title) || '（無題）'}</div>`).join('') + '</div>';
+    }
+    $('#cal').innerHTML = html;
+    // list
+    $('#tbl tbody').innerHTML = posts.map((p) => { const d = new Date(p.date + 'T00:00:00'); return `<tr data-id="${p.id}"><td>第${weekOf(d)}週</td><td>${p.date.slice(5).replace('-', '/')}（${'日月火水木金土'[d.getDay()]}）${p.time}</td><td><span class="tag" style="background:${colorOf(p.media)}">${esc(p.media)}</span></td><td>${esc(p.title)}</td><td style="color:${p.material === 'none' ? 'var(--warn)' : p.material === 'ready' ? 'var(--ok)' : 'var(--ink2)'}">${MAT[p.material] || ''}</td><td>${esc(p.owner)}</td><td>${p.done ? '投稿済み' : '予定'}</td><td><button class="mini" data-act="edit">編集</button><button class="mini" data-act="toggle">${p.done ? '未投稿に' : '投稿済み'}</button></td></tr>`; }).join('') || '<tr><td colspan="8" style="color:var(--muted);text-align:center;padding:30px">この月の投稿予定はありません。右のフォームかテンプレで追加してください。</td></tr>';
+  }
+  function fillForm(p) {
+    $('#date').value = p.date || ymd(now); $('#time').value = p.time || '19:00'; $('#media').value = p.media || state.media[0].name; $('#title').value = p.title || ''; $('#memo').value = p.memo || ''; $('#owner').value = p.owner || ''; $('#material').value = p.material || 'none'; $('#done').checked = !!p.done;
+  }
+  function startEdit(id) { const p = state.posts.find((x) => x.id === id); if (!p) return; editing = p; fillForm(p); $('#formTitle').textContent = '投稿を編集'; $('#btnDelete').hidden = false; $('#btnClear').hidden = false; }
+  function stopEdit() { editing = null; $('#formTitle').textContent = '投稿を追加'; $('#btnDelete').hidden = true; $('#btnClear').hidden = true; fillForm({ date: $('#date').value }); }
+
+  $('#btnSave').addEventListener('click', () => {
+    const p = { id: editing ? editing.id : Date.now().toString(36), date: $('#date').value, time: $('#time').value || '19:00', media: $('#media').value, title: $('#title').value.trim(), memo: $('#memo').value, owner: $('#owner').value.trim(), material: $('#material').value, done: $('#done').checked };
+    if (!p.date) { toast('日付を入れてください'); return; }
+    if (demoBlock(p.date)) { toast('無料デモは当月の予定だけ保存できます。製品版で全期間が使えます'); return; }
+    if (editing) { const i = state.posts.findIndex((x) => x.id === editing.id); if (i >= 0) state.posts[i] = p; } else state.posts.push(p);
+    save(); ym = { y: +p.date.slice(0, 4), m: +p.date.slice(5, 7) - 1 }; stopEdit(); render(); toast('保存しました');
+  });
+  $('#btnDelete').addEventListener('click', () => { if (!editing) return; state.posts = state.posts.filter((x) => x.id !== editing.id); save(); stopEdit(); render(); });
+  $('#btnClear').addEventListener('click', stopEdit);
+  $('#cal').addEventListener('click', (e) => {
+    const post = e.target.closest('.post'); if (post) { startEdit(post.dataset.id); return; }
+    const day = e.target.closest('.day'); if (day) { stopEdit(); $('#date').value = day.dataset.date; $('#title').focus(); }
+  });
+  $('#tbl').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-act]'); if (!b) return; const id = b.closest('tr').dataset.id;
+    if (b.dataset.act === 'edit') startEdit(id);
+    if (b.dataset.act === 'toggle') { const p = state.posts.find((x) => x.id === id); if (p) { p.done = !p.done; save(); render(); } }
+  });
+  $('#prev').addEventListener('click', () => { ym.m--; if (ym.m < 0) { ym.m = 11; ym.y--; } render(); });
+  $('#next').addEventListener('click', () => { ym.m++; if (ym.m > 11) { ym.m = 0; ym.y++; } render(); });
+  $('#todayBtn').addEventListener('click', () => { ym = { y: now.getFullYear(), m: now.getMonth() }; render(); });
+  $('#view').addEventListener('change', () => { const list = $('#view').value === 'list'; $('#list').hidden = !list; $('#calwrap').hidden = list; });
+  $('#btnTpl').addEventListener('click', () => {
+    const t = $('#tpl').value, media = $('#tplMedia').value; if (!t) { toast('テンプレを選んでください'); return; }
+    if (demoBlock(monthKey() + '-01')) { toast('無料デモは当月のみ'); return; }
+    const days = new Date(ym.y, ym.m + 1, 0).getDate(); const add = [];
+    const push = (d, time, title) => add.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date: `${monthKey()}-${pad(d)}`, time, media, title, memo: '', owner: '', material: 'none', done: false });
+    for (let d = 1; d <= days; d++) {
+      const w = new Date(ym.y, ym.m, d).getDay();
+      if (t === 'w3' && [1, 3, 5].includes(w)) push(d, '19:00', '');
+      if (t === 'short') push(d, '18:00', 'ショート #' + d);
+      if (t === 'biz' && ([2, 4].includes(w))) push(d, '12:00', '');
+      if (t === 'biz' && w === 6) push(d, '10:00', '週末まとめ');
+    }
+    if (t === 'launch') { const base = Math.min(15, days - 7); push(base, '19:00', '【告知】新商品を近日公開'); push(base + 3, '12:00', '【当日】新商品リリース'); push(base + 7, '19:00', '【振り返り】反響と使い方'); }
+    state.posts.push(...add); save(); render(); toast(`${add.length} 件を配置しました`);
+  });
+  $('#mediaList').addEventListener('input', (e) => { const i = e.target.dataset.i; if (i != null) { state.media[i].color = e.target.value; save(); renderMedia(); render(); } });
+  $('#mediaList').addEventListener('click', (e) => { const b = e.target.closest('button[data-del]'); if (!b) return; if (state.media.length <= 1) return; state.media.splice(+b.dataset.del, 1); save(); renderMedia(); render(); });
+  $('#addMedia').addEventListener('click', () => { const n = $('#newMedia').value.trim(); if (!n || state.media.find((m) => m.name === n)) return; state.media.push({ name: n, color: COLORS[state.media.length % COLORS.length] }); $('#newMedia').value = ''; save(); renderMedia(); render(); });
+  function download(name, text, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
+  $('#btnCsv').addEventListener('click', () => {
+    const rows = state.posts.filter((p) => p.date.startsWith(monthKey())).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    const head = ['日付', '時刻', '媒体', 'タイトル', 'メモ', '担当', '素材', '状態'];
+    download(`sns-${monthKey()}.csv`, '﻿' + [head, ...rows.map((p) => [p.date, p.time, p.media, p.title, p.memo, p.owner, MAT[p.material], p.done ? '投稿済み' : '予定'])].map((r) => r.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\r\n'), 'text/csv');
+  });
+  $('#btnIcs').addEventListener('click', () => {
+    const rows = state.posts.filter((p) => p.date.startsWith(monthKey()));
+    const fmt = (date, time) => date.replace(/-/g, '') + 'T' + time.replace(':', '') + '00';
+    const ev = rows.map((p) => { const [h, m] = p.time.split(':').map(Number); const end = `${pad(Math.min(23, h + (m + 30 >= 60 ? 1 : 0)))}:${pad((m + 30) % 60)}`; return ['BEGIN:VEVENT', `UID:${p.id}@sns-calendar`, `DTSTART:${fmt(p.date, p.time)}`, `DTEND:${fmt(p.date, end)}`, `SUMMARY:[${p.media}] ${(p.title || '投稿').replace(/\n/g, ' ')}`, `DESCRIPTION:${(p.memo || '').replace(/\n/g, '\\n')}`, 'BEGIN:VALARM', 'TRIGGER:-PT30M', 'ACTION:DISPLAY', 'DESCRIPTION:投稿30分前', 'END:VALARM', 'END:VEVENT'].join('\r\n'); });
+    download(`sns-${monthKey()}.ics`, ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Chain-Movies//SNS Calendar//JA', ...ev, 'END:VCALENDAR'].join('\r\n') + '\r\n', 'text/calendar');
+  });
+  $('#btnJson').addEventListener('click', () => download('sns-calendar-backup.json', JSON.stringify(state, null, 1), 'application/json'));
+  $('#fileJson').addEventListener('change', (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { const s = JSON.parse(r.result); if (Array.isArray(s.posts)) { state = { media: DEFAULT_MEDIA, ...s }; save(); renderMedia(); render(); toast('復元しました'); } } catch (err) { toast('読み込めませんでした'); } }; r.readAsText(f); e.target.value = ''; });
+  $('#btnPrint').addEventListener('click', () => window.print());
+
+  try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && Array.isArray(s.posts)) state = { media: DEFAULT_MEDIA, ...s }; } catch (e) { /* ignore */ }
+  renderMedia(); fillForm({ date: ymd(now) }); render();
+})();
+</script>
+</body>
+</html>

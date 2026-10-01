@@ -1,5 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-03 向け
+- 実装済み: diy（10/3 Release 予定）、travel（10/4）、clinic（10/5）、consult（10/6）、bousai（10/7）、apps/sns-calendar（金曜のアプリ #7）。`node factory/calendar.mjs next-design` は `agri-vol1`（10/8・農業・産直・道の駅）を返すはずなので、それを20デザイン実装する。brief は calendar.json の agri-vol1 を参照（土ブラウン #6b4423・葉グリーン #3f8f3f・クラフト紙 #e8dcc5・白・トマト赤 #d7263d は値札のみ、Zen Maru Gothic 700/900 / Kiwi Maru / Yusei Magic / Noto Sans JP 700）。gourmet（食べる側）と分けて「作る・売る側」。実在の産地ブランド名・JA 名は不可
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40 で最初から書く。tag は position 'left' / 'above' のみ。tag 'above' は anchor y 'bottom'、bar は align: 'center'
+- 10/3 は土曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack agri-vol1 --quick` で contact_sheet を確認
+- calendar には interview-vol1（10/10・インタビュー・対談）・expo-vol1（10/11・展示会・イベントレポート）を追加済み。未実装は agri／car／interview／expo の4件
+
 ## 2026-10-02 向け
 - 実装済み: music（10/2 Release 予定）、diy（10/3）、travel（10/4）、clinic（10/5）、consult（10/6）。`node factory/calendar.mjs next-design` は `bousai-vol1`（10/7・防災・自治体広報）を返すはずなので、それを20デザイン実装する。brief は calendar.json の bousai-vol1 を参照（白・黒・防災オレンジ #ff7a00・警戒黄 #ffcf4a・危険赤 #d7263d・紫 #7a3cff・自治体ブルー #2b6cb0、BIZ UDPGothic 700 / Noto Sans JP 900 / M PLUS 1p 900）。「警戒レベル」は tag 差し替えで 3/4/5 → 黄/赤/紫。「訓練です」常時表示ラベルを忘れずに。実在の自治体名・学校名は不可
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40 で最初から書く（consult はこのサイズで一発で通った）。tag は position 'left' / 'above' のみ。tag を 'above' にする時は anchor y を 'bottom' にする（'top' だと画面上端にかかる）。box type 'bar' は align: 'center' を付けないと左寄せになる
