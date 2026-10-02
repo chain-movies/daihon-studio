@@ -1,0 +1,35 @@
+{
+  "vault": "",
+  "root": "ClaudeCode",
+  "sessions_dir": "Sessions",
+  "projects_dir": "Projects",
+
+  "log": {
+    "prompts": true,
+    "files": true,
+    "commands": true,
+    "summary": true,
+    "max_prompt_chars": 1200,
+    "max_command_chars": 300
+  },
+
+  "daily_note": {
+    "enabled": true,
+    "dir": "Daily",
+    "format": "%Y-%m-%d",
+    "heading": "## Claude Code"
+  },
+
+  "recall": {
+    "session_start": true,
+    "per_prompt": true,
+    "max_notes": 3,
+    "max_chars": 700,
+    "min_score": 1.5
+  },
+
+  "search_dirs": [],
+  "exclude": [".obsidian", ".trash", "Templates", "Private"],
+  "redact": true,
+  "locale": "ja"
+}
