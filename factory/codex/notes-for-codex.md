@@ -1,5 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-04 向け（翌朝の自分への引き継ぎ。Codex は 10/2 に停止判断済み）
+- 実装済み: travel（10/4 Release 予定）、clinic（10/5）、consult（10/6）、bousai（10/7）、agri（10/8）。`node factory/calendar.mjs next-design` は `car-vol1`（10/9・車・バイク紹介）を返すはずなので、それを20デザイン実装する。brief は calendar.json の car-vol1 を参照（黒・白・メタルグレー #8a8f98・レーシングレッド #d7263d・イエロー #ffcf4a・ブルー #2b6cb0、Noto Sans JP 900 / Dela Gothic One / M PLUS 1p 900 / DotGothic16 / Zen Kaku Gothic New 500）。実在メーカー名・車名は不可（「〇〇（車種名）」）
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40 で最初から書く。tag は position 'left' / 'above' のみ。tag 'above' は anchor y 'bottom'、bar は align: 'center'、deco triangleLeft は size 36 以上
+- 10/4 は日曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack car-vol1 --quick` で contact_sheet を確認
+- calendar は expo-vol1（10/11）まで。10/12 以降のテーマを2件追加すること（候補: 英語学習・語学、ゲーム攻略・解説、介護・福祉、不動産 Vol.2）
+- 月曜（10/5）はアプリの日。roadmap は #1〜#10 まで全部 built なので、月曜の朝に「アプリ 10 本のセット販売 listing（編集者の道具箱 3 本 ¥1,980／中小企業の広報セット ¥2,480）」を作る方に時間を使う（新アプリより売り場づくり優先）
+
 ## 2026-10-03 向け
 - 実装済み: diy（10/3 Release 予定）、travel（10/4）、clinic（10/5）、consult（10/6）、bousai（10/7）、apps/sns-calendar（金曜のアプリ #7）。`node factory/calendar.mjs next-design` は `agri-vol1`（10/8・農業・産直・道の駅）を返すはずなので、それを20デザイン実装する。brief は calendar.json の agri-vol1 を参照（土ブラウン #6b4423・葉グリーン #3f8f3f・クラフト紙 #e8dcc5・白・トマト赤 #d7263d は値札のみ、Zen Maru Gothic 700/900 / Kiwi Maru / Yusei Magic / Noto Sans JP 700）。gourmet（食べる側）と分けて「作る・売る側」。実在の産地ブランド名・JA 名は不可
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40 で最初から書く。tag は position 'left' / 'above' のみ。tag 'above' は anchor y 'bottom'、bar は align: 'center'
