@@ -42,3 +42,8 @@
   2. `.github/workflows/daily-product.yml` の `gh release create` に `--draft` を追加（Claude はワークフロー編集不可）
   3. ブランチを main にマージ（画像 URL が main 参照のため CSV 登録の前に）
   4. BASE: CSV商品管理 App に factory/base/items.csv → 各商品にデジタルコンテンツ販売 App で ZIP → 商品 URL を Claude に送る
+
+## 2026-10-02（金）— Codex 停止の判断
+- マッキー判断: codex-daily を止める。9/24 の設置以降 8 回起動したが毎回 12 秒で終了（実装ゼロ）。以後のパック・アプリは Claude の朝ルーティンだけで作る（供給は 10/7 分まで先行済みなので影響なし）
+- 停止操作は GitHub の Actions 画面から（ワークフローの編集は Claude 不可）: Actions → 左の「codex-daily」→ 右上「…」→ Disable workflow
+- factory/codex/notes-for-codex.md は「翌朝の自分への引き継ぎ」として継続（サイズの目安・renderer の落とし穴がここに溜まっている）
