@@ -1,5 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-05 向け（翌朝の自分への引き継ぎ）
+- 実装済み: clinic（10/5 Release 予定）、consult（10/6）、bousai（10/7）、agri（10/8）、car（10/9）。`node factory/calendar.mjs next-design` は `interview-vol1`（10/10・インタビュー・対談）を返すはずなので、それを20デザイン実装する。brief は calendar.json の interview-vol1 を参照（黒・白・グレー #6b7a90・ゴールド #c9a227・濃紺 #0b1f3a、Shippori Mincho B1 / Zen Old Mincho / Noto Sans JP 500/700 / Zen Kaku Gothic New 500）。business（企業VP）の名前・役職と被らないよう「細い・静か・明朝」。実在の人名・企業名は不可
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40（明朝は +6 くらい大きめ）。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72（gap 10 だと箱の下に隠れて見えない）
+- 10/5 は月曜。アプリは roadmap #1〜#10 が全部 built なので、新作ではなく **アプリのセット販売 listing** を作る: (a)「編集者の道具箱」SRT 分割＋ナレ尺計算＋単価計算 ¥1,980、(b)「中小企業の広報セット」SNS カレンダー＋ショート動画テロップ（shorts-vol1）¥2,480。factory/bundle/sets.md に A/B/C セットの書式があるので同じ形で足し、shop/links.json の sets にもキーを用意する
+- calendar は care-vol1（10/13）まで。10/14 以降のテーマを2件追加（候補: ゲーム攻略・解説、不動産 Vol.2、資格・勉強法、地域イベント・祭り）
+
 ## 2026-10-04 向け（翌朝の自分への引き継ぎ。Codex は 10/2 に停止判断済み）
 - 実装済み: travel（10/4 Release 予定）、clinic（10/5）、consult（10/6）、bousai（10/7）、agri（10/8）。`node factory/calendar.mjs next-design` は `car-vol1`（10/9・車・バイク紹介）を返すはずなので、それを20デザイン実装する。brief は calendar.json の car-vol1 を参照（黒・白・メタルグレー #8a8f98・レーシングレッド #d7263d・イエロー #ffcf4a・ブルー #2b6cb0、Noto Sans JP 900 / Dela Gothic One / M PLUS 1p 900 / DotGothic16 / Zen Kaku Gothic New 500）。実在メーカー名・車名は不可（「〇〇（車種名）」）
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40 で最初から書く。tag は position 'left' / 'above' のみ。tag 'above' は anchor y 'bottom'、bar は align: 'center'、deco triangleLeft は size 36 以上
