@@ -1,5 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-06 向け（翌朝の自分への引き継ぎ）
+- 実装済み: consult（10/6 Release 予定）、bousai（10/7）、agri（10/8）、car（10/9）、interview（10/10）。`node factory/calendar.mjs next-design` は `expo-vol1`（10/11・展示会・イベントレポート）を返すはずなので、それを20デザイン実装する。brief は calendar.json の expo-vol1 を参照（白・黒・イベントブルー #2b6cb0・オレンジ #ff7a00・黄 #ffcf4a・グレー #6b7a90、Noto Sans JP 700/900 / Dela Gothic One / Zen Kaku Gothic New 500 / M PLUS 1p 900）。実在の展示会名・企業名は不可
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72。box.accent.side は left/top/bottom のみ（right は無い）。デザイン数は入れた後に必ず count=20 を確認（interview は 21 個書いて 1 つ削った）
+- 10/6 は火曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack expo-vol1 --quick` で contact_sheet を確認
+- calendar は study-vol1（10/15）まで。10/16 以降のテーマを2件追加（候補: 介護は 10/13 で入れた。残り候補: 地域イベント・祭り、不動産 Vol.2、ネイル・美容 Vol.2、英語以外の語学、保険・金融）
+- 月曜に作ったアプリのセット listing（factory/bundle/app-sets.md）と shop の「ツール セット」欄は push 済み。製品版 ZIP の作り方は app-sets.md の冒頭
+
 ## 2026-10-05 向け（翌朝の自分への引き継ぎ）
 - 実装済み: clinic（10/5 Release 予定）、consult（10/6）、bousai（10/7）、agri（10/8）、car（10/9）。`node factory/calendar.mjs next-design` は `interview-vol1`（10/10・インタビュー・対談）を返すはずなので、それを20デザイン実装する。brief は calendar.json の interview-vol1 を参照（黒・白・グレー #6b7a90・ゴールド #c9a227・濃紺 #0b1f3a、Shippori Mincho B1 / Zen Old Mincho / Noto Sans JP 500/700 / Zen Kaku Gothic New 500）。business（企業VP）の名前・役職と被らないよう「細い・静か・明朝」。実在の人名・企業名は不可
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40（明朝は +6 くらい大きめ）。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72（gap 10 だと箱の下に隠れて見えない）

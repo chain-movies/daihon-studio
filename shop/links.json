@@ -115,6 +115,41 @@
     "call-sheet": {
       "price": 1480,
       "base": ""
+    },
+    "narration-timer": {
+      "price": 980,
+      "base": ""
+    },
+    "rate-calc": {
+      "price": 980,
+      "base": ""
+    },
+    "sns-calendar": {
+      "price": 980,
+      "base": ""
+    }
+  },
+  "appSets": {
+    "T1": {
+      "name": "編集者の道具箱 3本セット",
+      "items": [
+        "srt-splitter",
+        "narration-timer",
+        "rate-calc"
+      ],
+      "desc": "字幕分割・ナレ尺計算・単価計算。貼るだけ・入れるだけ。",
+      "price": 1980,
+      "base": ""
+    },
+    "T2": {
+      "name": "中小企業の広報セット",
+      "items": [
+        "sns-calendar",
+        "shorts-vol1"
+      ],
+      "desc": "SNS 投稿カレンダー＋ショート動画テロップ 20 デザイン。",
+      "price": 2480,
+      "base": ""
     }
   }
 }

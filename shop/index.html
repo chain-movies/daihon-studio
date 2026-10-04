@@ -81,7 +81,7 @@ footer a{color:var(--ink2)}
 </head>
 <body>
 <div class="wrap">
-  <nav><span class="brand">Chain-Movies テロップ工房</span><span class="sp"></span><a id="shopLink" href="#packs" hidden>BASEショップ</a><a href="#packs">素材集</a><a href="#sets">セット</a><a href="#free">無料ツール</a><a href="#faq">FAQ</a><a href="../apps/">ツール一覧</a></nav>
+  <nav><span class="brand">Chain-Movies テロップ工房</span><span class="sp"></span><a id="shopLink" href="#packs" hidden>BASEショップ</a><a href="#packs">素材集</a><a href="#sets">セット</a><a href="#toolsets">ツールセット</a><a href="#free">無料ツール</a><a href="#faq">FAQ</a><a href="../apps/">ツール一覧</a></nav>
 
   <section class="hero">
     <div>
@@ -113,6 +113,10 @@ footer a{color:var(--ink2)}
   <div class="lead">単品合計 ¥5,940 → セット ¥4,980（約16%OFF）。作る動画のジャンルが決まっている人向け。</div>
   <div class="sets" id="setGrid"></div>
   <div class="bundle" id="bundle"></div>
+
+  <h2 id="toolsets">ツール セット</h2>
+  <div class="lead">動画編集者向け・中小企業の広報向けに、ツールを束ねた買い切りセット。デモ版は下の「無料で使えるツール」で試せます。</div>
+  <div class="sets" id="appSetGrid"></div>
 
   <h2 id="free">無料で使えるツール</h2>
   <div class="lead">動画制作の現場から生まれた小さなツール。デモ版はここで試せます。</div>
@@ -162,6 +166,14 @@ footer a{color:var(--ink2)}
     const el = document.createElement('div'); el.className = 'set';
     el.innerHTML = `<div class="t">${s.name}</div><ul>${s.packs.map((id) => `<li>${(D.PACKS[id] || { name: id }).name}</li>`).join('')}</ul><div class="p">${yen(s.price)}<small>${s.packs.length}パック・${s.packs.reduce((a, id) => a + D.DESIGNS.filter((d) => d.pack === id).length, 0)}デザイン</small></div><div style="margin-top:10px">${buy ? `<a class="btn primary" href="${buy}" target="_blank" rel="noopener">BASEで購入</a>` : `<a class="btn primary" aria-disabled="true">BASE 準備中</a>`}</div>`;
     sets.appendChild(el);
+  }
+  const APPNAME = { 'srt-splitter': '台本→SRT 字幕分割', 'narration-timer': 'ナレーション尺計算・原稿タイマー', 'rate-calc': '動画編集 単価計算・時給見える化', 'sns-calendar': 'SNS 投稿カレンダー', 'thumb-maker': 'YouTube サムネ文字メーカー', 'invoice-maker': '見積書・請求書ジェネレーター', 'call-sheet': '香盤表ジェネレーター' };
+  const asets = document.getElementById('appSetGrid');
+  for (const k of Object.keys(L.appSets || {})) {
+    const s = L.appSets[k]; const buy = s.base || L.shopUrl;
+    const el = document.createElement('div'); el.className = 'set';
+    el.innerHTML = `<div class="t">${s.name}</div><ul>${s.items.map((id) => `<li>${D.PACKS[id] ? D.PACKS[id].name : (APPNAME[id] || id)}</li>`).join('')}</ul><div class="p">${yen(s.price)}<small>${s.desc || ''}</small></div><div style="margin-top:10px">${buy ? `<a class="btn primary" href="${buy}" target="_blank" rel="noopener">BASEで購入</a>` : `<a class="btn primary" aria-disabled="true">BASE 準備中</a>`}</div>`;
+    asets.appendChild(el);
   }
   const b = L.bundle || {}; const all = D.DESIGNS.length; const sum = ids.reduce((a, id) => a + D.PACKS[id].price, 0); const bb = b.base || L.shopUrl;
   document.getElementById('bundle').innerHTML = `<div><div class="t">${b.name || '全部入りバンドル'}</div><div class="d">${ids.length}パック・${all}デザインをまとめて。単品合計 ${yen(sum)} → ${yen(b.price || 9980)}。テロップメーカーは全デザイン対応版。</div></div><div class="p">${yen(b.price || 9980)}</div>${bb ? `<a class="btn primary" href="${bb}" target="_blank" rel="noopener">BASEで購入</a>` : `<a class="btn primary" aria-disabled="true">BASE 準備中</a>`}`;
