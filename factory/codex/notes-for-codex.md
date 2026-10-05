@@ -1,5 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-07 向け（翌朝の自分への引き継ぎ）
+- 実装済み: bousai（10/7 Release 予定）、agri（10/8）、car（10/9）、interview（10/10）、expo（10/11）。`node factory/calendar.mjs next-design` は `english-vol1`（10/12・英語学習・語学レッスン）を返すはずなので、それを20デザイン実装する。brief は calendar.json の english-vol1 を参照（白・ネイビー #0b1f3a・スカイブルー #7cc4ff・イエロー #ffcf4a・コーラル #ff6b6b は NG のみ、Dela Gothic One / Noto Sans JP 700/900 / Zen Kaku Gothic New 500 / M PLUS 1p 900）。school-vol1（黒板）と被らない「明るい・英字主体」。実在のスクール名・教材名・試験名は不可
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ。入れた後に count=20 を確認
+- 10/7 は水曜なのでアプリ枠あり。roadmap は全部 built なので、新作ではなく **購入者向け FAQ（factory/bundle/faq.md、10/6 作成）を各パックの BASE 説明文の末尾に流し込む仕組み**を作る: factory/base_kit.mjs の description に FAQ の短縮版（5問）を追記するオプション `--faq`。それが済んだら「使い方動画の 60 秒台本」（factory/bundle/howto-script.md）
+- calendar は money-vol1（10/17）まで。10/18 以降のテーマを2件追加（候補: 不動産 Vol.2、ネイル・美容 Vol.2、保険・金融は money と被るので避ける、スポーツ Vol.2（部活・大会）、ペット Vol.2（しつけ・病院））
+
 ## 2026-10-06 向け（翌朝の自分への引き継ぎ）
 - 実装済み: consult（10/6 Release 予定）、bousai（10/7）、agri（10/8）、car（10/9）、interview（10/10）。`node factory/calendar.mjs next-design` は `expo-vol1`（10/11・展示会・イベントレポート）を返すはずなので、それを20デザイン実装する。brief は calendar.json の expo-vol1 を参照（白・黒・イベントブルー #2b6cb0・オレンジ #ff7a00・黄 #ffcf4a・グレー #6b7a90、Noto Sans JP 700/900 / Dela Gothic One / Zen Kaku Gothic New 500 / M PLUS 1p 900）。実在の展示会名・企業名は不可
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72。box.accent.side は left/top/bottom のみ（right は無い）。デザイン数は入れた後に必ず count=20 を確認（interview は 21 個書いて 1 つ削った）
