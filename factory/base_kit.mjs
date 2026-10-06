@@ -3,6 +3,7 @@
 //   node factory/base_kit.mjs                 # 配信済み（built 済み）パック全部
 //   node factory/base_kit.mjs --pack stream-vol1
 //   node factory/base_kit.mjs --ref main      # 画像URLの参照ブランチ（既定 main）
+//   node factory/base_kit.mjs --no-faq        # 説明文末尾の「よくある質問」（factory/bundle/faq.md）を付けない
 // 出力: factory/base/items.csv（CSV商品管理 App 用）と factory/base/<pack>/{title,description,tags,images,price}.txt
 // BASE には公開APIがあるが「デジタルコンテンツ販売 App」のZIP登録はAPI非対応のため、
 // 商品情報は CSV で一括、ZIP だけ手で付ける前提。
@@ -19,6 +20,15 @@ const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 const onlyPack = opt('--pack', null);
 const ref = opt('--ref', 'main');
+const withFaq = !args.includes('--no-faq');
+function faqShort() {
+  try {
+    const t = fs.readFileSync(path.join(root, 'factory/bundle/faq.md'), 'utf8');
+    const i = t.indexOf('■ よくある質問');
+    return i >= 0 ? t.slice(i).trim() : '';
+  } catch (e) { return ''; }
+}
+const FAQ = withFaq ? faqShort() : '';
 const RAW = `https://raw.githubusercontent.com/chain-movies/daihon-studio/${ref}`;
 const GALLERY = ['cover', 'designs', 'portrait', 'howto', 'contents', 'compare', 'faq'];
 
@@ -67,7 +77,7 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
-© Chain-Movies Inc.`;
+${FAQ ? '\n' + FAQ + '\n' : ''}© Chain-Movies Inc.`;
 }
 
 const esc = (s) => `"${String(s).replace(/"/g, '""')}"`;

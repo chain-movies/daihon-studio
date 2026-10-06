@@ -1,0 +1,7 @@
+https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_01_cover.jpg
+https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_02_designs.jpg
+https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_03_portrait.jpg
+https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_04_howto.jpg
+https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_05_contents.jpg
+https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_06_compare.jpg
+https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_07_faq.jpg

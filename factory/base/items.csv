@@ -55,6 +55,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","1","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/tv-vol1/tv-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/tv-vol1/tv-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/tv-vol1/tv-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/tv-vol1/tv-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/tv-vol1/tv-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/tv-vol1/tv-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/tv-vol1/tv-vol1_07_faq.jpg"
 "バラエティ特化 ツッコミ・リアクションテロップ集｜20デザイン×色違い 67点 透過PNG＋テロップメーカー付き","バラエティ特化 ツッコミ・リアクションテロップ集｜20デザイン×色違い 67点の透過PNG＋テロップメーカー付き
 
@@ -110,6 +161,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","2","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/variety-vol1/variety-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/variety-vol1/variety-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/variety-vol1/variety-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/variety-vol1/variety-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/variety-vol1/variety-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/variety-vol1/variety-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/variety-vol1/variety-vol1_07_faq.jpg"
 "ニュース・報道テロップ集｜20デザイン×色違い 67点 透過PNG＋テロップメーカー付き","ニュース・報道テロップ集｜20デザイン×色違い 67点の透過PNG＋テロップメーカー付き
 
@@ -165,6 +267,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","3","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/news-vol1/news-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/news-vol1/news-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/news-vol1/news-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/news-vol1/news-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/news-vol1/news-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/news-vol1/news-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/news-vol1/news-vol1_07_faq.jpg"
 "縦動画（ショート・リール）専用 テロップ集｜20デザイン×色違い 74点 透過PNG＋テロップメーカー付き","縦動画（ショート・リール）専用 テロップ集｜20デザイン×色違い 74点の透過PNG＋テロップメーカー付き
 
@@ -220,6 +373,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","4","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/shorts-vol1/shorts-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/shorts-vol1/shorts-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/shorts-vol1/shorts-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/shorts-vol1/shorts-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/shorts-vol1/shorts-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/shorts-vol1/shorts-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/shorts-vol1/shorts-vol1_07_faq.jpg"
 "企業VP・セミナー動画テロップ集｜20デザイン×色違い 68点 透過PNG＋テロップメーカー付き","企業VP・セミナー動画テロップ集｜20デザイン×色違い 68点の透過PNG＋テロップメーカー付き
 
@@ -275,6 +479,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","5","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/business-vol1/business-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/business-vol1/business-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/business-vol1/business-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/business-vol1/business-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/business-vol1/business-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/business-vol1/business-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/business-vol1/business-vol1_07_faq.jpg"
 "グルメ・旅・Vlog テロップ集｜20デザイン×色違い 72点 透過PNG＋テロップメーカー付き","グルメ・旅・Vlog テロップ集｜20デザイン×色違い 72点の透過PNG＋テロップメーカー付き
 
@@ -330,6 +585,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","6","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/gourmet-vol1/gourmet-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/gourmet-vol1/gourmet-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/gourmet-vol1/gourmet-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/gourmet-vol1/gourmet-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/gourmet-vol1/gourmet-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/gourmet-vol1/gourmet-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/gourmet-vol1/gourmet-vol1_07_faq.jpg"
 "教育・子ども向け ポップテロップ集｜20デザイン×色違い 71点 透過PNG＋テロップメーカー付き","教育・子ども向け ポップテロップ集｜20デザイン×色違い 71点の透過PNG＋テロップメーカー付き
 
@@ -385,6 +691,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","7","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/kids-vol1/kids-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/kids-vol1/kids-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/kids-vol1/kids-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/kids-vol1/kids-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/kids-vol1/kids-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/kids-vol1/kids-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/kids-vol1/kids-vol1_07_faq.jpg"
 "スポーツ中継・速報テロップ集｜20デザイン×色違い 63点 透過PNG＋テロップメーカー付き","スポーツ中継・速報テロップ集｜20デザイン×色違い 63点の透過PNG＋テロップメーカー付き
 
@@ -440,6 +797,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","8","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/sports-vol1/sports-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/sports-vol1/sports-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/sports-vol1/sports-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/sports-vol1/sports-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/sports-vol1/sports-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/sports-vol1/sports-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/sports-vol1/sports-vol1_07_faq.jpg"
 "季節イベント テロップ集（ハロウィン・秋・クリスマス・年末年始）｜20デザイン×色違い 61点 透過PNG＋テロップメーカー付き","季節イベント テロップ集（ハロウィン・秋・クリスマス・年末年始）｜20デザイン×色違い 61点の透過PNG＋テロップメーカー付き
 
@@ -495,6 +903,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","9","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/season-autumn-vol1/season-autumn-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/season-autumn-vol1/season-autumn-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/season-autumn-vol1/season-autumn-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/season-autumn-vol1/season-autumn-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/season-autumn-vol1/season-autumn-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/season-autumn-vol1/season-autumn-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/season-autumn-vol1/season-autumn-vol1_07_faq.jpg"
 "結婚式・イベント映像テロップ集｜20デザイン×色違い 64点 透過PNG＋テロップメーカー付き","結婚式・イベント映像テロップ集｜20デザイン×色違い 64点の透過PNG＋テロップメーカー付き
 
@@ -550,6 +1009,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","10","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/wedding-vol1/wedding-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/wedding-vol1/wedding-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/wedding-vol1/wedding-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/wedding-vol1/wedding-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/wedding-vol1/wedding-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/wedding-vol1/wedding-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/wedding-vol1/wedding-vol1_07_faq.jpg"
 "配信・ゲーム実況テロップ集｜20デザイン×色違い 63点 透過PNG＋テロップメーカー付き","配信・ゲーム実況テロップ集｜20デザイン×色違い 63点の透過PNG＋テロップメーカー付き
 
@@ -605,6 +1115,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","11","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/stream-vol1/stream-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/stream-vol1/stream-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/stream-vol1/stream-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/stream-vol1/stream-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/stream-vol1/stream-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/stream-vol1/stream-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/stream-vol1/stream-vol1_07_faq.jpg"
 "不動産・物件紹介テロップ集｜20デザイン×色違い 62点 透過PNG＋テロップメーカー付き","不動産・物件紹介テロップ集｜20デザイン×色違い 62点の透過PNG＋テロップメーカー付き
 
@@ -660,6 +1221,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","12","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/realestate-vol1/realestate-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/realestate-vol1/realestate-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/realestate-vol1/realestate-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/realestate-vol1/realestate-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/realestate-vol1/realestate-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/realestate-vol1/realestate-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/realestate-vol1/realestate-vol1_07_faq.jpg"
 "美容・サロン・ファッション テロップ集｜20デザイン×色違い 67点 透過PNG＋テロップメーカー付き","美容・サロン・ファッション テロップ集｜20デザイン×色違い 67点の透過PNG＋テロップメーカー付き
 
@@ -715,6 +1327,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","13","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/beauty-vol1/beauty-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/beauty-vol1/beauty-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/beauty-vol1/beauty-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/beauty-vol1/beauty-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/beauty-vol1/beauty-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/beauty-vol1/beauty-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/beauty-vol1/beauty-vol1_07_faq.jpg"
 "採用・会社紹介動画テロップ集｜20デザイン×色違い 72点 透過PNG＋テロップメーカー付き","採用・会社紹介動画テロップ集｜20デザイン×色違い 72点の透過PNG＋テロップメーカー付き
 
@@ -770,6 +1433,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","14","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/recruit-vol1/recruit-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/recruit-vol1/recruit-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/recruit-vol1/recruit-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/recruit-vol1/recruit-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/recruit-vol1/recruit-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/recruit-vol1/recruit-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/recruit-vol1/recruit-vol1_07_faq.jpg"
 "フィットネス・健康 テロップ集｜20デザイン×色違い 63点 透過PNG＋テロップメーカー付き","フィットネス・健康 テロップ集｜20デザイン×色違い 63点の透過PNG＋テロップメーカー付き
 
@@ -825,6 +1539,57 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","15","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/fitness-vol1/fitness-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/fitness-vol1/fitness-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/fitness-vol1/fitness-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/fitness-vol1/fitness-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/fitness-vol1/fitness-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/fitness-vol1/fitness-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/fitness-vol1/fitness-vol1_07_faq.jpg"
 "学校・塾・オンライン講座 テロップ集｜20デザイン×色違い 61点 透過PNG＋テロップメーカー付き","学校・塾・オンライン講座 テロップ集｜20デザイン×色違い 61点の透過PNG＋テロップメーカー付き
 
@@ -880,4 +1645,797 @@ Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie
 
 ■ サポート
 使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
 © Chain-Movies Inc.","1980","10","9999","1","16","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/school-vol1/school-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/school-vol1/school-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/school-vol1/school-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/school-vol1/school-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/school-vol1/school-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/school-vol1/school-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/school-vol1/school-vol1_07_faq.jpg"
+"料理レシピ動画 テロップ集｜20デザイン×色違い 62点 透過PNG＋テロップメーカー付き","料理レシピ動画 テロップ集｜20デザイン×色違い 62点の透過PNG＋テロップメーカー付き
+
+貼るだけでテレビ番組のような「あのテロップ」になる、材料・手順・火加減・ポイント・リアクション・スタンプ・ラベル・章タイトル・コメント・情報・エンディング・注意・下部帯 20デザインのセットです。
+文字を変えたい人のために、ブラウザで動く「テロップメーカー」を同梱。台本を貼れば全行分を一括でPNG書き出しできます。
+
+■ こんな人に
+・YouTube / ショート動画のテロップに「テレビっぽさ」が欲しい
+・Premiere Pro の文字装飾を毎回ゼロから作るのが面倒
+・CapCut・DaVinci・iMovie でも使える素材が欲しい（画像を置くだけ）
+
+■ 収録内容
+・16:9（1920×1080）透過PNG 20デザイン × 色違い（計 62点）
+・9:16（1080×1920）縦動画用 透過PNG（同数）
+・文字なし「帯・ボックスのみ」PNG（自分のテキストを載せて使える）
+・テロップメーカー（HTMLアプリ）: 好きな文字で同デザインを書き出し／台本一括書き出し
+・RECIPE.txt: Premiere のエッセンシャルグラフィックスで再現するための設定値
+
+■ 収録デザイン
+01. 材料（2人分）・見出し（ブラウン・トマト赤・葉っぱ緑・クリーム×ブラウン）
+02. 材料行・分量タグ（ブラウン・トマト赤・葉っぱ緑）
+03. 手順 STEP・丸文字（STEP 1（赤）・STEP 2（緑）・STEP 3（ブラウン）・STEP 4（オレンジ））
+04. 中火で3分・タイマー（中火（赤）・弱火（オレンジ）・強火（濃赤））
+05. 火加減ラベル・炎（弱火（黄）・中火（オレンジ）・強火（赤））
+06. ポイント・ふせん（クリーム×緑・白×赤・クリーム×ブラウン）
+07. 完成！・バースト（黄×赤・クリーム×緑・赤×白）
+08. 保存版・スタンプ（赤・ブラウン・緑）
+09. 時短10分・ピル（緑・オレンジ・クリーム×ブラウン）
+10. 今日の献立・章タイトル（白×ブラウン・クリーム×赤・白×緑）
+11. 調味料・ラベル（ブラウン・赤・緑）
+12. アレンジ・吹き出し（オレンジ・緑・クリーム×ブラウン）
+13. レンジ 600W・角丸（黒×黄線・赤・白×ブラウン）
+14. 保存目安・小ラベル（青・緑・ブラウン）
+15. カロリー・数字（緑・赤・ブラウン）
+16. 盛り付けのコツ・手書き（白×黄線・クリーム×赤線・ブラウン（明るい映像用））
+17. いただきます・丸文字（白×ブラウン・クリーム×赤・白×緑）
+18. 人数・調理時間 ピル2連（クリーム×ブラウン・白×赤・緑×白）
+19. 注意・やけど（赤×黄・黒×黄・オレンジ×白）
+20. レシピ名・下部帯（ブラウン×クリーム・赤×白・緑×クリーム）
+
+■ 対応ソフト
+Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva など、画像を読み込めるものすべて
+
+■ ライセンス
+商用利用OK・クレジット表記不要。
+素材そのものの再配布・転売・二次配布、素材集としての再パッケージは禁止。
+デジタル商品のため、購入後の返品・返金はできません。
+
+■ 注意
+特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+テロップメーカーはフォント読み込みにインターネット接続が必要です。
+ご購入後、ダウンロードできる ZIP（約 数十MB）を解凍してお使いください。
+
+■ サポート
+使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
+© Chain-Movies Inc.","1980","10","9999","1","17","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/cooking-vol1/cooking-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/cooking-vol1/cooking-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/cooking-vol1/cooking-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/cooking-vol1/cooking-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/cooking-vol1/cooking-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/cooking-vol1/cooking-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/cooking-vol1/cooking-vol1_07_faq.jpg"
+"ペット動画 テロップ集｜20デザイン×色違い 63点 透過PNG＋テロップメーカー付き","ペット動画 テロップ集｜20デザイン×色違い 63点の透過PNG＋テロップメーカー付き
+
+貼るだけでテレビ番組のような「あのテロップ」になる、プロフィール・日常・日記・心の声・リアクション・ラベル・注意・数字・章タイトル・ふせん・NG/OK・CTA・キャプション・記録・コメント・下部帯・エンディング 20デザインのセットです。
+文字を変えたい人のために、ブラウザで動く「テロップメーカー」を同梱。台本を貼れば全行分を一括でPNG書き出しできます。
+
+■ こんな人に
+・YouTube / ショート動画のテロップに「テレビっぽさ」が欲しい
+・Premiere Pro の文字装飾を毎回ゼロから作るのが面倒
+・CapCut・DaVinci・iMovie でも使える素材が欲しい（画像を置くだけ）
+
+■ 収録内容
+・16:9（1920×1080）透過PNG 20デザイン × 色違い（計 63点）
+・9:16（1080×1920）縦動画用 透過PNG（同数）
+・文字なし「帯・ボックスのみ」PNG（自分のテキストを載せて使える）
+・テロップメーカー（HTMLアプリ）: 好きな文字で同デザインを書き出し／台本一括書き出し
+・RECIPE.txt: Premiere のエッセンシャルグラフィックスで再現するための設定値
+
+■ 収録デザイン
+01. 名前・年齢・肉球タグ（クリーム×ピンク・クリーム×水色・白×ブラウン）
+02. 今日のご飯・丸文字（白×ブラウン・ピンク×白・水色×白）
+03. お散歩なう・ピル（草原グリーン・水色・ピンク・クリーム）
+04. 日記風・日付＋一言（白×ブラウン・クリーム×ピンク・白×水色）
+05. 心の声・もくもく吹き出し（白・クリーム・ピンク）
+06. かわいい・ハート（ピンク・水色・イエロー）
+07. 保護犬・保護猫 ラベル（クリーム×ブラウン・白×ピンク・白×水色）
+08. おやつタイム・リボン（ピンク・水色・ブラウン・イエロー）
+09. 診察日・注意ラベル（水色・ピンク・ブラウン）
+10. 体重・数字（クリーム×ブラウン・白×ピンク・白×水色）
+11. 初めての〇〇・章タイトル（白×ブラウン・クリーム×ピンク・白×水色）
+12. 状態ラベル・寝てる／遊んでる（寝てる（水色）・遊んでる（イエロー）・ごはん中（ブラウン）・お昼寝（ピンク））
+13. しつけメモ・ふせん（黄ふせん・ピンクふせん・水色ふせん）
+14. NG行動／OK・丸ラベル（NG（赤）・OK（緑）・OK（水色））
+15. フォローしてね・ピル（ピンク・水色・ブラウン）
+16. 今日の1枚・キャプション（ブラウン半透明・白半透明・クリーム）
+17. うちの子記念日・カウント（クリーム×ピンク・白×水色・ピンク×白）
+18. 飼い主コメント・吹き出し（白×ブラウン・クリーム×ピンク・白×水色）
+19. 名前・下部帯（クリーム×ピンク・白×水色・ブラウン×クリーム）
+20. おやすみ・丸文字（白×ネイビー・クリーム×ブラウン・ピンク×白）
+
+■ 対応ソフト
+Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva など、画像を読み込めるものすべて
+
+■ ライセンス
+商用利用OK・クレジット表記不要。
+素材そのものの再配布・転売・二次配布、素材集としての再パッケージは禁止。
+デジタル商品のため、購入後の返品・返金はできません。
+
+■ 注意
+特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+テロップメーカーはフォント読み込みにインターネット接続が必要です。
+ご購入後、ダウンロードできる ZIP（約 数十MB）を解凍してお使いください。
+
+■ サポート
+使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
+© Chain-Movies Inc.","1980","10","9999","1","18","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/pet-vol1/pet-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/pet-vol1/pet-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/pet-vol1/pet-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/pet-vol1/pet-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/pet-vol1/pet-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/pet-vol1/pet-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/pet-vol1/pet-vol1_07_faq.jpg"
+"音楽・ライブ映像 テロップ集｜20デザイン×色違い 63点 透過PNG＋テロップメーカー付き","音楽・ライブ映像 テロップ集｜20デザイン×色違い 63点の透過PNG＋テロップメーカー付き
+
+貼るだけでテレビ番組のような「あのテロップ」になる、曲名・歌詞・会場・セットリスト・クレジット・ラベル・進行・演出・エンディング・注意・章タイトル・下部帯・メッセージ・告知 20デザインのセットです。
+文字を変えたい人のために、ブラウザで動く「テロップメーカー」を同梱。台本を貼れば全行分を一括でPNG書き出しできます。
+
+■ こんな人に
+・YouTube / ショート動画のテロップに「テレビっぽさ」が欲しい
+・Premiere Pro の文字装飾を毎回ゼロから作るのが面倒
+・CapCut・DaVinci・iMovie でも使える素材が欲しい（画像を置くだけ）
+
+■ 収録内容
+・16:9（1920×1080）透過PNG 20デザイン × 色違い（計 63点）
+・9:16（1080×1920）縦動画用 透過PNG（同数）
+・文字なし「帯・ボックスのみ」PNG（自分のテキストを載せて使える）
+・テロップメーカー（HTMLアプリ）: 好きな文字で同デザインを書き出し／台本一括書き出し
+・RECIPE.txt: Premiere のエッセンシャルグラフィックスで再現するための設定値
+
+■ 収録デザイン
+01. 曲名＋アーティスト・セリフ（白×ゴールド・ゴールド×白・白×ワイン）
+02. 歌詞テロップ・中央薄帯（白×黒帯・ゴールド×黒帯・白×ワイン帯・白×帯なし（影のみ））
+03. LIVE at 会場・英字（白×ゴールド・ゴールド×白・スモーキーブルー）
+04. セットリスト M1・番号（M1（ゴールド）・M2（ワイン）・M3（スモーキーブルー）・EN（アンコール・白））
+05. 演奏クレジット・楽器＋名前（Guitar（ゴールド）・Vocal（白）・Drums（ワイン）・Bass（ブルー））
+06. Now Playing・ピル（黒×ゴールド線・ワイン・白×黒）
+07. アンコール・大文字（ゴールド・白・ワイン）
+08. MC・小ラベル（白・ゴールド・黒×白）
+09. 作詞・作曲クレジット（白・ゴールド・白×黒帯）
+10. カウント 1, 2, 3, 4（白・ゴールド・ワイン）
+11. サビ・マーカー（ゴールド・ワイン×白・白×黒）
+12. Thank you for coming（白×ゴールド線・ゴールド・ワイン（明るい映像用））
+13. 次の曲・細帯（黒×ゴールド・ワイン・ブルー）
+14. 音量注意・小ラベル（黒半透明・白半透明・ワイン）
+15. Special Thanks・見出し（ゴールド×白・白×白・ワイン（明るい映像用））
+16. 日付・時刻スタンプ（白線・ゴールド線・ワイン塗り）
+17. 章タイトル・Act（白×ゴールド・ゴールド×白・ブルー×白）
+18. バンド名・下部帯（黒×ゴールド・ワイン×白・ブルー×白）
+19. MC の一言・引用（白×ゴールド・白×白・ゴールド）
+20. グッズ・物販 告知（白×ゴールド・白×ワイン・ゴールド×黒）
+
+■ 対応ソフト
+Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva など、画像を読み込めるものすべて
+
+■ ライセンス
+商用利用OK・クレジット表記不要。
+素材そのものの再配布・転売・二次配布、素材集としての再パッケージは禁止。
+デジタル商品のため、購入後の返品・返金はできません。
+
+■ 注意
+特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+テロップメーカーはフォント読み込みにインターネット接続が必要です。
+ご購入後、ダウンロードできる ZIP（約 数十MB）を解凍してお使いください。
+
+■ サポート
+使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
+© Chain-Movies Inc.","1980","10","9999","1","19","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/music-vol1/music-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/music-vol1/music-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/music-vol1/music-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/music-vol1/music-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/music-vol1/music-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/music-vol1/music-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/music-vol1/music-vol1_07_faq.jpg"
+"DIY・ハンドメイド テロップ集｜20デザイン×色違い 61点 透過PNG＋テロップメーカー付き","DIY・ハンドメイド テロップ集｜20デザイン×色違い 61点の透過PNG＋テロップメーカー付き
+
+貼るだけでテレビ番組のような「あのテロップ」になる、材料・手順・注意・ポイント・Before/After・数字・ラベル・NG/OK・コメント・CTA・章タイトル・エンディング・下部帯 20デザインのセットです。
+文字を変えたい人のために、ブラウザで動く「テロップメーカー」を同梱。台本を貼れば全行分を一括でPNG書き出しできます。
+
+■ こんな人に
+・YouTube / ショート動画のテロップに「テレビっぽさ」が欲しい
+・Premiere Pro の文字装飾を毎回ゼロから作るのが面倒
+・CapCut・DaVinci・iMovie でも使える素材が欲しい（画像を置くだけ）
+
+■ 収録内容
+・16:9（1920×1080）透過PNG 20デザイン × 色違い（計 61点）
+・9:16（1080×1920）縦動画用 透過PNG（同数）
+・文字なし「帯・ボックスのみ」PNG（自分のテキストを載せて使える）
+・テロップメーカー（HTMLアプリ）: 好きな文字で同デザインを書き出し／台本一括書き出し
+・RECIPE.txt: Premiere のエッセンシャルグラフィックスで再現するための設定値
+
+■ 収録デザイン
+01. 材料と道具・見出し（ブラウン×オレンジ・クラフト紙×ブラウン・ボード緑×白）
+02. 寸法タグ・材料行（オレンジ・ブラウン・ボード緑）
+03. STEP 1 採寸・番号（STEP 1（ブラウン）・STEP 2（オレンジ）・STEP 3（緑）・STEP 4（黒））
+04. ケガに注意・警告帯（黄×黒・オレンジ×黒・赤×白）
+05. 乾燥 24時間・タイマー（ブラウン・オレンジ・緑）
+06. ここがコツ・ふせん（黄×オレンジ・クラフト紙×ブラウン・白×緑）
+07. BEFORE／AFTER・工具風タグ（BEFORE（クラフト紙）・AFTER（オレンジ）・AFTER（緑））
+08. 完成サイズ・数字（ブラウン・オレンジ・緑）
+09. かかった費用・¥（オレンジ・クラフト紙・緑）
+10. 所要時間・ピル（クラフト紙・白×オレンジ・緑×白）
+11. 使用した工具・ラベル（黒×オレンジ・ブラウン×クラフト紙・白×緑）
+12. 失敗例／成功例・タグ（失敗例（赤）・成功例（緑）・よくあるミス（オレンジ））
+13. アレンジ案・吹き出し（白×ブラウン・クラフト紙×オレンジ・白×緑）
+14. 作り方はこちら・ピル（オレンジ・ブラウン・緑）
+15. 章タイトル・組み立て（白×ブラウン・塗装（白×オレンジ）・仕上げ（白×緑））
+16. 塗装・色名ラベル（ウォールナット・ホワイト・グリーン）
+17. 寸法メモ・手書き（白×ブラウン・黄×黒・白×オレンジ）
+18. できあがり・バースト（黄×ブラウン・オレンジ×白・クラフト紙×緑）
+19. 作品ナンバー・#（クラフト紙・黒×オレンジ・白×緑）
+20. 作品名・下部帯（ブラウン×オレンジ・黒×黄・緑×白）
+
+■ 対応ソフト
+Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva など、画像を読み込めるものすべて
+
+■ ライセンス
+商用利用OK・クレジット表記不要。
+素材そのものの再配布・転売・二次配布、素材集としての再パッケージは禁止。
+デジタル商品のため、購入後の返品・返金はできません。
+
+■ 注意
+特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+テロップメーカーはフォント読み込みにインターネット接続が必要です。
+ご購入後、ダウンロードできる ZIP（約 数十MB）を解凍してお使いください。
+
+■ サポート
+使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
+© Chain-Movies Inc.","1980","10","9999","1","20","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/diy-vol1/diy-vol1_07_faq.jpg"
+"旅行・ホテル紹介 テロップ集｜20デザイン×色違い 61点 透過PNG＋テロップメーカー付き","旅行・ホテル紹介 テロップ集｜20デザイン×色違い 61点の透過PNG＋テロップメーカー付き
+
+貼るだけでテレビ番組のような「あのテロップ」になる、行程・時刻・宿・価格・ピン・ラベル・ふせん・注意・章タイトル・食事・オープニング・下部帯 20デザインのセットです。
+文字を変えたい人のために、ブラウザで動く「テロップメーカー」を同梱。台本を貼れば全行分を一括でPNG書き出しできます。
+
+■ こんな人に
+・YouTube / ショート動画のテロップに「テレビっぽさ」が欲しい
+・Premiere Pro の文字装飾を毎回ゼロから作るのが面倒
+・CapCut・DaVinci・iMovie でも使える素材が欲しい（画像を置くだけ）
+
+■ 収録内容
+・16:9（1920×1080）透過PNG 20デザイン × 色違い（計 61点）
+・9:16（1080×1920）縦動画用 透過PNG（同数）
+・文字なし「帯・ボックスのみ」PNG（自分のテキストを載せて使える）
+・テロップメーカー（HTMLアプリ）: 好きな文字で同デザインを書き出し／台本一括書き出し
+・RECIPE.txt: Premiere のエッセンシャルグラフィックスで再現するための設定値
+
+■ 収録デザイン
+01. DAY 1・行程タグ（DAY 1（空色）・DAY 2（サンド）・DAY 3（白）・DAY 1（赤））
+02. 移動・所要時間（白×空色・サンド×ネイビー・ネイビー×白）
+03. チェックイン・時刻（ネイビー×白・空色×ネイビー・サンド）
+04. 客室・タイプ＋広さ（白×サンド・白×空色・ネイビー（明るい映像用））
+05. 宿泊料金・1泊2食（赤×ネイビー・ネイビー×空色・白×赤（暗い映像用））
+06. 絶景ポイント・ピン（赤・空色・ネイビー）
+07. 地図ラベル・アクセス（ネイビー・空色・サンド）
+08. おすすめ度・星（★4・★5・★3）
+09. 持ち物メモ・ふせん（サンド×ネイビー・白×空色・黄×ネイビー）
+10. 注意・混雑（赤×白・ネイビー×黄・黒×白）
+11. 旅のまとめ・章タイトル（白×空色・白×サンド・ネイビー（明るい映像用））
+12. 今日の宿・宿名（ネイビー×サンド・白×ネイビー・ネイビー×空色）
+13. 朝食ビュッフェ・ラベル（サンド・白・空色）
+14. フォトスポット・スタンプ（白・空色・赤）
+15. 予算・1人あたり（白×赤・空色×ネイビー・サンド×ネイビー）
+16. Vlog 番号・#（ネイビー・白・空色）
+17. 行ってきます・丸文字（白×ネイビー・空色×ネイビー・ただいま（サンド×ネイビー））
+18. 観光地名・下線（白・白×空色線・ネイビー（明るい映像用））
+19. 現在時刻・天気（黒半透明・空色・白）
+20. 旅タイトル・下部帯（ネイビー×空色・サンド×ネイビー・空色×白）
+
+■ 対応ソフト
+Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva など、画像を読み込めるものすべて
+
+■ ライセンス
+商用利用OK・クレジット表記不要。
+素材そのものの再配布・転売・二次配布、素材集としての再パッケージは禁止。
+デジタル商品のため、購入後の返品・返金はできません。
+
+■ 注意
+特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+テロップメーカーはフォント読み込みにインターネット接続が必要です。
+ご購入後、ダウンロードできる ZIP（約 数十MB）を解凍してお使いください。
+
+■ サポート
+使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
+© Chain-Movies Inc.","1980","10","9999","1","21","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/travel-vol1/travel-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/travel-vol1/travel-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/travel-vol1/travel-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/travel-vol1/travel-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/travel-vol1/travel-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/travel-vol1/travel-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/travel-vol1/travel-vol1_07_faq.jpg"
+"医療・クリニック案内 テロップ集｜20デザイン×色違い 63点 透過PNG＋テロップメーカー付き","医療・クリニック案内 テロップ集｜20デザイン×色違い 63点の透過PNG＋テロップメーカー付き
+
+貼るだけでテレビ番組のような「あのテロップ」になる、診療時間・ラベル・章タイトル・チェック・Q&A・引用・料金・数字・案内・CTA・注意・流れ・スタッフ・エンド 20デザインのセットです。
+文字を変えたい人のために、ブラウザで動く「テロップメーカー」を同梱。台本を貼れば全行分を一括でPNG書き出しできます。
+
+■ こんな人に
+・YouTube / ショート動画のテロップに「テレビっぽさ」が欲しい
+・Premiere Pro の文字装飾を毎回ゼロから作るのが面倒
+・CapCut・DaVinci・iMovie でも使える素材が欲しい（画像を置くだけ）
+
+■ 収録内容
+・16:9（1920×1080）透過PNG 20デザイン × 色違い（計 63点）
+・9:16（1080×1920）縦動画用 透過PNG（同数）
+・文字なし「帯・ボックスのみ」PNG（自分のテキストを載せて使える）
+・テロップメーカー（HTMLアプリ）: 好きな文字で同デザインを書き出し／台本一括書き出し
+・RECIPE.txt: Premiere のエッセンシャルグラフィックスで再現するための設定値
+
+■ 収録デザイン
+01. 診療時間・表風（ブルー・ミント・グレー）
+02. 休診日・ラベル（グレー・ブルー・白×グレー）
+03. 予約制・ピル（ブルー・ミント・白・グレー）
+04. 初診の方へ・章タイトル（白×ミント・白×ブルー・ブルー×白）
+05. 症状チェック・✓（ブルー✓・ミント✓・グレー□）
+06. Q&A・タグ差し替え（Q（ブルー）・A（ミント）・Q（グレー））
+07. 院長より・引用（ブルー・ミント・グレー）
+08. 保険適用／自費・タグ（保険適用（ブルー）・自費（グレー）・保険適用（ミント））
+09. 所要時間・大きめ（ブルー・ミント・グレー）
+10. 持ち物・リスト（ミント・ブルー・グレー）
+11. アクセス・駅徒歩（ブルー・ミント・グレー）
+12. 感染対策・小ラベル（ミント・白・ブルー）
+13. 予約はこちら・CTA（ブルー・ミント・ネイビー）
+14. 注意事項・帯（赤・グレー（お知らせ）・ブルー（ご案内））
+15. お子さま連れOK・ピル（ミント・白・ブルー・グレー）
+16. STEP・受診の流れ（STEP 1・STEP 2・STEP 3・STEP 4（ミント））
+17. 料金・大きな数字（ブルー・ネイビー・ミント）
+18. 相談無料・斜め（ブルー・ミント・白）
+19. スタッフ紹介・名前＋職種（ブルー×白・ミント×白・白×グレー）
+20. お大事に・エンド（白×ミント・白×ブルー・ブルー×白）
+
+■ 対応ソフト
+Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva など、画像を読み込めるものすべて
+
+■ ライセンス
+商用利用OK・クレジット表記不要。
+素材そのものの再配布・転売・二次配布、素材集としての再パッケージは禁止。
+デジタル商品のため、購入後の返品・返金はできません。
+
+■ 注意
+特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+テロップメーカーはフォント読み込みにインターネット接続が必要です。
+ご購入後、ダウンロードできる ZIP（約 数十MB）を解凍してお使いください。
+
+■ サポート
+使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
+© Chain-Movies Inc.","1980","10","9999","1","22","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/clinic-vol1/clinic-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/clinic-vol1/clinic-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/clinic-vol1/clinic-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/clinic-vol1/clinic-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/clinic-vol1/clinic-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/clinic-vol1/clinic-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/clinic-vol1/clinic-vol1_07_faq.jpg"
+"士業・コンサル解説 テロップ集｜20デザイン×色違い 63点 透過PNG＋テロップメーカー付き","士業・コンサル解説 テロップ集｜20デザイン×色違い 63点の透過PNG＋テロップメーカー付き
+
+貼るだけでテレビ番組のような「あのテロップ」になる、結論・制度・ポイント・誤解・要件・期限・ケース・計算式・注釈・Q&A・用語・まとめ・CTA・流れ・数字・章タイトル・エンド 20デザインのセットです。
+文字を変えたい人のために、ブラウザで動く「テロップメーカー」を同梱。台本を貼れば全行分を一括でPNG書き出しできます。
+
+■ こんな人に
+・YouTube / ショート動画のテロップに「テレビっぽさ」が欲しい
+・Premiere Pro の文字装飾を毎回ゼロから作るのが面倒
+・CapCut・DaVinci・iMovie でも使える素材が欲しい（画像を置くだけ）
+
+■ 収録内容
+・16:9（1920×1080）透過PNG 20デザイン × 色違い（計 63点）
+・9:16（1080×1920）縦動画用 透過PNG（同数）
+・文字なし「帯・ボックスのみ」PNG（自分のテキストを載せて使える）
+・テロップメーカー（HTMLアプリ）: 好きな文字で同デザインを書き出し／台本一括書き出し
+・RECIPE.txt: Premiere のエッセンシャルグラフィックスで再現するための設定値
+
+■ 収録デザイン
+01. 結論・タグ＋一文（ネイビー×黄・ブルー×白・白×ネイビー）
+02. 改正・日付タグ（ブルー・赤（注意喚起）・ネイビー）
+03. 対象・条件ラベル（ネイビー・ブルー・対象外（グレー））
+04. ポイント番号・タグ差し替え（ポイント①・ポイント②・ポイント③・ポイント①（ブルー））
+05. よくある誤解・×（グレー×赤・ネイビー×赤・白×赤）
+06. 正しくは・○（白×ブルー・白×ネイビー・ネイビー×黄）
+07. 要件・チェック風（ブルー☑・ネイビー☑・未チェック☐）
+08. 期限・赤（赤・ネイビー・黄（要注意））
+09. 例・ケース（グレー・ブルー・黄）
+10. 計算式・枠（ネイビー・ブルー・ネイビー地×白）
+11. 免責・小ラベル（グレー・ネイビー・白）
+12. Q&A・ネイビー（Q（黄）・A（ブルー）・Q（白））
+13. 用語解説・定義（ブルー・ネイビー・黄）
+14. まとめ・帯（ネイビー×黄・ブルー×白・白×ネイビー）
+15. 無料相談・CTA（ブルー・ネイビー・黄）
+16. 出典・小ラベル（ネイビー・グレー・白）
+17. STEP・申請の流れ（STEP 1・STEP 2・STEP 3・STEP 4（ブルー））
+18. 金額・大きな数字（ネイビー×黄・赤（負担額）・ブルー）
+19. 章タイトル・番号（01・02・03・01（ブルー））
+20. ご相談ください・エンド（ネイビー×黄・ブルー×白・白×ネイビー）
+
+■ 対応ソフト
+Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva など、画像を読み込めるものすべて
+
+■ ライセンス
+商用利用OK・クレジット表記不要。
+素材そのものの再配布・転売・二次配布、素材集としての再パッケージは禁止。
+デジタル商品のため、購入後の返品・返金はできません。
+
+■ 注意
+特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+テロップメーカーはフォント読み込みにインターネット接続が必要です。
+ご購入後、ダウンロードできる ZIP（約 数十MB）を解凍してお使いください。
+
+■ サポート
+使い方のご質問は BASE のメッセージからどうぞ。
+
+■ よくある質問」として短縮版（★印の5問）を入れる。長い版はサポートのメッセージ返信にコピペする。
+
+## ★ Q. どの編集ソフトで使えますか？
+A. 画像（PNG）を読み込めるソフトならすべて使えます。Premiere Pro / After Effects / CapCut / DaVinci Resolve / Final Cut Pro / iMovie / Canva で動作を確認しています。テロップは透過 PNG なので、映像の上に置くだけです。
+
+## ★ Q. 文字は自分で変えられますか？
+A. はい。同梱の「テロップメーカー」（HTML アプリ）をブラウザで開き、好きな文字を入れて同じデザインで PNG を書き出せます。台本を貼れば全行分を一括で書き出せます。文字なしの「帯のみ」PNG も入っているので、編集ソフトのテキストを上に乗せる使い方もできます。
+
+## ★ Q. 商用利用はできますか？クレジットは必要ですか？
+A. 商用利用 OK、クレジット表記は不要です。YouTube・広告・企業VP・結婚式映像・クライアント案件に使えます。禁止はテロップ素材そのものの再配布・転売・二次配布と、素材集として再パッケージすることだけです。
+
+## ★ Q. 縦動画（ショート・リール）でも使えますか？
+A. はい。全デザインに 9:16（1080×1920）版が入っています。16:9（1920×1080）版と同じファイル名で、`png/9x16/` フォルダにあります。
+
+## ★ Q. ZIP を解凍したら文字化けしています／開けません
+A. Windows の標準解凍で日本語ファイル名が化けることがあります。7-Zip など UTF-8 対応の解凍ソフトをお使いください。Mac では標準で開けます。それでも開けない場合は BASE のメッセージからご連絡ください。再送します。
+
+## Q. テロップメーカーが真っ白／フォントが違う
+A. テロップメーカーはフォントを Google Fonts から読み込むため、インターネット接続が必要です。オフラインだと代替フォントで表示されます。Chrome・Edge・Safari の最新版でお使いください。社内ネットワークで外部フォントがブロックされている場合は、PNG 素材をそのままお使いください。
+
+## Q. Premiere で同じ見た目を自分で作りたい
+A. 同梱の RECIPE.txt に、各デザインのフォント・サイズ・色・縁取り・影の設定値を載せています。エッセンシャルグラフィックスで同じ値を入れれば再現できます。
+
+## Q. 1つ買えば会社の他のスタッフも使えますか？
+A. 購入者本人と同一事業所内での利用は台数無制限です。別会社・外部スタッフに渡す場合は、その会社ごとにご購入ください。
+
+## Q. 他のパックのテロップメーカーと同じですか？
+A. アプリは共通で、入っているデザインがパックごとに違います。複数パックをお持ちの場合は、最新のパックに入っているテロップメーカーが全パック対応版です（designs.js に全デザインが入っています）。
+
+## Q. 返品・返金はできますか？
+A. デジタル商品の性質上、購入後の返品・返金はできません。ファイルが壊れている・足りない場合は再送しますので、BASE のメッセージからご連絡ください。
+
+## Q. アップデートはありますか？
+A. デザインの修正や追加があった場合は、購入者に BASE のメッセージで新しい ZIP をお送りします。追加料金はありません。
+
+## Q. 特定の番組のテロップと同じものですか？
+A. いいえ。特定の番組・局のロゴやデザインを複製したものではなく、ジャンルの「雰囲気」を再現した汎用デザインです。
+
+## Q. 欲しいジャンルがありません
+A. 毎日 1 パックずつ新ジャンルを追加しています。BASE のメッセージでリクエストをいただければ、制作の参考にします。
+
+---
+## BASE 説明文の末尾に貼る短縮版（コピペ用）
+
+■ よくある質問
+Q. どのソフトで使える？ → 画像を読み込めるソフトすべて（Premiere / CapCut / DaVinci / iMovie / Canva）。透過 PNG を置くだけ
+Q. 文字は変えられる？ → 同梱のテロップメーカー（ブラウザで動く）で好きな文字に。台本を貼れば一括書き出し
+Q. 商用利用・クレジット → 商用 OK・クレジット不要。素材そのものの再配布・転売のみ禁止
+Q. 縦動画でも使える？ → 全デザインに 9:16 版を同梱
+Q. 解凍できない・文字化け → 7-Zip など UTF-8 対応の解凍ソフトで。それでもダメならメッセージで再送します
+© Chain-Movies Inc.","1980","10","9999","1","23","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/consult-vol1/consult-vol1_01_cover.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/consult-vol1/consult-vol1_02_designs.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/consult-vol1/consult-vol1_03_portrait.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/consult-vol1/consult-vol1_04_howto.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/consult-vol1/consult-vol1_05_contents.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/consult-vol1/consult-vol1_06_compare.jpg","https://raw.githubusercontent.com/chain-movies/daihon-studio/main/factory/gallery/consult-vol1/consult-vol1_07_faq.jpg"

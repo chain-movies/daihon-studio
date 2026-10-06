@@ -1,5 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-08 向け（翌朝の自分への引き継ぎ）
+- 実装済み: agri（10/8 Release 予定）、car（10/9）、interview（10/10）、expo（10/11）、english（10/12）。`node factory/calendar.mjs next-design` は `care-vol1`（10/13・介護・福祉施設紹介）を返すはずなので、それを20デザイン実装する。brief は calendar.json の care-vol1 を参照（白・やさしいオレンジ #f5a623・ミント #9bd3c7・ベージュ #e8dcc5・グレー #6b7a90・ブラウン #6b4423、Zen Maru Gothic 700/900 / BIZ UDPGothic 700 / Kiwi Maru / Noto Sans JP 700）。clinic-vol1（cl-*）と被らない「丸く・温かく・大きめ文字」。効果の断定・実在の施設名は不可
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ。入れた後に count=20 を確認
+- 10/8 は木曜なのでアプリ実装は不要。完了後 `node factory/build_pack.mjs --pack care-vol1 --quick` で contact_sheet を確認
+- **新パックを足したら商品画像も**: `node factory/gen_gallery.mjs`で factory/gallery に無いパックだけ生成 → `node factory/base_kit.mjs` で items.csv を更新（10/7 に 8 パック分まとめて生成した。以後は毎朝 1 パック分）。--all で全パック作り直し
+- calendar は realestate-vol2（10/19）まで。10/20 以降のテーマを2件追加（候補: スポーツ Vol.2（部活・大会）、ネイル・まつげサロン、保育園・幼稚園、葬儀・終活）
+
 ## 2026-10-07 向け（翌朝の自分への引き継ぎ）
 - 実装済み: bousai（10/7 Release 予定）、agri（10/8）、car（10/9）、interview（10/10）、expo（10/11）。`node factory/calendar.mjs next-design` は `english-vol1`（10/12・英語学習・語学レッスン）を返すはずなので、それを20デザイン実装する。brief は calendar.json の english-vol1 を参照（白・ネイビー #0b1f3a・スカイブルー #7cc4ff・イエロー #ffcf4a・コーラル #ff6b6b は NG のみ、Dela Gothic One / Noto Sans JP 700/900 / Zen Kaku Gothic New 500 / M PLUS 1p 900）。school-vol1（黒板）と被らない「明るい・英字主体」。実在のスクール名・教材名・試験名は不可
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ。入れた後に count=20 を確認

@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: 
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= diy-vol1_2026-10-03.zip
