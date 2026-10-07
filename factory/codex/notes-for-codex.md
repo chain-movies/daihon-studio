@@ -1,5 +1,12 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-09 向け（翌朝の自分への引き継ぎ）
+- 実装済み: car（10/9 Release 予定）、interview（10/10）、expo（10/11）、english（10/12）、care（10/13）。`node factory/calendar.mjs next-design` は `game-vol1`（10/14・ゲーム攻略・解説）を返すはずなので、それを20デザイン実装する。brief は calendar.json の game-vol1 を参照（黒 #111・白・ネオングリーン #39ff14・サイバー青 #00e5ff・赤 #d7263d・黄 #ffcf4a、DotGothic16 / M PLUS 1p 900 / Noto Sans JP 900 / Dela Gothic One / Zen Kaku Gothic New 500）。stream-vol1（st-*）のネオン管・ピクセルと被らない「情報パネル・HUD 風」。実在のゲームタイトル・キャラ名は不可
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ。入れた後に count=20 を確認
+- 10/9 は金曜なのでアプリ枠あり。新作ではなく「note No.26 の仕上げ」（content/note/2026-10-08-30packs/ に下書きあり。記事の型 v2 で ■ 見出し 3〜5、ヘッダーは factory/note_header.mjs、挿絵は 1280×640 フラット、CTA は相談窓口）→ Drive の投稿パックへ body.txt とガイド
+- 毎朝の定型: デザイン実装 → quick → 目視 → full → `node factory/gen_gallery.mjs`（無いパックだけ）→ `node factory/base_kit.mjs` → 報告
+- calendar は nursery-vol1（10/21）まで。10/22 以降のテーマを2件追加（候補: ネイル・まつげサロン、葬儀・終活、不用品回収・引越し、学習塾 Vol.2（受験）、観光協会・インバウンド）
+
 ## 2026-10-08 向け（翌朝の自分への引き継ぎ）
 - 実装済み: agri（10/8 Release 予定）、car（10/9）、interview（10/10）、expo（10/11）、english（10/12）。`node factory/calendar.mjs next-design` は `care-vol1`（10/13・介護・福祉施設紹介）を返すはずなので、それを20デザイン実装する。brief は calendar.json の care-vol1 を参照（白・やさしいオレンジ #f5a623・ミント #9bd3c7・ベージュ #e8dcc5・グレー #6b7a90・ブラウン #6b4423、Zen Maru Gothic 700/900 / BIZ UDPGothic 700 / Kiwi Maru / Noto Sans JP 700）。clinic-vol1（cl-*）と被らない「丸く・温かく・大きめ文字」。効果の断定・実在の施設名は不可
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ。入れた後に count=20 を確認
