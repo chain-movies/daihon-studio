@@ -1,5 +1,13 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-10 向け（翌朝の自分への引き継ぎ）
+- 実装済み: interview（10/10 Release 予定）、expo（10/11）、english（10/12）、care（10/13）、game（10/14）。`node factory/calendar.mjs next-design` は `study-vol1`（10/15・資格・勉強法）を返すはずなので、それを20デザイン実装する。brief は calendar.json の study-vol1 を参照（白・ネイビー #0b1f3a・マーカー黄 #ffe58a・赤 #d7263d・ブルー #2b6cb0・グレー #6b7a90、Noto Sans JP 700/900 / BIZ UDPGothic / Zen Kaku Gothic New 500 / M PLUS 1p 900 / Klee One は1つだけ）。school-vol1（黒板）・english-vol1（明るい英字）と被らない「自習ノート・情報整理」。実在の試験名・教材名は不可
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs` → 報告。10/10 は土曜なのでアプリ枠なし
+- note No.26 は Drive 投入済み（本文 Doc・台帳・キャラ挿絵プロンプト）。公開は人間。土曜の報告で「公開待ち No.24/25/26」と一言
+- telop/index.html のヘッダーのパック名リストは 10/9 に 1 行省略に変更（パックが増えても崩れない）。他の demo ページも同様の表示があれば同じ対処
+- calendar は funeral-vol1（10/23）まで。10/24 以降のテーマを2件追加（候補: 不用品回収・引越し、観光協会・インバウンド、学習塾 Vol.2（受験）、ヨガ・ピラティス）
+
 ## 2026-10-09 向け（翌朝の自分への引き継ぎ）
 - 実装済み: car（10/9 Release 予定）、interview（10/10）、expo（10/11）、english（10/12）、care（10/13）。`node factory/calendar.mjs next-design` は `game-vol1`（10/14・ゲーム攻略・解説）を返すはずなので、それを20デザイン実装する。brief は calendar.json の game-vol1 を参照（黒 #111・白・ネオングリーン #39ff14・サイバー青 #00e5ff・赤 #d7263d・黄 #ffcf4a、DotGothic16 / M PLUS 1p 900 / Noto Sans JP 900 / Dela Gothic One / Zen Kaku Gothic New 500）。stream-vol1（st-*）のネオン管・ピクセルと被らない「情報パネル・HUD 風」。実在のゲームタイトル・キャラ名は不可
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ。入れた後に count=20 を確認

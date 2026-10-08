@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: 
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= agri-vol1_2026-10-08.zip
