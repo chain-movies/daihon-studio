@@ -1,5 +1,11 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-11 向け（翌朝の自分への引き継ぎ）
+- 実装済み: expo（10/11 Release 予定）、english（10/12）、care（10/13）、game（10/14）、study（10/15）。`node factory/calendar.mjs next-design` は `local-vol1`（10/16・地域イベント・お祭り）を返すはずなので、それを20デザイン実装する。brief は calendar.json の local-vol1 を参照（白・朱赤 #d7263d・藍 #0b1f3a・山吹 #ffcf4a・緑 #3f8f3f・クラフト #e8dcc5、Yuji Syuku は1つ / Zen Maru Gothic 900 / Noto Sans JP 900 / Kiwi Maru / M PLUS 1p 900）。season-autumn-vol1 と被らない「日本の地域行事」。実在の祭り名・地名は不可
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、**sub の align は 'left' か 'center' のみ（'right' は箱がずれる。右寄せ配置は anchor x 'right' ＋ sub align 'left'）**。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs` → 報告。10/11 は日曜なのでアプリ枠なし
+- calendar は tourism-vol1（10/25）まで。10/26 以降のテーマを2件追加（候補: ヨガ・ピラティス、学習塾 Vol.2（受験）、観葉植物・園芸、カフェ・パン屋）
+
 ## 2026-10-10 向け（翌朝の自分への引き継ぎ）
 - 実装済み: interview（10/10 Release 予定）、expo（10/11）、english（10/12）、care（10/13）、game（10/14）。`node factory/calendar.mjs next-design` は `study-vol1`（10/15・資格・勉強法）を返すはずなので、それを20デザイン実装する。brief は calendar.json の study-vol1 を参照（白・ネイビー #0b1f3a・マーカー黄 #ffe58a・赤 #d7263d・ブルー #2b6cb0・グレー #6b7a90、Noto Sans JP 700/900 / BIZ UDPGothic / Zen Kaku Gothic New 500 / M PLUS 1p 900 / Klee One は1つだけ）。school-vol1（黒板）・english-vol1（明るい英字）と被らない「自習ノート・情報整理」。実在の試験名・教材名は不可
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ。入れた後に count=20 を確認
