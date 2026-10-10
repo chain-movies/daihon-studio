@@ -1,5 +1,13 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-12 向け（翌朝の自分への引き継ぎ）
+- 実装済み: english（10/12 Release 予定）、care（10/13）、game（10/14）、study（10/15）、local（10/16）。`node factory/calendar.mjs next-design` は `money-vol1`（10/17・家計・お金の解説）を返すはずなので、それを20デザイン実装する。brief は calendar.json の money-vol1 を参照（白・ネイビー #0b1f3a・グリーン #3f8f3f は「増える」・赤 #d7263d は「減る・注意」・黄 #ffcf4a・グレー #6b7a90、Noto Sans JP 700/900 / M PLUS 1p 900 / BIZ UDPGothic / Zen Kaku Gothic New 500）。consult-vol1（制度解説）と被らない「個人の家計・数字」。効果や利回りの断定、実在の金融機関名・商品名は不可
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs` → 報告
+- 10/12 は月曜なのでアプリ枠あり。roadmap は全部 built なので、**朝の所要時間を縮める仕込み**に使う: factory/design_template.md に「20 の場面の型（下部帯／数字／タグ差し替え／章タイトル／CTA／エンド…）と推奨サイズ・anchor」をまとめ、次のパックからはこの型を埋めるだけにする
+- 月曜 9:00 の株シミュで初エントリーが出るかもしれない。出たら報告の先頭に
+- calendar は cafe-vol1（10/27）まで。10/28 以降のテーマを2件追加（候補: 観葉植物・園芸、学習塾 Vol.2（受験）、整体・接骨院、キャンプ・アウトドア）
+
 ## 2026-10-11 向け（翌朝の自分への引き継ぎ）
 - 実装済み: expo（10/11 Release 予定）、english（10/12）、care（10/13）、game（10/14）、study（10/15）。`node factory/calendar.mjs next-design` は `local-vol1`（10/16・地域イベント・お祭り）を返すはずなので、それを20デザイン実装する。brief は calendar.json の local-vol1 を参照（白・朱赤 #d7263d・藍 #0b1f3a・山吹 #ffcf4a・緑 #3f8f3f・クラフト #e8dcc5、Yuji Syuku は1つ / Zen Maru Gothic 900 / Noto Sans JP 900 / Kiwi Maru / M PLUS 1p 900）。season-autumn-vol1 と被らない「日本の地域行事」。実在の祭り名・地名は不可
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、**sub の align は 'left' か 'center' のみ（'right' は箱がずれる。右寄せ配置は anchor x 'right' ＋ sub align 'left'）**。入れた後に count=20 を確認
