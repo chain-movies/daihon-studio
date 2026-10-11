@@ -1,5 +1,13 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-13 向け（翌朝の自分への引き継ぎ）
+- 実装済み: care（10/13 Release 予定）、game（10/14）、study（10/15）、local（10/16）、money（10/17）。`node factory/calendar.mjs next-design` は `pet-vol2`（10/18・ペット Vol.2 しつけ・動物病院）を返すはずなので、それを20デザイン実装する。brief は calendar.json の pet-vol2 を参照（白・ミント #9bd3c7・やさしいブルー #7cc4ff・ブラウン #8a5a2b・クリーム #fff3d6・赤 #d7263d は注意のみ、Zen Maru Gothic 700/900 / Kiwi Maru / BIZ UDPGothic 700 / Noto Sans JP 700）。clinic-vol1（cl-*）・care-vol1（ca-*）と被らない「丸い・やわらかい・ミント」。効果の断定、実在の病院名・薬品名は不可
+- **10/12 に factory/design_template.md（20 枠の型）を作った。まずこれを開き、20 枠に pet-vol2 の語彙を当てはめてから書く**（brief 特有の場面は枠 6・9・13・17 を差し替え）
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → 報告。10/13 は火曜なのでアプリ枠なし
+- 株シミュ: 10/12 9:00 の実行で三菱自動車に初エントリーが入ったかを `git show origin/main:stocks/data/report.md` で確認し、入った／入らない理由を所感の先頭に
+- calendar は bodycare-vol1（10/29）まで。10/30 以降のテーマを2件追加（候補: キャンプ・アウトドア、学習塾 Vol.2（受験）、整体・接骨院は 10/29 に入れた、ハンドメイド・雑貨、動画編集者向け汎用 Vol.2）
+
 ## 2026-10-12 向け（翌朝の自分への引き継ぎ）
 - 実装済み: english（10/12 Release 予定）、care（10/13）、game（10/14）、study（10/15）、local（10/16）。`node factory/calendar.mjs next-design` は `money-vol1`（10/17・家計・お金の解説）を返すはずなので、それを20デザイン実装する。brief は calendar.json の money-vol1 を参照（白・ネイビー #0b1f3a・グリーン #3f8f3f は「増える」・赤 #d7263d は「減る・注意」・黄 #ffcf4a・グレー #6b7a90、Noto Sans JP 700/900 / M PLUS 1p 900 / BIZ UDPGothic / Zen Kaku Gothic New 500）。consult-vol1（制度解説）と被らない「個人の家計・数字」。効果や利回りの断定、実在の金融機関名・商品名は不可
 - 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
