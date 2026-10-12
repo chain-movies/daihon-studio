@@ -1,5 +1,13 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-14 向け（翌朝の自分への引き継ぎ）
+- 実装済み: game（10/14 Release 予定）、study（10/15）、local（10/16）、money（10/17）、pet2（10/18）。`node factory/calendar.mjs next-design` は `realestate-vol2`（10/19・不動産 Vol.2 賃貸管理・リフォーム）を返すはずなので、それを20デザイン実装する。brief は calendar.json の realestate-vol2 を参照（白・ネイビー #0b1f3a・グリーン #0e8a7a・ベージュ #f3e9d2・赤 #d7263d は価格のみ・グレー #6b7a90、Noto Sans JP 700/900 / Zen Kaku Gothic New 700 / M PLUS 1p 900 / BIZ UDPGothic）。vol1（re-*）と同じ色系で「before/after・改善数字」中心。実在の管理会社名・物件名は不可。id の接頭辞は re2- にする（re- は vol1）
+- factory/design_template.md の 20 枠に当てはめてから書く（10/13 の pet-vol2 はこの型で 20 分で終わった。枠 13 の対比は BEFORE／AFTER を 2 デザインに分ける）
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認。サンプル文に「LINE」などのサービス名を入れない（10/13 に 1 か所直した）
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → 報告。10/14 は水曜なのでアプリ枠あり。roadmap は全部 built なので、**使い方動画の収録準備**（factory/bundle/howto-script.md の 60 秒台本を、telop/index.html の実際の画面に沿った「操作手順＋画面キャプチャ 6 枚」に展開して factory/bundle/howto-storyboard.md に）
+- 株シミュ: 10/13 9:00 の実行で三菱自動車に初エントリーが入ったかを `git show origin/main:stocks/data/report.md` で確認し、入った／入らない理由を所感の先頭に。祝日は休場（10/12 で見落とした）
+- calendar は handmade-vol1（10/31）まで。11/1 以降のテーマを2件追加（候補: 学習塾 Vol.2（受験）、動画編集者向け汎用 Vol.2、年末年始・新年のご挨拶、保育園 Vol.2 は早い）
+
 ## 2026-10-13 向け（翌朝の自分への引き継ぎ）
 - 実装済み: care（10/13 Release 予定）、game（10/14）、study（10/15）、local（10/16）、money（10/17）。`node factory/calendar.mjs next-design` は `pet-vol2`（10/18・ペット Vol.2 しつけ・動物病院）を返すはずなので、それを20デザイン実装する。brief は calendar.json の pet-vol2 を参照（白・ミント #9bd3c7・やさしいブルー #7cc4ff・ブラウン #8a5a2b・クリーム #fff3d6・赤 #d7263d は注意のみ、Zen Maru Gothic 700/900 / Kiwi Maru / BIZ UDPGothic 700 / Noto Sans JP 700）。clinic-vol1（cl-*）・care-vol1（ca-*）と被らない「丸い・やわらかい・ミント」。効果の断定、実在の病院名・薬品名は不可
 - **10/12 に factory/design_template.md（20 枠の型）を作った。まずこれを開き、20 枠に pet-vol2 の語彙を当てはめてから書く**（brief 特有の場面は枠 6・9・13・17 を差し替え）
