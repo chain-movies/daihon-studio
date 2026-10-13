@@ -1,5 +1,14 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-15 向け（翌朝の自分への引き継ぎ）
+- 実装済み: study（10/15 Release 予定）、local（10/16）、money（10/17）、pet2（10/18）、re2（10/19）。`node factory/calendar.mjs next-design` は `sports-vol2`（10/20・スポーツ Vol.2 部活・大会）を返すはずなので、それを20デザイン実装する。brief は calendar.json の sports-vol2 を参照。sports-vol1 の id 接頭辞を確認して被らないもの（sp2- など）にする
+- factory/design_template.md の 20 枠に当てはめてから書く（pet2・re2 とも初回レンダリングで修正なし。型で 20 分）
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認。サンプル文にサービス名・ブランド名を入れない
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → 報告。10/15 は木曜なのでアプリ枠なし
+- 水曜に factory/bundle/howto-storyboard.md（使い方動画の絵コンテ・6 カット・画面キャプチャ付き）を作った。金曜のアプリ枠で `factory/gen_howto_caps.mjs`（テロップメーカー画面の cap4／cap4b／cap5 を Playwright で自動キャプチャ、1 パック 3 枚）を作ると、BASE 商品画像 4 枚目と note の挿絵に流用できる
+- 株シミュ: 10/14 の report を確認。桁ずれは「解消」と判断済み。RSI 上限 80 への緩和は提案のみ（指示が来るまで実装しない）
+- calendar は newyear-vol1（11/2）まで。11/3 以降のテーマを2件追加（候補: 動画編集者向け汎用 Vol.2、保険・FP は money と被るので避ける、ブライダル Vol.2（前撮り・余興）、ドローン空撮・風景）
+
 ## 2026-10-14 向け（翌朝の自分への引き継ぎ）
 - 実装済み: game（10/14 Release 予定）、study（10/15）、local（10/16）、money（10/17）、pet2（10/18）。`node factory/calendar.mjs next-design` は `realestate-vol2`（10/19・不動産 Vol.2 賃貸管理・リフォーム）を返すはずなので、それを20デザイン実装する。brief は calendar.json の realestate-vol2 を参照（白・ネイビー #0b1f3a・グリーン #0e8a7a・ベージュ #f3e9d2・赤 #d7263d は価格のみ・グレー #6b7a90、Noto Sans JP 700/900 / Zen Kaku Gothic New 700 / M PLUS 1p 900 / BIZ UDPGothic）。vol1（re-*）と同じ色系で「before/after・改善数字」中心。実在の管理会社名・物件名は不可。id の接頭辞は re2- にする（re- は vol1）
 - factory/design_template.md の 20 枠に当てはめてから書く（10/13 の pet-vol2 はこの型で 20 分で終わった。枠 13 の対比は BEFORE／AFTER を 2 デザインに分ける）
