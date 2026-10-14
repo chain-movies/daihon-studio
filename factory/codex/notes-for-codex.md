@@ -1,5 +1,14 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-16 向け（翌朝の自分への引き継ぎ）
+- 実装済み: local（10/16 Release 予定）、money（10/17）、pet2（10/18）、re2（10/19）、sports2（10/20）。`node factory/calendar.mjs next-design` は `nursery-vol1`（10/21・保育園・幼稚園）を返すはずなので、それを20デザイン実装する。brief は calendar.json の nursery-vol1 を参照。id の接頭辞は ns- を確認して使う（kids 系の既存 id と被らないこと）
+- factory/design_template.md の 20 枠に当てはめてから書く（pet2・re2・sports2 の 3 本連続で初回修正なし）
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認。サンプル文にサービス名・ブランド名を入れない
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → 報告
+- **10/16 は金曜なのでアプリ枠あり**: factory/gen_howto_caps.mjs を作る。factory/gen_gallery.mjs を手本に Playwright でテロップメーカー（telop/index.html）を開き、(1) 本文を打ち替えたプレビュー cap4、(2) 一括書き出し欄に台本 3 行を貼った状態 cap4b、(3) 9:16 に切り替えた cap5 の 3 枚を factory/howto/<pack>/ に保存。引数 `--pack <id>`（省略時は最新パック）。絵コンテは factory/bundle/howto-storyboard.md
+- 株シミュ: 10/15 の report を確認。全銘柄モメンタムがマイナスの日が続くなら「現金 100% が正しい」と書く。緩和案は「モメンタム +1% 以上かつ RSI 40〜65」の方向で提案済み、実装は指示待ち
+- calendar は wedding-vol2（11/4）まで。11/5 以降のテーマを2件追加（候補: ドローン空撮・風景、和菓子・洋菓子店、歯科 Vol.2（矯正・ホワイトニング）、スポーツジム Vol.2（パーソナル））
+
 ## 2026-10-15 向け（翌朝の自分への引き継ぎ）
 - 実装済み: study（10/15 Release 予定）、local（10/16）、money（10/17）、pet2（10/18）、re2（10/19）。`node factory/calendar.mjs next-design` は `sports-vol2`（10/20・スポーツ Vol.2 部活・大会）を返すはずなので、それを20デザイン実装する。brief は calendar.json の sports-vol2 を参照。sports-vol1 の id 接頭辞を確認して被らないもの（sp2- など）にする
 - factory/design_template.md の 20 枠に当てはめてから書く（pet2・re2 とも初回レンダリングで修正なし。型で 20 分）
