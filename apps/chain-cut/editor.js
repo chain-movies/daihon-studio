@@ -57,7 +57,7 @@
      ================================================================= */
   const undoStack = [], redoStack = [];
   let lastCoalesce = { key: null, t: 0 };
-  function snapshot() { return JSON.stringify({ tracks: P.tracks, clips: P.clips, media: P.media, name: P.name }); }
+  function snapshot() { return JSON.stringify({ tracks: P.tracks, clips: P.clips, media: P.media, name: P.name, inPoint: P.inPoint, outPoint: P.outPoint }); }
   function pushUndo(coalesceKey) {
     const now = performance.now();
     if (coalesceKey && lastCoalesce.key === coalesceKey && now - lastCoalesce.t < 900) { lastCoalesce.t = now; return; }
@@ -68,7 +68,7 @@
   }
   function restore(s) {
     const o = JSON.parse(s);
-    P.tracks = o.tracks; P.clips = o.clips; P.media = o.media; P.name = o.name;
+    P.tracks = o.tracks; P.clips = o.clips; P.media = o.media; P.name = o.name; P.inPoint = o.inPoint; P.outPoint = o.outPoint;
     for (const id of Array.from(st.sel)) if (!clipById(id)) st.sel.delete(id);
     changed({ structure: true });
   }
@@ -102,7 +102,8 @@
   function fadeFactor(c, t) {
     let a = 1;
     const local = t - c.start, rem = clipEnd(c) - t;
-    if (c.fadeIn > 0 && local < c.fadeIn) a *= clamp(local / c.fadeIn, 0, 1);
+    // 先頭フレームが真っ黒（透明）にならないよう 1 フレーム分前倒し
+    if (c.fadeIn > 0 && local < c.fadeIn) a *= clamp((local + 1 / fps()) / (c.fadeIn + 1 / fps()), 0, 1);
     if (c.fadeOut > 0 && rem < c.fadeOut) a *= clamp(rem / c.fadeOut, 0, 1);
     return a;
   }
@@ -619,6 +620,7 @@
           ctx.drawImage(e.canvas, ox, oy);
           ctx.restore();
           rects[c.id] = { x: r.x + (c.x || 0), y: r.y + (c.y || 0), w: r.w, h: r.h };
+          if (isLocked(c.designId) && !opt.noSample) drawSample(ctx, rects[c.id]);
         }
       }
     }
@@ -770,9 +772,10 @@
   function tick(now) {
     if (!st.playing) return;
     let t = playT0 + (now - playP0) / 1000 * st.rate;
-    const end = duration();
+    const io = st.loop ? inOut() : null;
+    const end = io ? io[1] : duration();
     if (t >= end) {
-      if (st.loop && end > 0) { t = 0; playT0 = 0; playP0 = now; }
+      if (st.loop && end > 0) { t = io ? io[0] : 0; playT0 = t; playP0 = now; }
       else { st.time = end; pause(); return; }
     }
     if (t < 0) { st.time = 0; pause(); return; }
@@ -971,6 +974,7 @@
       lane.appendChild(clipEl(c));
     }
     content.classList.toggle('razor', st.tool === 'razor');
+    drawInOut();
     drawRuler();
     updateTimeUI();
   }
@@ -1043,6 +1047,15 @@
       if (isMaj) rctx.fillText(tc(t).replace(/^00:/, ''), x + 3, 10);
     }
     rctx.stroke();
+    // イン／アウト
+    const io = inOut();
+    if (io) {
+      const a = io[0] * st.pps - x0, b = io[1] * st.pps - x0;
+      rctx.fillStyle = 'rgba(45,140,235,.35)'; rctx.fillRect(a, 14, b - a, 12);
+      rctx.fillStyle = '#4fa3f7';
+      if (P.inPoint != null) { rctx.fillRect(a, 0, 2, 26); rctx.fillRect(a, 0, 7, 2); rctx.fillRect(a, 24, 7, 2); }
+      if (P.outPoint != null) { rctx.fillRect(b - 2, 0, 2, 26); rctx.fillRect(b - 7, 0, 7, 2); rctx.fillRect(b - 7, 24, 7, 2); }
+    }
     // 編集点の印
     const end = duration();
     const ex = end * st.pps - x0;
@@ -1439,7 +1452,7 @@
     const q = st.libQ.toLowerCase();
     const list = DESIGNS.filter((d) => (!st.libPack || d.pack === st.libPack) &&
       (!q || [d.name, d.category, d.sample, d.id, (PACKS[d.pack] || {}).short].join(' ').toLowerCase().includes(q)));
-    libGrid.innerHTML = list.slice(0, 600).map((d) => `<div class="dcard${st.libDesign === d.id ? ' sel' : ''}" draggable="true" data-design="${d.id}" title="${escapeHtml(d.name)}（${escapeHtml(d.category || '')}）"><canvas width="360" height="150"></canvas><div class="nm">${escapeHtml(d.name)}</div></div>`).join('') || '<div class="note" style="padding:12px;color:var(--muted)">該当するデザインがありません</div>';
+    libGrid.innerHTML = list.slice(0, 600).map((d) => `<div class="dcard${st.libDesign === d.id ? ' sel' : ''}${isLocked(d.id) ? ' locked' : ''}" draggable="true" data-design="${d.id}" title="${escapeHtml(d.name)}（${escapeHtml(d.category || '')}）${isLocked(d.id) ? ' ・ 製品版デザイン（試せますが書き出しに透かし）' : ''}"><canvas width="360" height="150"></canvas><div class="nm">${isLocked(d.id) ? '<span class="lock">PRO</span>' : ''}${escapeHtml(d.name)}</div></div>`).join('') || '<div class="note" style="padding:12px;color:var(--muted)">該当するデザインがありません</div>';
     thumbQueue.length = 0;
     $$('.dcard', libGrid).forEach((el) => libObserver.observe(el));
     renderVariants();
@@ -1515,6 +1528,7 @@
         <div class="note">デザイン：<b style="color:var(--ink)">${escapeHtml(d ? d.name : '不明')}</b>${d ? `（${escapeHtml((PACKS[d.pack] || {}).short || '')}）` : ''}</div>
         <div class="chips">${vs.map((v, i) => `<button class="chip${i === (c.variant || 0) ? ' on' : ''}" data-tv="${i}">${escapeHtml(v.name || '色' + (i + 1))}</button>`).join('')}</div>
         <div class="note">左の「テロップ」タブでデザインを選び「選択に適用」で入れ替えできます。</div>
+        ${isLocked(c.designId) ? '<div class="note" style="color:var(--warn)">製品版デザインです（書き出すと透かしが入ります）。<a href="#" data-cmd="unlock" style="color:var(--accent2)">解除コードを入力</a></div>' : ''}
       </div></div>`;
       h += `<div class="sec"><h4>アニメーション</h4><div class="in">
         ${field('登場', `<select id="t-anim">${[['none', 'なし'], ['pop', 'ポップ'], ['slideUp', '下からスライド'], ['slideLeft', '右からスライド'], ['wipe', 'ワイプ'], ['type', 'タイプライター']].map(([v, l]) => `<option value="${v}"${(c.anim || 'none') === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`)}
@@ -1571,14 +1585,10 @@
     <div class="sec"><h4>よく使うショートカット</h4><div class="in">${shortcutsHtml(true)}</div></div>`;
   }
 
-  function shortcutsHtml(short) {
-    const list = [
-      ['Space', '再生／停止'], ['J K L', '逆再生／停止／再生（連打で倍速）'], ['← →', '1フレーム移動（Shift で5フレーム）'], ['↑ ↓', '前／次の編集点へ'],
-      ['Ctrl+K', '再生ヘッドで分割'], ['V / C / B', '選択／レーザー／リップルツール'], ['Delete', '削除'], ['Shift+Delete', 'リップル削除'],
-      ['Ctrl+Z', '取り消し'], ['T', 'テロップ追加'], ['= / -', 'ズーム'], ['\\', '全体表示'],
-    ];
-    const more = [['S', 'スナップ切替'], ['Ctrl+C / V', 'コピー／再生ヘッドに貼り付け'], ['Ctrl+D', '複製'], ['Ctrl+Shift+X', '無音カット'], ['Ctrl+S', 'プロジェクト保存'], ['Ctrl+M', '書き出し'], ['Home / End', '先頭／末尾'], ["'", 'セーフエリア'], ['Ctrl+ホイール', 'タイムラインのズーム']];
-    return `<div class="keys">${(short ? list : list.concat(more)).map(([k, v]) => `<span>${k.split(' ').map((x) => x === '/' ? '/' : `<kbd>${x}</kbd>`).join(' ')}</span><span>${v}</span>`).join('')}</div>`;
+  function shortcutsHtml() {
+    const ids = ['togglePlay', 'shuttleFwd', 'stepFwd', 'nextEdit', 'markIn', 'markOut', 'extract', 'rippleTrimPrev', 'rippleTrimNext', 'split', 'toolRazor', 'rippleDelete', 'undo', 'addTelop'];
+    return `<div class="keys">${ids.map((id) => `<span>${keysHtml(id) || '—'}</span><span>${escapeHtml(ACTION_BY_ID.get(id)[1])}</span>`).join('')}</div>
+      <button class="btn sm" data-cmd="shortcuts" style="margin-top:8px">すべてのショートカットを見る・変更する</button>`;
   }
 
   function setProp(c, prop, v) {
@@ -1666,6 +1676,167 @@
       const p = el.dataset.prop, dec = +el.dataset.dec;
       if (p in c) el.textContent = (+c[p]).toFixed(dec);
     });
+  }
+
+  /* =================================================================
+     イン／アウトと範囲カット（リフト・抽出・Q/W）
+     ================================================================= */
+  function inOut() {
+    const a = P.inPoint, b = P.outPoint;
+    if (a == null && b == null) return null;
+    const s = a == null ? 0 : a, e = b == null ? duration() : b;
+    return e - s >= 1 / fps() ? [s, e] : null;
+  }
+  function setMark(which, t) {
+    pushUndo('mark');
+    t = snapFrame(clamp(t, 0, Math.max(duration(), t)));
+    if (which === 'in') { P.inPoint = t; if (P.outPoint != null && P.outPoint <= t) P.outPoint = null; }
+    else { P.outPoint = t; if (P.inPoint != null && P.inPoint >= t) P.inPoint = null; }
+    drawInOut(); drawRuler(); scheduleSave();
+  }
+  function drawInOut() {
+    const el = $('#inout');
+    const r = inOut();
+    if (!r) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.style.left = `calc(var(--tl-head) + ${r[0] * st.pps}px)`;
+    el.style.width = Math.max(1, (r[1] - r[0]) * st.pps) + 'px';
+  }
+  /** [a,b] の中身を全トラックから取り除く。ripple なら後ろを詰める */
+  function removeRange(a, b, ripple, trackFilter) {
+    a = snapFrame(a); b = snapFrame(b);
+    if (b - a < 1 / fps() / 2) return 0;
+    const len = b - a;
+    const out = [];
+    for (const c of P.clips) {
+      const tr = trackById(c.track);
+      if (trackFilter && !trackFilter(tr)) { out.push(c); continue; }
+      const s = c.start, e = clipEnd(c);
+      if (e <= a + EPS || s >= b - EPS) { out.push(c); continue; }            // 範囲外
+      if (s >= a - EPS && e <= b + EPS) continue;                              // 範囲内に収まる → 削除
+      if (s < a && e > b) {                                                    // 範囲をまたぐ → 2つに
+        const right = clone(c); right.id = uid('c');
+        right.start = b; right.in = (c.in || 0) + (b - s); right.dur = e - b; right.fadeIn = 0;
+        if (c.type === 'image' || c.type === 'telop') right.in = 0;
+        c.dur = a - s; c.fadeOut = 0;
+        out.push(c, right); continue;
+      }
+      if (s < a) { c.dur = a - s; c.fadeOut = 0; out.push(c); continue; }      // 後ろが削られる
+      const cut = b - s;                                                       // 頭が削られる
+      c.start = b; c.dur = e - b; c.fadeIn = 0;
+      if (c.type === 'video' || c.type === 'audio') c.in = (c.in || 0) + cut;
+      out.push(c);
+    }
+    if (ripple) for (const c of out) {
+      if (trackFilter && !trackFilter(trackById(c.track))) continue;
+      if (c.start >= b - EPS) c.start = snapFrame(c.start - len);
+    }
+    // 1フレームに満たない切れ端は消す
+    P.clips = out.filter((c) => c.dur >= 1 / fps() - 1e-4);
+    for (const id of Array.from(st.sel)) if (!clipById(id)) st.sel.delete(id);
+    return len;
+  }
+  function liftOrExtract(ripple) {
+    const r = inOut();
+    if (!r) return toast('先にイン点（I）とアウト点（O）をマークしてください');
+    pushUndo();
+    const len = removeRange(r[0], r[1], ripple);
+    if (ripple) { P.inPoint = null; P.outPoint = null; seek(r[0]); }
+    changed({ structure: true }); drawInOut();
+    toast(ripple ? `${len.toFixed(2)} 秒を抽出して詰めました` : `${len.toFixed(2)} 秒をリフトしました（すき間は残ります）`);
+  }
+  function rippleTrim(dir) {
+    const t = snapFrame(st.time);
+    const pts = editPoints();
+    if (dir < 0) {
+      const prev = pts.filter((x) => x < t - 1e-3).pop();
+      if (prev == null) return toast('前に編集点がありません');
+      pushUndo(); removeRange(prev, t, true); seek(prev);
+    } else {
+      const next = pts.find((x) => x > t + 1e-3);
+      if (next == null) return toast('後ろに編集点がありません');
+      pushUndo(); removeRange(t, next, true); seek(t);
+    }
+    changed({ structure: true });
+  }
+  function splitAll() {
+    const t = st.time;
+    const targets = P.clips.filter((c) => isActive(c, t));
+    if (!targets.length) return toast('再生ヘッドの位置にクリップがありません');
+    pushUndo();
+    for (const c of targets) splitClipAt(c, t);
+    changed({ structure: true });
+  }
+  function markClip() {
+    const t = st.time;
+    let c = P.clips.find((x) => st.sel.has(x.id) && isActive(x, t)) || P.clips.find((x) => st.sel.has(x.id));
+    if (!c) {
+      const order = P.tracks.filter((x) => x.kind === 'video').map((x) => x.id);
+      c = P.clips.filter((x) => isActive(x, t)).sort((a, b) => order.indexOf(a.track) - order.indexOf(b.track))[0];
+    }
+    if (!c) return toast('マークするクリップがありません');
+    pushUndo('mark');
+    P.inPoint = snapFrame(c.start); P.outPoint = snapFrame(clipEnd(c));
+    drawInOut(); drawRuler(); scheduleSave();
+  }
+
+  /* =================================================================
+     無料版／製品版（テロップの制限）
+     ================================================================= */
+  // 公開リポジトリなのでコードそのものは置かず、ハッシュだけを持つ
+  const LICENSE_HASHES = ['cd8fc4721b8d02a39457a76641093fac40f7a8f2bbd2a338c8b8ffa8d71ea27a'];
+  const LIC_LS = 'cc-license';
+  const FREE_PER_PACK = 2;
+  const freeDesigns = new Set();
+  { const seen = {}; for (const d of DESIGNS) { const k = d.pack || 'tv-vol1'; seen[k] = (seen[k] || 0) + 1; if (seen[k] <= FREE_PER_PACK) freeDesigns.add(d.id); } }
+  let licensed = false;
+  try { licensed = LICENSE_HASHES.includes(localStorage.getItem(LIC_LS)); } catch (e) { /* ignore */ }
+  function isLocked(designId) { return !licensed && !freeDesigns.has(designId); }
+  async function hashCode(code) {
+    const norm = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('chain-cut:' + norm));
+    return Array.from(new Uint8Array(buf)).map((x) => x.toString(16).padStart(2, '0')).join('');
+  }
+  function updateLicenseBadge() {
+    const b = $('#lic-badge');
+    b.textContent = licensed ? '製品版' : '無料版';
+    b.classList.toggle('pro', licensed);
+    b.title = licensed ? 'すべてのテロップデザインが使えます' : `無料版：各パック ${FREE_PER_PACK} デザインまで。クリックで解除コードを入力`;
+  }
+  async function unlockDialog() {
+    if (licensed) {
+      const m = openModal('製品版', `<p class="big">製品版として登録済みです。</p><p>テロップ ${DESIGNS.length} デザインすべてを透かしなしで書き出せます。</p>`, [['このブラウザの登録を解除', 'off'], ['閉じる', null, true]]);
+      if (await m.result === 'off') { try { localStorage.removeItem(LIC_LS); } catch (e) { /* ignore */ } licensed = false; afterLicenseChange(); }
+      return false;
+    }
+    let m;
+    const tryUnlock = async () => {
+      const h = await hashCode($('#lic-code', m.el).value);
+      if (LICENSE_HASHES.includes(h)) {
+        try { localStorage.setItem(LIC_LS, h); } catch (e) { /* ignore */ }
+        licensed = true; afterLicenseChange(); m.close('ok');
+        toast('製品版になりました。すべてのテロップが使えます');
+      } else { $('#lic-msg', m.el).innerHTML = '<span style="color:var(--danger)">コードが正しくありません（ハイフンの有無・大文字小文字は問いません）</span>'; }
+    };
+    m = openModal('製品版の解除コードを入力', `
+      <p>テロップ素材集（BASE）をご購入の方は、購入時にお届けした解除コードを入力すると、<b>${DESIGNS.length} デザインすべて</b>が使えるようになります。</p>
+      <input type="text" id="lic-code" placeholder="CC-XXXX-XXXX-XXXX" style="font-size:16px;letter-spacing:.08em;text-transform:uppercase">
+      <p id="lic-msg" class="note" style="min-height:20px"></p>
+      <p class="note" style="font-size:11px;color:var(--muted)">無料版でも各パック ${FREE_PER_PACK} デザイン（計 ${freeDesigns.size} 種）と、編集・書き出しのすべての機能が使えます。製品版デザインも試しに置けますが、書き出すと透かしが入ります。<a href="../../shop/" target="_blank" style="color:var(--accent2)">テロップ素材集を見る →</a></p>
+    `, [['キャンセル', null], ['解除する', tryUnlock, true]], { onEnter: tryUnlock });
+    setTimeout(() => { const i = $('#lic-code', m.el); if (i) i.focus(); }, 30);
+    return (await m.result) === 'ok';
+  }
+  function afterLicenseChange() { updateLicenseBadge(); telopCache.clear(); if (libGrid.children.length) renderLib(); requestDraw(); renderInspector(); }
+  function drawSample(ctx, r) {
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    const fs = Math.max(18, Math.min(r.h * 0.35, 60));
+    ctx.font = `900 ${fs}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.translate(r.x + r.w / 2, r.y + r.h / 2); ctx.rotate(-0.12);
+    ctx.lineWidth = fs / 6; ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.fillStyle = 'rgba(255,255,255,.75)';
+    ctx.strokeText('SAMPLE ・ 製品版デザイン', 0, 0); ctx.fillText('SAMPLE ・ 製品版デザイン', 0, 0);
+    ctx.restore();
   }
 
   /* =================================================================
@@ -1884,7 +2055,7 @@
     let resolve;
     const result = new Promise((r) => { resolve = r; });
     const close = (v) => { bg.remove(); document.removeEventListener('keydown', esc, true); resolve(v); };
-    const esc = (e) => { if (e.key === 'Escape' && !(opts && opts.locked)) { e.stopPropagation(); close(null); } if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && buttons && buttons.length) { const pri = buttons.findIndex((b) => b[2]); if (pri >= 0 && !(opts && opts.locked)) { e.preventDefault(); close(buttons[pri][1]); } } };
+    const esc = (e) => { if (e.key === 'Escape' && !(opts && opts.locked)) { e.stopPropagation(); close(null); } if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && buttons && buttons.length) { const pri = buttons.findIndex((b) => b[2]); if (pri >= 0 && !(opts && opts.locked)) { e.preventDefault(); const v = buttons[pri][1]; if (typeof v === 'function') v(); else close(v); } } };
     document.addEventListener('keydown', esc, true);
     $$('[data-mb]', bg).forEach((b) => b.addEventListener('click', () => { const v = buttons[+b.dataset.mb][1]; if (typeof v === 'function') v(); else close(v); }));
     bg.addEventListener('pointerdown', (e) => { if (e.target === bg && !(opts && opts.locked)) close(null); });
@@ -1968,6 +2139,17 @@
     if (total <= 0) return toast('タイムラインが空です', true);
     const missing = P.clips.filter((c) => c.type !== 'telop' && !media.has(c.mediaId));
     if (missing.length && !confirm(`${missing.length} 個のクリップの素材が見つかりません（未リンク）。このまま書き出しますか？`)) return;
+    const lockedUsed = P.clips.filter((c) => c.type === 'telop' && isLocked(c.designId));
+    if (lockedUsed.length) {
+      const names = Array.from(new Set(lockedUsed.map((c) => (designById.get(c.designId) || {}).name))).slice(0, 5);
+      const q = openModal('製品版のテロップが含まれています', `
+        <p>次のデザインは製品版専用です：<b>${names.map(escapeHtml).join('、')}</b>${lockedUsed.length > 5 ? ' など' : ''}（${lockedUsed.length} 個）</p>
+        <p>解除コードを入力すると透かしなしで書き出せます。このまま書き出すと「SAMPLE」の透かしが入ります。</p>
+      `, [['キャンセル', null], ['透かし付きで書き出す', 'wm'], ['解除コードを入力', 'unlock', true]]);
+      const a = await q.result;
+      if (!a) return;
+      if (a === 'unlock' && !(await unlockDialog())) return;
+    }
     const hasWC = !!(window.VideoEncoder && window.VideoFrame && window.Mp4Muxer);
     const name = (P.name || 'chain-cut').replace(/[\\/:*?"<>|]/g, '_');
     const m = openModal('MP4 に書き出し', `
@@ -1975,7 +2157,7 @@
       ${field('ファイル名', `<input type="text" id="x-name" value="${escapeHtml(name)}">`)}
       ${field('解像度', `<select id="x-res"><option value="1">${P.width}×${P.height}（フル）</option><option value="0.6667">${Math.round(P.width * 2 / 3 / 2) * 2}×${Math.round(P.height * 2 / 3 / 2) * 2}（軽量）</option><option value="0.5">${P.width / 2}×${P.height / 2}（確認用）</option></select>`)}
       ${field('画質', '<select id="x-q"><option value="20">高画質（20 Mbps）</option><option value="12" selected>標準（12 Mbps）</option><option value="6">軽量（6 Mbps）</option></select>')}
-      ${field('範囲', `<select id="x-range"><option value="all">全体（${tc(total)}）</option>${P.clips.some((c) => st.sel.has(c.id)) ? '<option value="sel">選択したクリップの範囲</option>' : ''}</select>`)}
+      ${field('範囲', `<select id="x-range">${inOut() ? `<option value="io" selected>イン〜アウト（${tc(inOut()[1] - inOut()[0])}）</option>` : ''}<option value="all">全体（${tc(total)}）</option>${P.clips.some((c) => st.sel.has(c.id)) ? '<option value="sel">選択したクリップの範囲</option>' : ''}</select>`)}
       <p class="note" style="font-size:11px;color:var(--muted)">H.264 / AAC の MP4 を作ります。書き出しはブラウザの中だけで行われ、動画がどこかに送信されることはありません。</p>
     `, [['キャンセル', null], ['書き出し開始', 'go', true]]);
     const r = await m.result;
@@ -1991,6 +2173,7 @@
   let exportAbort = false;
   async function runExport(opts) {
     let t0 = 0, t1 = duration();
+    if (opts.range === 'io' && inOut()) { [t0, t1] = inOut(); }
     if (opts.range === 'sel') {
       const cs = P.clips.filter((c) => st.sel.has(c.id));
       t0 = Math.min(...cs.map((c) => c.start)); t1 = Math.max(...cs.map(clipEnd));
@@ -2300,7 +2483,19 @@
     stepFwd: () => { pause(); seek(snapFrame(st.time + 1 / fps())); followPlayhead(); },
     prevEdit: () => { pause(); const p = editPoints().filter((x) => x < st.time - 1e-3); seek(p.length ? p[p.length - 1] : 0); followPlayhead(); },
     nextEdit: () => { pause(); const p = editPoints().find((x) => x > st.time + 1e-3); if (p != null) seek(p); followPlayhead(); },
-    shortcuts: () => openModal('キーボードショートカット', shortcutsHtml(false), [['閉じる', null, true]]),
+    shortcuts: shortcutsDialog,
+    unlock: unlockDialog,
+    shuttleBack: () => shuttle(-1), shuttleStop: () => shuttle(0), shuttleFwd: () => shuttle(1),
+    stepBack5: () => { pause(); seek(snapFrame(st.time - 5 / fps())); followPlayhead(); },
+    stepFwd5: () => { pause(); seek(snapFrame(st.time + 5 / fps())); followPlayhead(); },
+    markIn: () => setMark('in', st.time), markOut: () => setMark('out', st.time), markClip,
+    clearInOut: () => { pushUndo('mark'); P.inPoint = null; P.outPoint = null; drawInOut(); drawRuler(); scheduleSave(); },
+    goIn: () => { if (P.inPoint != null) { pause(); seek(P.inPoint); followPlayhead(); } },
+    goOut: () => { if (P.outPoint != null) { pause(); seek(P.outPoint); followPlayhead(); } },
+    lift: () => liftOrExtract(false), extract: () => liftOrExtract(true),
+    rippleTrimPrev: () => rippleTrim(-1), rippleTrimNext: () => rippleTrim(1),
+    splitAll,
+    toolSelect: () => setTool('select'), toolRazor: () => setTool('razor'), toolRipple: () => setTool('ripple'),
     about: () => openModal('Chain Cut について', `<p class="big">Chain Cut — ブラウザ動画編集ソフト</p><p>タイムライン編集、テロップ（Chain-Movies テロップ素材集 ${DESIGNS.length} デザイン）、BGM、無音カット、SRT 字幕読み込み、MP4 書き出しまで、インストール不要でブラウザだけで完結します。素材はこの PC のブラウザ内にだけ保存され、外部に送信されません。</p><p class="note" style="color:var(--muted);font-size:11px">推奨環境：Chrome / Edge の最新版（パソコン）。MP4 書き出しには WebCodecs を使います。<br>MP4 Muxer: mp4-muxer (MIT License, © Vanilagy)</p>`, [['閉じる', null, true]]),
   };
 
@@ -2340,59 +2535,158 @@
   $('#projname').addEventListener('change', (e) => { pushUndo(); P.name = e.target.value.trim() || '無題のプロジェクト'; scheduleSave(); document.title = `${P.name} — Chain Cut`; });
   $('#projname').addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') e.target.blur(); });
 
+  /* =================================================================
+     キーボードショートカット（変更可能）
+     ================================================================= */
+  const ACTIONS = [
+    // [id, 表示名, 分類, 既定キー]
+    ['togglePlay', '再生／停止', '再生', ['Space']],
+    ['shuttleBack', '逆再生（連打で倍速）', '再生', ['J']],
+    ['shuttleStop', '停止', '再生', ['K']],
+    ['shuttleFwd', '再生（連打で倍速）', '再生', ['L']],
+    ['stepBack', '1フレーム戻る', '再生', ['ArrowLeft']],
+    ['stepFwd', '1フレーム進む', '再生', ['ArrowRight']],
+    ['stepBack5', '5フレーム戻る', '再生', ['Shift+ArrowLeft']],
+    ['stepFwd5', '5フレーム進む', '再生', ['Shift+ArrowRight']],
+    ['prevEdit', '前の編集点へ', '再生', ['ArrowUp']],
+    ['nextEdit', '次の編集点へ', '再生', ['ArrowDown']],
+    ['goStart', '先頭へ', '再生', ['Home']],
+    ['goEnd', '末尾へ', '再生', ['End']],
+    ['markIn', 'イン点をマーク', 'イン／アウト', ['I']],
+    ['markOut', 'アウト点をマーク', 'イン／アウト', ['O']],
+    ['markClip', 'クリップの範囲をマーク', 'イン／アウト', ['X']],
+    ['clearInOut', 'イン／アウトを消去', 'イン／アウト', ['Ctrl+Shift+X']],
+    ['goIn', 'イン点へ移動', 'イン／アウト', ['Shift+I']],
+    ['goOut', 'アウト点へ移動', 'イン／アウト', ['Shift+O']],
+    ['lift', 'リフト（範囲を削除・すき間を残す）', 'イン／アウト', [';']],
+    ['extract', '抽出（範囲を削除して詰める）', 'イン／アウト', ["'"]],
+    ['rippleTrimPrev', '前の編集点から再生ヘッドまで削除して詰める', 'カット', ['Q']],
+    ['rippleTrimNext', '再生ヘッドから次の編集点まで削除して詰める', 'カット', ['W']],
+    ['split', '再生ヘッドで分割', 'カット', ['Ctrl+K']],
+    ['splitAll', '全トラックを再生ヘッドで分割', 'カット', ['Ctrl+Shift+K']],
+    ['delete', '削除', 'カット', ['Delete', 'Backspace']],
+    ['rippleDelete', 'リップル削除', 'カット', ['Shift+Delete', 'Shift+Backspace']],
+    ['silence', '無音部分を自動カット', 'カット', ['Ctrl+Alt+X']],
+    ['toolSelect', '選択ツール', 'ツール', ['V']],
+    ['toolRazor', 'レーザーツール', 'ツール', ['C']],
+    ['toolRipple', 'リップルツール', 'ツール', ['B']],
+    ['toggleSnap', 'スナップ切替', 'ツール', ['S']],
+    ['addTelop', 'テロップを追加', '編集', ['T']],
+    ['undo', '取り消し', '編集', ['Ctrl+Z']],
+    ['redo', 'やり直し', '編集', ['Ctrl+Shift+Z', 'Ctrl+Y']],
+    ['copy', 'コピー', '編集', ['Ctrl+C']],
+    ['paste', '再生ヘッドに貼り付け', '編集', ['Ctrl+V']],
+    ['duplicate', '複製', '編集', ['Ctrl+D']],
+    ['selectAll', 'すべて選択', '編集', ['Ctrl+A']],
+    ['deselect', '選択解除', '編集', ['Escape']],
+    ['zoomIn', 'タイムライン拡大', '表示', ['=', '+']],
+    ['zoomOut', 'タイムライン縮小', '表示', ['-']],
+    ['zoomFit', '全体を表示', '表示', ['\\']],
+    ['toggleSafe', 'セーフエリアガイド', '表示', ['G']],
+    ['new', '新規プロジェクト', 'ファイル', ['Ctrl+Alt+N']],
+    ['open', 'プロジェクトを開く', 'ファイル', ['Ctrl+O']],
+    ['save', 'プロジェクトを保存', 'ファイル', ['Ctrl+S']],
+    ['savePackage', '素材ごとパッケージ保存', 'ファイル', ['Ctrl+Shift+S']],
+    ['import', '素材を読み込み', 'ファイル', ['Ctrl+I']],
+    ['export', 'MP4 に書き出し', 'ファイル', ['Ctrl+M']],
+    ['shortcuts', 'ショートカット一覧・変更', 'ヘルプ', ['?', 'Shift+?']],
+  ];
+  const ACTION_BY_ID = new Map(ACTIONS.map((a) => [a[0], a]));
+  const KEYS_LS = 'cc-keys';
+  let keyOverrides = {};
+  try { keyOverrides = JSON.parse(localStorage.getItem(KEYS_LS) || '{}') || {}; } catch (e) { keyOverrides = {}; }
+  function keysFor(id) { return keyOverrides[id] || (ACTION_BY_ID.get(id) || [])[3] || []; }
+  let keyIndex = new Map();
+  function rebuildKeyIndex() {
+    keyIndex = new Map();
+    for (const [id] of ACTIONS) for (const k of keysFor(id)) keyIndex.set(k, id);
+    // メニューの表示も更新
+    $$('.dd button[data-cmd]').forEach((b) => {
+      const k = keysFor(b.dataset.cmd)[0];
+      let span = b.querySelector('.k');
+      if (!k) { if (span) span.textContent = ''; return; }
+      if (!span) { span = document.createElement('span'); span.className = 'k'; b.appendChild(span); }
+      span.textContent = keyLabel(k);
+    });
+  }
+  /** キーイベント → "Ctrl+Shift+K" 形式 */
+  function comboOf(e) {
+    let k = e.key;
+    if (k === ' ' || k === 'Spacebar') k = 'Space';
+    if (k === 'Esc') k = 'Escape';
+    if (['Control', 'Shift', 'Alt', 'Meta', 'Process', 'Unidentified', 'Dead'].includes(k)) return null;
+    if (k.length === 1) k = k.toUpperCase();
+    // Alt で文字が変わる配列（Mac）対策：英字・数字は物理キーから
+    if (e.altKey && e.code && /^Key[A-Z]$/.test(e.code)) k = e.code.slice(3);
+    if (e.altKey && e.code && /^Digit\d$/.test(e.code)) k = e.code.slice(5);
+    const parts = [];
+    if (e.ctrlKey || e.metaKey) parts.push('Ctrl');
+    if (e.altKey) parts.push('Alt');
+    // 記号は Shift で別の文字になるので、英字・特殊キー以外は Shift を含めない
+    if (e.shiftKey && (/^[A-Z0-9]$/.test(k) || k.length > 1)) parts.push('Shift');
+    parts.push(k);
+    return parts.join('+');
+  }
+  const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  function keyLabel(c) {
+    const map = { ArrowLeft: '←', ArrowRight: '→', ArrowUp: '↑', ArrowDown: '↓', Escape: 'Esc', Backspace: 'BS', Delete: 'Del' };
+    return c.split('+').map((p) => (p === 'Ctrl' ? (IS_MAC ? '⌘' : 'Ctrl') : p === 'Alt' && IS_MAC ? '⌥' : map[p] || p)).join(IS_MAC ? '' : '+');
+  }
+  function keysHtml(id) { return keysFor(id).map((c) => `<kbd>${escapeHtml(keyLabel(c))}</kbd>`).join(' '); }
+
+  function shortcutsDialog() {
+    let editing = null;
+    const groups = [];
+    for (const a of ACTIONS) { let g = groups.find((x) => x.name === a[2]); if (!g) groups.push(g = { name: a[2], items: [] }); g.items.push(a); }
+    const body = () => `<p class="note" style="font-size:11px;color:var(--muted)">「変更」を押してから新しいキーを押すと割り当てられます（Esc で取り消し、Delete で割り当てなし）。設定はこのブラウザに保存されます。</p>
+      <div style="max-height:56vh;overflow:auto;display:flex;flex-direction:column;gap:2px">
+      ${groups.map((g) => `<div style="font-weight:700;color:var(--ink2);margin:8px 0 2px">${g.name}</div>` + g.items.map(([id, label]) => `
+        <div class="field" style="min-height:28px"><label style="width:auto;flex:1">${label}</label>
+          <div class="ctl" style="flex:none;gap:6px">${editing === id ? '<span style="color:var(--warn)">キーを押してください…</span>' : `<span>${keysHtml(id) || '<span class="unit">なし</span>'}</span>`}
+            <button class="btn sm" data-kedit="${id}">${editing === id ? 'やめる' : '変更'}</button></div></div>`).join('')).join('')}
+      </div>`;
+    const m = openModal('キーボードショートカット', body(), [['初期値に戻す', () => { if (confirm('すべてのショートカットを初期値に戻しますか？')) { keyOverrides = {}; persist(); refresh(); } }], ['閉じる', null, true]], { width: 620 });
+    const persist = () => { try { localStorage.setItem(KEYS_LS, JSON.stringify(keyOverrides)); } catch (e) { /* ignore */ } rebuildKeyIndex(); };
+    const refresh = () => { $('.mb', m.el).innerHTML = body(); };
+    $('.mb', m.el).addEventListener('click', (e) => {
+      const b = e.target.closest('[data-kedit]'); if (!b) return;
+      editing = editing === b.dataset.kedit ? null : b.dataset.kedit; refresh();
+    });
+    const onKey = (e) => {
+      if (!editing) return;
+      e.preventDefault(); e.stopPropagation();
+      if (e.key === 'Escape') { editing = null; refresh(); return; }
+      if (e.key === 'Delete' || e.key === 'Backspace') { keyOverrides[editing] = []; editing = null; persist(); refresh(); return; }
+      const c = comboOf(e); if (!c) return;
+      const other = keyIndex.get(c);
+      if (other && other !== editing) {
+        const oa = ACTION_BY_ID.get(other);
+        if (!confirm(`${keyLabel(c)} は「${oa[1]}」に使われています。こちらに付け替えますか？`)) return;
+        keyOverrides[other] = keysFor(other).filter((x) => x !== c);
+      }
+      keyOverrides[editing] = [c];
+      editing = null; persist(); refresh();
+    };
+    document.addEventListener('keydown', onKey, true);
+    m.result.then(() => document.removeEventListener('keydown', onKey, true));
+  }
+
   /* キーボード */
   document.addEventListener('keydown', (e) => {
     const tag = (e.target.tagName || '').toLowerCase();
-    const mod = e.ctrlKey || e.metaKey;
-    const k = e.key;
-    const run = (name) => { e.preventDefault(); cmd[name](); };
     if ($('.modal-bg')) return;
+    const combo = comboOf(e);
+    if (!combo) return;
+    const id = keyIndex.get(combo);
     if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) {
       // 入力中でも効くもの：保存・書き出し、Esc で入力欄から抜ける
-      if (mod && (k === 's' || k === 'S')) return run(e.shiftKey ? 'savePackage' : 'save');
-      if (mod && (k === 'm' || k === 'M')) return run('export');
-      if (k === 'Escape') e.target.blur();
+      if (id === 'save' || id === 'savePackage' || id === 'export') { e.preventDefault(); cmd[id](); }
+      else if (e.key === 'Escape') e.target.blur();
       return;
     }
-    if (mod && e.altKey && (k === 'n' || k === 'N')) return run('new');
-    if (mod && (k === 'z' || k === 'Z')) return run(e.shiftKey ? 'redo' : 'undo');
-    if (mod && (k === 'y' || k === 'Y')) return run('redo');
-    if (mod && (k === 'k' || k === 'K')) return run('split');
-    if (mod && (k === 's' || k === 'S')) return run(e.shiftKey ? 'savePackage' : 'save');
-    if (mod && (k === 'o' || k === 'O')) return run('open');
-    if (mod && (k === 'i' || k === 'I')) return run('import');
-    if (mod && (k === 'm' || k === 'M')) return run('export');
-    if (mod && (k === 'c' || k === 'C')) return run('copy');
-    if (mod && (k === 'v' || k === 'V')) return run('paste');
-    if (mod && (k === 'd' || k === 'D')) return run('duplicate');
-    if (mod && (k === 'a' || k === 'A')) return run('selectAll');
-    if (mod && e.shiftKey && (k === 'x' || k === 'X')) return run('silence');
-    if (mod) return;
-    switch (k) {
-      case ' ': return run('togglePlay');
-      case 'j': case 'J': e.preventDefault(); return shuttle(-1);
-      case 'k': case 'K': e.preventDefault(); return shuttle(0);
-      case 'l': case 'L': e.preventDefault(); return shuttle(1);
-      case 'ArrowLeft': e.preventDefault(); pause(); seek(snapFrame(st.time - (e.shiftKey ? 5 : 1) / fps())); followPlayhead(); return;
-      case 'ArrowRight': e.preventDefault(); pause(); seek(snapFrame(st.time + (e.shiftKey ? 5 : 1) / fps())); followPlayhead(); return;
-      case 'ArrowUp': return run('prevEdit');
-      case 'ArrowDown': return run('nextEdit');
-      case 'Home': return run('goStart');
-      case 'End': return run('goEnd');
-      case 'Delete': case 'Backspace': return run(e.shiftKey ? 'rippleDelete' : 'delete');
-      case 'v': case 'V': return setTool('select');
-      case 'c': case 'C': return setTool('razor');
-      case 'b': case 'B': return setTool('ripple');
-      case 's': case 'S': return run('toggleSnap');
-      case 't': case 'T': return run('addTelop');
-      case '=': case '+': return run('zoomIn');
-      case '-': case '_': return run('zoomOut');
-      case '\\': return run('zoomFit');
-      case "'": return run('toggleSafe');
-      case '?': return run('shortcuts');
-      case 'Escape': return run('deselect');
-      default:
-    }
+    if (!id || !cmd[id]) return;
+    e.preventDefault();
+    cmd[id]();
   });
 
   /* パネルのリサイズ */
@@ -2433,6 +2727,8 @@
      ================================================================= */
   async function boot() {
     setupLib();
+    rebuildKeyIndex();
+    updateLicenseBadge();
     try {
       const saved = await idbGet('kv', 'project');
       if (saved && Array.isArray(saved.clips)) {

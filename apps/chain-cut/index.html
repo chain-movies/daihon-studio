@@ -100,6 +100,11 @@ button{cursor:pointer}
 .dcard:hover{border-color:#555}
 .dcard.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .dcard canvas{display:block;width:100%;aspect-ratio:2.4/1;background:repeating-conic-gradient(#1b1b1b 0 25%,#232323 0 50%) 0 0/14px 14px}
+.dcard.locked canvas{opacity:.75}
+.dcard .lock{display:inline-block;background:#6b4fd6;color:#fff;font-size:9px;font-weight:800;border-radius:3px;padding:0 4px;margin-right:5px;letter-spacing:.04em}
+#lic-badge{border:1px solid var(--warn);color:var(--warn);background:none;border-radius:5px;padding:2px 9px;font-size:11px;margin-right:10px}
+#lic-badge.pro{border-color:var(--ok);color:var(--ok)}
+#inout{position:absolute;top:26px;bottom:0;background:rgba(45,140,235,.08);border-left:1px solid rgba(79,163,247,.6);border-right:1px solid rgba(79,163,247,.6);z-index:5;pointer-events:none;display:none}
 .dcard .nm{padding:3px 6px;font-size:10.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--panel2)}
 #lib .lfoot{flex:none;border-top:1px solid var(--line);padding:8px;display:flex;flex-direction:column;gap:6px}
 .chips{display:flex;flex-wrap:wrap;gap:4px}
@@ -268,6 +273,17 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
     </div></div>
     <div class="menu"><button>クリップ</button><div class="dd">
       <button data-cmd="split">再生ヘッドで分割<span class="k">Ctrl+K</span></button>
+      <button data-cmd="splitAll">全トラックを再生ヘッドで分割</button>
+      <button data-cmd="rippleTrimPrev">前の編集点まで削除して詰める（Q）</button>
+      <button data-cmd="rippleTrimNext">次の編集点まで削除して詰める（W）</button>
+      <hr>
+      <button data-cmd="markIn">イン点をマーク</button>
+      <button data-cmd="markOut">アウト点をマーク</button>
+      <button data-cmd="markClip">クリップの範囲をマーク</button>
+      <button data-cmd="extract">抽出（イン〜アウトを削除して詰める）</button>
+      <button data-cmd="lift">リフト（イン〜アウトを削除・すき間を残す）</button>
+      <button data-cmd="clearInOut">イン／アウトを消去</button>
+      <hr>
       <button data-cmd="silence">無音部分を自動カット…<span class="k">Ctrl+Shift+X</span></button>
       <button data-cmd="closeGaps">すき間を詰める（選択トラック）</button>
       <hr>
@@ -285,13 +301,15 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
       <button data-cmd="toggleSnap">スナップ<span class="k">S</span></button>
     </div></div>
     <div class="menu"><button>ヘルプ</button><div class="dd">
-      <button data-cmd="shortcuts">キーボードショートカット<span class="k">?</span></button>
+      <button data-cmd="shortcuts">キーボードショートカット（一覧・変更）<span class="k">?</span></button>
+      <button data-cmd="unlock">製品版の解除コードを入力…</button>
       <button data-cmd="about">Chain Cut について</button>
     </div></div>
     <div class="sp"></div>
     <input id="projname" type="text" value="無題のプロジェクト" spellcheck="false" title="プロジェクト名">
     <div class="sp"></div>
     <span id="savestate">—</span>
+    <button id="lic-badge" data-cmd="unlock">無料版</button>
     <button class="btn primary" data-cmd="export">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l5 5h-3v6h-4V8H7zM5 17h14v3H5z"/></svg>書き出し</button>
   </div>
@@ -350,7 +368,7 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
         <button class="ib" data-cmd="toggleLoop" id="btn-loop" title="ループ再生"><svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg></button>
       </div>
       <div class="mon-right">
-        <button class="ib" data-cmd="toggleSafe" id="btn-safe" title="セーフエリアガイド (')"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3zm2 2v14h14V5zm2 2h10v10H7zm2 2v6h6V9z"/></svg></button>
+        <button class="ib" data-cmd="toggleSafe" id="btn-safe" title="セーフエリアガイド (G)"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3zm2 2v14h14V5zm2 2h10v10H7zm2 2v6h6V9z"/></svg></button>
         <button class="ib" data-cmd="snapshot" title="フレームを PNG 保存"><svg viewBox="0 0 24 24"><path d="M9 3L7.2 5H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.2L15 3zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg></button>
         <div class="tc total" id="tc-total">00:00:00:00</div>
       </div>
@@ -379,7 +397,7 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
       <div id="tl-bar">
         <span class="tc" id="tl-tc">00:00:00:00</span>
         <button class="btn sm" data-cmd="split" title="Ctrl+K">分割</button>
-        <button class="btn sm" data-cmd="silence" title="Ctrl+Shift+X">無音カット</button>
+        <button class="btn sm" data-cmd="silence" title="Ctrl+Alt+X">無音カット</button>
         <button class="btn sm" data-cmd="addTelop" title="T">＋テロップ</button>
         <div class="sp"></div>
         <span class="unit">ズーム</span>
@@ -390,7 +408,7 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
         <div id="tl-content">
           <div id="tl-rulerrow"><div id="tl-corner"></div><canvas id="tl-ruler"></canvas></div>
           <div id="tl-rows"></div>
-          <div id="playhead"></div><div id="snapline"></div><div id="razorline"></div><div id="marquee"></div>
+          <div id="playhead"></div><div id="snapline"></div><div id="razorline"></div><div id="marquee"></div><div id="inout"></div>
         </div>
       </div>
     </div>
