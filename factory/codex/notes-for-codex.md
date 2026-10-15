@@ -1,5 +1,14 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-17 向け（翌朝の自分への引き継ぎ）
+- 実装済み: money（10/17 Release 予定）、pet2（10/18）、re2（10/19）、sports2（10/20）、nursery（10/21）。`node factory/calendar.mjs next-design` は `nail-vol1`（10/22・ネイル・まつげサロン）を返すはずなので、それを20デザイン実装する。brief は calendar.json の nail-vol1 を参照。id 接頭辞は nl- を確認して使う
+- **朝イチで `ls telop/fontcache/files | wc -l` を確認。無ければ `node factory/fetch_fonts.mjs`**（10/16 にコンテナ再起動でキャッシュが消え、本ビルドが途中で失敗した。quick は通っても full の gen_gallery で落ちる）
+- factory/design_template.md の 20 枠に当てはめてから書く（4 本連続で初回修正なし）
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認。サンプル文にサービス名・ブランド名を入れない
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → `node factory/gen_howto_caps.mjs`（新: 使い方キャプチャ 3 枚、factory/howto/<pack>/）→ 報告。10/17 は土曜なのでアプリ枠なし
+- 株シミュ: 10/16 の report を確認。来週も売買ゼロなら条件緩和の実装を提案（指示があるまで実装しない）
+- calendar は sweets-vol1（11/6）まで。11/7 以降のテーマを2件追加（候補: 歯科 Vol.2（矯正・ホワイトニング）、スポーツジム Vol.2（パーソナル）、学童・習い事、自治会・町内会）
+
 ## 2026-10-16 向け（翌朝の自分への引き継ぎ）
 - 実装済み: local（10/16 Release 予定）、money（10/17）、pet2（10/18）、re2（10/19）、sports2（10/20）。`node factory/calendar.mjs next-design` は `nursery-vol1`（10/21・保育園・幼稚園）を返すはずなので、それを20デザイン実装する。brief は calendar.json の nursery-vol1 を参照。id の接頭辞は ns- を確認して使う（kids 系の既存 id と被らないこと）
 - factory/design_template.md の 20 枠に当てはめてから書く（pet2・re2・sports2 の 3 本連続で初回修正なし）
