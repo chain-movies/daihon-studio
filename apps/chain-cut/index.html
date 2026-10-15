@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1d1d1d">
+<title>Chain Cut｜ブラウザ動画編集ソフト</title>
+<meta name="description" content="ブラウザだけで動く本格動画編集ソフト。タイムライン編集、テロップ、BGM、無音カット、SRT字幕読込、MP4書き出し。インストール不要。">
+<script src="../../telop/designs.js"></script>
+<script>
+  (function () { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = TelopDesigns.googleFontsHref(); document.head.appendChild(l); })();
+</script>
+<script src="../../telop/renderer.js"></script>
+<script src="vendor/mp4-muxer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{
+  --bg:#141414;--panel:#1e1e1e;--panel2:#252525;--panel3:#2e2e2e;--panel4:#383838;
+  --line:#0d0d0d;--line2:#3a3a3a;--ink:#e8e8e8;--ink2:#b4b4b4;--muted:#7d7d7d;
+  --accent:#2d8ceb;--accent2:#4fa3f7;--accent-soft:rgba(45,140,235,.18);
+  --val:#5aa9ff;--warn:#f0b429;--danger:#e5484d;--ok:#3ecf8e;
+  --c-video:#4a6fa5;--c-image:#7a5ea8;--c-audio:#3d8a5f;--c-telop:#b5692e;
+  --tl-head:150px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:12px;line-height:1.5;user-select:none;-webkit-user-select:none}
+input,textarea,select,button{font:inherit;color:inherit}
+textarea,input[type=text]{user-select:text;-webkit-user-select:text}
+button{cursor:pointer}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--panel)}
+::-webkit-scrollbar-thumb{background:#444;border-radius:6px;border:2px solid var(--panel)}
+::-webkit-scrollbar-thumb:hover{background:#555}
+
+/* ---------- 全体レイアウト ---------- */
+#app{display:grid;height:100vh;grid-template-rows:34px var(--top-h,58%) 5px 1fr;grid-template-columns:var(--left-w,320px) 5px 1fr 5px var(--right-w,300px);gap:0;background:var(--line)}
+#menubar{grid-column:1/-1;display:flex;align-items:center;background:#181818;border-bottom:1px solid var(--line);padding:0 8px;gap:2px}
+.logo{display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;margin-right:10px;letter-spacing:.02em}
+.logo .mark{width:20px;height:20px;border-radius:5px;background:linear-gradient(135deg,#2d8ceb 0%,#9b5de5 55%,#f15bb5 100%);display:grid;place-items:center;font-size:10px;font-weight:900;color:#fff}
+.menu{position:relative}
+.menu>button{background:none;border:0;padding:5px 9px;border-radius:4px;color:var(--ink2)}
+.menu>button:hover,.menu.open>button{background:var(--panel3);color:var(--ink)}
+.menu .dd{display:none;position:absolute;top:100%;left:0;min-width:240px;background:#2a2a2a;border:1px solid #444;border-radius:6px;padding:4px;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.menu.open .dd{display:block}
+.dd button{display:flex;width:100%;background:none;border:0;padding:6px 10px;border-radius:4px;text-align:left;gap:10px}
+.dd button:hover{background:var(--accent)}
+.dd button .k{margin-left:auto;color:var(--muted);font-size:11px}
+.dd button:hover .k{color:#dfeeff}
+.dd hr{border:0;border-top:1px solid #3d3d3d;margin:4px 2px}
+#menubar .sp{flex:1}
+#projname{background:transparent;border:1px solid transparent;border-radius:4px;padding:3px 8px;width:200px;text-align:center;color:var(--ink2)}
+#projname:hover,#projname:focus{border-color:var(--line2);outline:0;background:var(--panel)}
+#savestate{color:var(--muted);font-size:11px;min-width:110px;text-align:right;margin-right:10px}
+#savestate.dirty{color:var(--warn)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line2);background:var(--panel3);border-radius:5px;padding:5px 11px;white-space:nowrap}
+.btn:hover{background:var(--panel4)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.btn.primary:hover{background:var(--accent2)}
+.btn.sm{padding:3px 8px;font-size:11px}
+.btn.block{width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.danger{color:#ff9b9e}
+
+.splitter{background:var(--line);cursor:col-resize;position:relative}
+.splitter:hover,.splitter.drag{background:var(--accent)}
+#split-h{grid-column:1/-1;cursor:row-resize}
+
+.panel{background:var(--panel);display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+.ptabs{display:flex;align-items:stretch;height:30px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;padding-left:4px}
+.ptabs button{background:none;border:0;padding:0 12px;color:var(--muted);border-bottom:2px solid transparent;font-weight:600}
+.ptabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+.ptabs .sp{flex:1}
+.ptabs .tool{align-self:center;margin-right:6px}
+.pbody{flex:1;overflow:auto;min-height:0}
+.hidden{display:none!important}
+
+/* ---------- プロジェクトパネル ---------- */
+#bin{padding:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;align-content:start;grid-auto-rows:max-content;min-height:100%}
+#bin.over{outline:2px dashed var(--accent);outline-offset:-6px;background:var(--accent-soft)}
+.mcard{background:var(--panel2);border:1px solid #2f2f2f;border-radius:6px;overflow:hidden;cursor:grab;position:relative}
+.mcard:hover{border-color:#555}
+.mcard.sel{border-color:var(--accent)}
+.mcard .th{aspect-ratio:16/9;background:#111 center/cover no-repeat;position:relative;display:grid;place-items:center;color:var(--muted);font-size:20px}
+.mcard .th .dur{position:absolute;right:4px;bottom:3px;background:rgba(0,0,0,.75);padding:0 4px;border-radius:3px;font-size:10px;color:#ddd;font-variant-numeric:tabular-nums}
+.mcard .th .kind{position:absolute;left:4px;top:3px;padding:0 5px;border-radius:3px;font-size:9.5px;font-weight:700;color:#fff}
+.mcard .nm{padding:4px 7px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+.mcard.unlinked .th{filter:grayscale(1) brightness(.5)}
+.mcard.unlinked .nm{color:var(--danger)}
+.mcard .busy{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.6);font-size:11px}
+.empty-bin{grid-column:1/-1;border:1px dashed #3d3d3d;border-radius:8px;padding:26px 14px;text-align:center;color:var(--muted);line-height:1.9}
+.empty-bin b{color:var(--ink2)}
+
+/* ---------- テロップライブラリ ---------- */
+#lib{display:flex;flex-direction:column;height:100%}
+#lib .lhead{padding:8px;display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line);flex:none}
+#lib .lgrid{flex:1;overflow:auto;padding:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;align-content:start;grid-auto-rows:max-content}
+.dcard{background:#0e0e0e;border:1px solid #2f2f2f;border-radius:5px;overflow:hidden;cursor:grab}
+.dcard:hover{border-color:#555}
+.dcard.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.dcard canvas{display:block;width:100%;aspect-ratio:2.4/1;background:repeating-conic-gradient(#1b1b1b 0 25%,#232323 0 50%) 0 0/14px 14px}
+.dcard .nm{padding:3px 6px;font-size:10.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--panel2)}
+#lib .lfoot{flex:none;border-top:1px solid var(--line);padding:8px;display:flex;flex-direction:column;gap:6px}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{border:1px solid var(--line2);background:var(--panel2);border-radius:20px;padding:1px 9px;font-size:11px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* フォーム */
+.field{display:flex;align-items:center;gap:8px;min-height:26px}
+.field>label{width:92px;flex:none;color:var(--ink2)}
+.field>.ctl{flex:1;min-width:0;display:flex;align-items:center;gap:6px}
+select,input[type=text],input[type=number],textarea{background:#161616;border:1px solid #3a3a3a;border-radius:4px;padding:4px 7px;width:100%;min-width:0}
+select:focus,input:focus,textarea:focus{outline:0;border-color:var(--accent)}
+textarea{resize:vertical;min-height:54px;line-height:1.45}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=checkbox]{accent-color:var(--accent)}
+.scrub{color:var(--val);cursor:ew-resize;font-variant-numeric:tabular-nums;padding:1px 3px;border-radius:3px;min-width:44px;display:inline-block;text-align:left}
+.scrub:hover{background:rgba(90,169,255,.12);text-decoration:underline dotted}
+.scrub-in{width:70px!important;padding:1px 4px!important;color:var(--val)}
+.unit{color:var(--muted);font-size:11px}
+
+/* ---------- モニター ---------- */
+#monitor{position:relative}
+#mon-stage{flex:1;position:relative;background:#0b0b0b;min-height:0;display:grid;place-items:center;overflow:hidden}
+#mon-wrap{position:relative;box-shadow:0 0 0 1px #2a2a2a}
+#mon-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#program{background:#000}
+#overlay{cursor:default}
+#mon-drop{position:absolute;inset:0;display:none;place-items:center;font-size:15px;color:#fff;background:rgba(45,140,235,.25);border:2px dashed var(--accent);pointer-events:none}
+.transport{flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:4px 10px 6px;gap:8px;background:var(--panel)}
+.tc{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:14px;color:var(--val);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.tc.total{color:var(--ink2);text-align:right}
+.tbtns{display:flex;gap:2px;align-items:center}
+.ib{width:30px;height:28px;display:grid;place-items:center;border:0;background:none;border-radius:4px;color:var(--ink2)}
+.ib:hover{background:var(--panel3);color:var(--ink)}
+.ib.on{color:var(--accent2)}
+.ib svg{width:16px;height:16px;fill:currentColor}
+.ib.play{width:38px}
+.ib.play svg{width:20px;height:20px}
+#scrubbar{flex:none;height:8px;margin:0 10px;background:#2a2a2a;border-radius:4px;position:relative;cursor:pointer}
+#scrubbar .fill{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:4px}
+.mon-right{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+
+/* ---------- インスペクター ---------- */
+#insp .sec{border-bottom:1px solid var(--line)}
+#insp .sec>h4{display:flex;align-items:center;gap:6px;padding:7px 10px;font-size:11px;font-weight:700;color:var(--ink2);background:var(--panel2);letter-spacing:.04em}
+#insp .sec>h4 .sw{width:9px;height:9px;border-radius:2px}
+#insp .sec .in{padding:8px 10px;display:flex;flex-direction:column;gap:5px}
+#insp .note{color:var(--muted);font-size:11px;line-height:1.6}
+#insp .btnrow{display:flex;gap:6px;flex-wrap:wrap}
+#insp .btnrow .btn{flex:1}
+kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-width:2px;border-radius:3px;padding:0 5px;font-size:10.5px;font-family:inherit;color:var(--ink);min-width:18px;text-align:center}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;font-size:11px;color:var(--ink2)}
+
+/* ---------- タイムライン ---------- */
+#timeline{grid-column:1/-1;flex-direction:row}
+#tools{width:38px;flex:none;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding-top:6px;gap:2px}
+#tools .ib.on{background:var(--accent-soft);color:var(--accent2)}
+#tl-main{flex:1;display:flex;flex-direction:column;min-width:0}
+#tl-bar{height:30px;display:flex;align-items:center;gap:8px;padding:0 8px;border-bottom:1px solid var(--line);flex:none}
+#tl-bar .tc{font-size:13px}
+#tl-bar .sp{flex:1}
+#tl-bar input[type=range]{width:130px}
+#tl-scroll{flex:1;overflow:auto;position:relative;background:#191919}
+#tl-content{position:relative;min-height:100%}
+#tl-rulerrow{position:sticky;top:0;z-index:20;height:26px;display:flex}
+#tl-corner{position:sticky;left:0;z-index:21;width:var(--tl-head);flex:none;background:var(--panel);border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;align-items:center;padding-left:8px;gap:4px}
+#tl-ruler{position:sticky;left:var(--tl-head);height:26px;display:block;background:var(--panel);border-bottom:1px solid var(--line);cursor:pointer}
+.trow{display:flex;position:relative;border-bottom:1px solid #111}
+.thead{position:sticky;left:0;z-index:10;width:var(--tl-head);flex:none;background:var(--panel2);border-right:1px solid var(--line);display:flex;align-items:center;gap:4px;padding:0 6px}
+.thead .tn{font-weight:700;width:26px;text-align:center;border-radius:3px;padding:1px 0;font-size:11px}
+.thead .tl{flex:1;color:var(--muted);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thead .ib{width:22px;height:22px}
+.thead .ib svg{width:13px;height:13px}
+.thead .ib.off{color:var(--danger)}
+.thead .tdel{display:none}
+.trow:hover .thead .tdel{display:grid}
+.lane{position:relative;flex:1}
+.trow.k-video .lane{background:#1c1c1f}
+.trow.k-telop .lane{background:#1f1c1a}
+.trow.k-audio .lane{background:#1a1e1c}
+.trow.dropok .lane{background:rgba(45,140,235,.12)}
+.clip{position:absolute;top:2px;bottom:2px;border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.6);cursor:pointer;background-repeat:repeat-x;background-size:auto 100%}
+.clip .cl{position:absolute;left:0;right:0;top:0;padding:1px 6px;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(0,0,0,.35);color:#fff;z-index:2;pointer-events:none}
+.clip canvas.wf{position:absolute;left:0;bottom:0;width:100%;pointer-events:none}
+.clip.t-video{background-color:var(--c-video)}
+.clip.t-image{background-color:var(--c-image)}
+.clip.t-audio{background-color:var(--c-audio)}
+.clip.t-telop{background-color:var(--c-telop)}
+.clip.t-telop .cl{background:none;top:50%;transform:translateY(-50%);font-size:11px;font-weight:600}
+.clip.sel{border-color:#fff;box-shadow:inset 0 0 0 1px #fff}
+.clip.off{opacity:.45}
+.clip .eh{position:absolute;top:0;bottom:0;width:7px;z-index:3;cursor:ew-resize}
+.clip .eh.l{left:0}
+.clip .eh.r{right:0}
+.clip .eh:hover{background:rgba(255,255,255,.35)}
+.clip .fade{position:absolute;top:0;bottom:0;pointer-events:none;z-index:1}
+.clip .fade.i{left:0;background:linear-gradient(90deg,rgba(0,0,0,.55),transparent)}
+.clip .fade.o{right:0;background:linear-gradient(270deg,rgba(0,0,0,.55),transparent)}
+.clip.unlinked{background:repeating-linear-gradient(45deg,#5a2a2a 0 8px,#4a2222 8px 16px)}
+#tl-content.razor .lane,#tl-content.razor .clip{cursor:crosshair}
+#playhead{position:absolute;top:0;bottom:0;width:1px;background:#e5484d;z-index:30;pointer-events:none}
+#playhead::before{content:"";position:absolute;top:0;left:-6px;border:6px solid transparent;border-top:9px solid #e5484d}
+#snapline{position:absolute;top:26px;bottom:0;width:1px;background:#ffd84d;z-index:29;pointer-events:none;display:none}
+#razorline{position:absolute;top:26px;bottom:0;width:1px;background:rgba(255,255,255,.7);z-index:29;pointer-events:none;display:none}
+#marquee{position:absolute;border:1px solid var(--accent2);background:rgba(45,140,235,.15);z-index:28;pointer-events:none;display:none}
+#meter{width:34px;flex:none;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:6px 0;gap:4px}
+#meter canvas{flex:1;width:22px;min-height:0}
+#meter span{font-size:9px;color:var(--muted)}
+
+/* ---------- モーダル ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:200}
+.modal{background:#262626;border:1px solid #444;border-radius:10px;width:min(520px,94vw);max-height:90vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.modal h3{font-size:14px;padding:14px 18px;border-bottom:1px solid #333;display:flex;align-items:center;gap:8px}
+.modal .mb{padding:14px 18px;display:flex;flex-direction:column;gap:9px}
+.modal .mf{padding:12px 18px;border-top:1px solid #333;display:flex;justify-content:flex-end;gap:8px}
+.modal p{color:var(--ink2);line-height:1.7}
+.modal .big{font-size:15px;color:var(--ink)}
+.prog{height:8px;background:#151515;border-radius:4px;overflow:hidden}
+.prog>div{height:100%;background:linear-gradient(90deg,var(--accent),#9b5de5);width:0;transition:width .15s}
+.aspects{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.aspects button{background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:12px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.aspects button.on{border-color:var(--accent);background:var(--accent-soft)}
+.aspects .shape{background:#555;border-radius:2px}
+.aspects button.on .shape{background:var(--accent)}
+.aspects small{color:var(--muted)}
+#sil-graph{width:100%;height:70px;background:#151515;border-radius:5px;display:block}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#333;border:1px solid #4a4a4a;color:#fff;padding:8px 16px;border-radius:8px;z-index:300;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:12.5px;max-width:90vw}
+.toast.err{border-color:var(--danger)}
+
+@media (max-width:900px){
+  #app{grid-template-columns:1fr;grid-template-rows:34px 40vh auto 1fr;height:auto;min-height:100vh}
+  html,body{overflow:auto}
+  .splitter{display:none}
+  #panel-left,#panel-right{min-height:260px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="menubar">
+    <div class="logo"><div class="mark">CC</div>Chain Cut</div>
+    <div class="menu"><button>ファイル</button><div class="dd">
+      <button data-cmd="new">新規プロジェクト…<span class="k">Ctrl+Alt+N</span></button>
+      <button data-cmd="open">プロジェクトを開く…<span class="k">Ctrl+O</span></button>
+      <button data-cmd="save">プロジェクトを保存<span class="k">Ctrl+S</span></button>
+      <button data-cmd="savePackage">素材ごとパッケージ保存（共有用 .zip）…<span class="k">Ctrl+Shift+S</span></button>
+      <hr>
+      <button data-cmd="import">素材を読み込み…<span class="k">Ctrl+I</span></button>
+      <button data-cmd="importSrt">字幕ファイル（SRT）を読み込み…</button>
+      <hr>
+      <button data-cmd="export">MP4 に書き出し…<span class="k">Ctrl+M</span></button>
+      <button data-cmd="snapshot">現在のフレームを PNG で保存</button>
+    </div></div>
+    <div class="menu"><button>編集</button><div class="dd">
+      <button data-cmd="undo">取り消し<span class="k">Ctrl+Z</span></button>
+      <button data-cmd="redo">やり直し<span class="k">Ctrl+Shift+Z</span></button>
+      <hr>
+      <button data-cmd="copy">コピー<span class="k">Ctrl+C</span></button>
+      <button data-cmd="paste">再生ヘッドに貼り付け<span class="k">Ctrl+V</span></button>
+      <button data-cmd="duplicate">複製<span class="k">Ctrl+D</span></button>
+      <button data-cmd="delete">削除<span class="k">Delete</span></button>
+      <button data-cmd="rippleDelete">リップル削除<span class="k">Shift+Delete</span></button>
+      <hr>
+      <button data-cmd="selectAll">すべて選択<span class="k">Ctrl+A</span></button>
+      <button data-cmd="deselect">選択解除<span class="k">Esc</span></button>
+    </div></div>
+    <div class="menu"><button>クリップ</button><div class="dd">
+      <button data-cmd="split">再生ヘッドで分割<span class="k">Ctrl+K</span></button>
+      <button data-cmd="silence">無音部分を自動カット…<span class="k">Ctrl+Shift+X</span></button>
+      <button data-cmd="closeGaps">すき間を詰める（選択トラック）</button>
+      <hr>
+      <button data-cmd="addTelop">テロップを追加<span class="k">T</span></button>
+      <button data-cmd="addTrackVideo">ビデオトラックを追加</button>
+      <button data-cmd="addTrackTelop">テロップトラックを追加</button>
+      <button data-cmd="addTrackAudio">オーディオトラックを追加</button>
+    </div></div>
+    <div class="menu"><button>表示</button><div class="dd">
+      <button data-cmd="zoomIn">タイムライン拡大<span class="k">=</span></button>
+      <button data-cmd="zoomOut">タイムライン縮小<span class="k">-</span></button>
+      <button data-cmd="zoomFit">全体を表示<span class="k">\</span></button>
+      <hr>
+      <button data-cmd="toggleSafe">セーフエリアガイド<span class="k">'</span></button>
+      <button data-cmd="toggleSnap">スナップ<span class="k">S</span></button>
+    </div></div>
+    <div class="menu"><button>ヘルプ</button><div class="dd">
+      <button data-cmd="shortcuts">キーボードショートカット<span class="k">?</span></button>
+      <button data-cmd="about">Chain Cut について</button>
+    </div></div>
+    <div class="sp"></div>
+    <input id="projname" type="text" value="無題のプロジェクト" spellcheck="false" title="プロジェクト名">
+    <div class="sp"></div>
+    <span id="savestate">—</span>
+    <button class="btn primary" data-cmd="export">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l5 5h-3v6h-4V8H7zM5 17h14v3H5z"/></svg>書き出し</button>
+  </div>
+
+  <!-- 左：プロジェクト / テロップ -->
+  <section class="panel" id="panel-left">
+    <div class="ptabs">
+      <button class="on" data-ltab="bin">プロジェクト</button>
+      <button data-ltab="lib">テロップ</button>
+      <div class="sp"></div>
+      <button class="btn sm tool" data-cmd="import" id="btn-import">＋ 読み込み</button>
+    </div>
+    <div class="pbody" id="tab-bin"><div id="bin"></div></div>
+    <div class="pbody hidden" id="tab-lib">
+      <div id="lib">
+        <div class="lhead">
+          <select id="lib-pack"></select>
+          <input type="text" id="lib-q" placeholder="デザインを検索（例：ニュース、ポップ）">
+        </div>
+        <div class="lgrid" id="lib-grid"></div>
+        <div class="lfoot">
+          <div class="chips" id="lib-variants"></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn primary" style="flex:1" data-cmd="addTelop">再生ヘッドに追加</button>
+            <button class="btn" data-cmd="applyDesign" title="選択中のテロップのデザインを入れ替え">選択に適用</button>
+          </div>
+          <button class="btn sm" data-cmd="importSrt">SRT 字幕を読み込んでテロップ化…</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="splitter" id="split-l"></div>
+
+  <!-- 中央：プログラムモニター -->
+  <section class="panel" id="monitor">
+    <div class="ptabs">
+      <button class="on">プログラム</button>
+      <div class="sp"></div>
+      <span id="mon-res" style="align-self:center;color:var(--muted);margin-right:10px;font-size:11px"></span>
+    </div>
+    <div id="mon-stage">
+      <div id="mon-wrap"><canvas id="program"></canvas><canvas id="overlay"></canvas></div>
+      <div id="mon-drop">ここにドロップして読み込み</div>
+    </div>
+    <div id="scrubbar"><div class="fill"></div></div>
+    <div class="transport">
+      <div class="tc" id="tc-cur">00:00:00:00</div>
+      <div class="tbtns">
+        <button class="ib" data-cmd="goStart" title="先頭へ (Home)"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+        <button class="ib" data-cmd="prevEdit" title="前の編集点 (↑)"><svg viewBox="0 0 24 24"><path d="M5 5h2v14H5zM19 5v14l-10-7z" opacity=".55"/><path d="M11 5h2v14h-2z"/></svg></button>
+        <button class="ib" data-cmd="stepBack" title="1フレーム戻る (←)"><svg viewBox="0 0 24 24"><path d="M15 5v14L6 12zM16 5h2v14h-2z"/></svg></button>
+        <button class="ib play" data-cmd="togglePlay" id="btn-play" title="再生／停止 (Space)"><svg viewBox="0 0 24 24" id="ico-play"><path d="M7 4v16l13-8z"/></svg></button>
+        <button class="ib" data-cmd="stepFwd" title="1フレーム進む (→)"><svg viewBox="0 0 24 24"><path d="M9 5v14l9-7zM6 5h2v14H6z"/></svg></button>
+        <button class="ib" data-cmd="nextEdit" title="次の編集点 (↓)"><svg viewBox="0 0 24 24"><path d="M5 5v14l10-7z" opacity=".55"/><path d="M11 5h2v14h-2zM17 5h2v14h-2z"/></svg></button>
+        <button class="ib" data-cmd="goEnd" title="末尾へ (End)"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+        <button class="ib" data-cmd="toggleLoop" id="btn-loop" title="ループ再生"><svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg></button>
+      </div>
+      <div class="mon-right">
+        <button class="ib" data-cmd="toggleSafe" id="btn-safe" title="セーフエリアガイド (')"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3zm2 2v14h14V5zm2 2h10v10H7zm2 2v6h6V9z"/></svg></button>
+        <button class="ib" data-cmd="snapshot" title="フレームを PNG 保存"><svg viewBox="0 0 24 24"><path d="M9 3L7.2 5H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.2L15 3zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg></button>
+        <div class="tc total" id="tc-total">00:00:00:00</div>
+      </div>
+    </div>
+  </section>
+  <div class="splitter" id="split-r"></div>
+
+  <!-- 右：インスペクター -->
+  <section class="panel" id="panel-right">
+    <div class="ptabs"><button class="on">インスペクター</button></div>
+    <div class="pbody" id="insp"></div>
+  </section>
+
+  <div class="splitter" id="split-h"></div>
+
+  <!-- 下：タイムライン -->
+  <section class="panel" id="timeline">
+    <div id="tools">
+      <button class="ib on" data-tool="select" title="選択ツール (V)"><svg viewBox="0 0 24 24"><path d="M5 2l14 11h-7l4 8-3 1.4-4-8.2L5 19z"/></svg></button>
+      <button class="ib" data-tool="razor" title="レーザーツール — クリックで分割 (C)"><svg viewBox="0 0 24 24"><path d="M3 20.5L14.5 9l1.4 1.4L4.4 22zM15 3l6 6-3.5 3.5-6-6z"/></svg></button>
+      <button class="ib" data-tool="ripple" title="リップル選択ツール — 端をドラッグすると後ろも詰まる (B)"><svg viewBox="0 0 24 24"><path d="M3 5h6v14H3zM12 12l4-4v3h5v2h-5v3z"/></svg></button>
+      <div style="height:8px"></div>
+      <button class="ib on" data-cmd="toggleSnap" id="btn-snap" title="スナップ (S)"><svg viewBox="0 0 24 24"><path d="M5 3h4v8a3 3 0 006 0V3h4v8a7 7 0 01-14 0zm0 0v3h4V3zm10 0v3h4V3z"/></svg></button>
+    </div>
+    <div id="tl-main">
+      <div id="tl-bar">
+        <span class="tc" id="tl-tc">00:00:00:00</span>
+        <button class="btn sm" data-cmd="split" title="Ctrl+K">分割</button>
+        <button class="btn sm" data-cmd="silence" title="Ctrl+Shift+X">無音カット</button>
+        <button class="btn sm" data-cmd="addTelop" title="T">＋テロップ</button>
+        <div class="sp"></div>
+        <span class="unit">ズーム</span>
+        <input type="range" id="zoom" min="0" max="100" value="40">
+        <button class="btn sm" data-cmd="zoomFit">全体</button>
+      </div>
+      <div id="tl-scroll">
+        <div id="tl-content">
+          <div id="tl-rulerrow"><div id="tl-corner"></div><canvas id="tl-ruler"></canvas></div>
+          <div id="tl-rows"></div>
+          <div id="playhead"></div><div id="snapline"></div><div id="razorline"></div><div id="marquee"></div>
+        </div>
+      </div>
+    </div>
+    <div id="meter"><canvas id="meter-c"></canvas><span>dB</span></div>
+  </section>
+</div>
+
+<input type="file" id="file-media" multiple accept="video/*,audio/*,image/*" hidden>
+<input type="file" id="file-srt" accept=".srt,.vtt,text/plain" hidden>
+<input type="file" id="file-proj" accept=".json,.zip,application/json,application/zip" hidden>
+
+<script src="editor.js"></script>
+</body>
+</html>
