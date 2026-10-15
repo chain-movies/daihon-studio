@@ -1,0 +1,102 @@
+{
+  "name": "ショート・バラエティ（ポップ）",
+  "description": "縦動画向け。無音を詰めたテンポのよいジャンプカット、黄色×黒フチの大きめテロップがポップに出て、要所でドン＋パンチイン。サンプル用の基本スタイル。",
+  "aspect": "9:16",
+  "designs": [
+    {
+      "id": "st-pop-yellow",
+      "name": "ポップ黄・黒フチ",
+      "category": "スタイル",
+      "sample": "これはヤバい！",
+      "font": {
+        "family": "Mochiy Pop One",
+        "weight": 400,
+        "size": 92,
+        "letterSpacing": 0.02
+      },
+      "fill": {
+        "type": "solid",
+        "color": "#ffe600"
+      },
+      "strokes": [
+        {
+          "color": "#111111",
+          "width": 14
+        },
+        {
+          "color": "#ffffff",
+          "width": 24
+        }
+      ],
+      "shadow": {
+        "color": "rgba(0,0,0,0.35)",
+        "blur": 0,
+        "dx": 6,
+        "dy": 8
+      },
+      "anchor": {
+        "x": "center",
+        "y": "bottom",
+        "margin": 110
+      },
+      "portraitScale": 1
+    },
+    {
+      "id": "st-pop-red",
+      "name": "強調・赤白",
+      "category": "スタイル",
+      "sample": "ここ重要！",
+      "font": {
+        "family": "Mochiy Pop One",
+        "weight": 400,
+        "size": 120,
+        "letterSpacing": 0.02
+      },
+      "fill": {
+        "type": "solid",
+        "color": "#ffffff"
+      },
+      "strokes": [
+        {
+          "color": "#e60023",
+          "width": 18
+        },
+        {
+          "color": "#ffffff",
+          "width": 30
+        }
+      ],
+      "anchor": {
+        "x": "center",
+        "y": "middle",
+        "margin": 0
+      },
+      "portraitScale": 1
+    }
+  ],
+  "telop": {
+    "design": "st-pop-yellow",
+    "anim": "pop",
+    "autoSe": null,
+    "se": "pop",
+    "maxChars": 12,
+    "fadeIn": 0.05,
+    "fadeOut": 0.05,
+    "emphasisDesign": "st-pop-red",
+    "emphasisAnim": "pop",
+    "emphasisSe": "don",
+    "y": -380
+  },
+  "cut": {
+    "silenceCut": {
+      "threshold": -38,
+      "minSilence": 0.4,
+      "pad": 0.06
+    },
+    "jumpCutZoom": 1.08
+  },
+  "bgm": {
+    "volumeDb": -22
+  },
+  "look": "vivid"
+}

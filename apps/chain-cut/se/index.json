@@ -1,0 +1,142 @@
+[
+ {
+  "file": "pop.wav",
+  "id": "pop",
+  "name": "ポン（軽い出現）",
+  "cat": "出現・強調",
+  "dur": 0.14
+ },
+ {
+  "file": "pon.wav",
+  "id": "pon",
+  "name": "ポーン（テロップ）",
+  "cat": "出現・強調",
+  "dur": 0.35
+ },
+ {
+  "file": "pikon.wav",
+  "id": "pikon",
+  "name": "ピコン（ひらめき）",
+  "cat": "出現・強調",
+  "dur": 0.24
+ },
+ {
+  "file": "kira.wav",
+  "id": "kira",
+  "name": "キラーン",
+  "cat": "出現・強調",
+  "dur": 0.8
+ },
+ {
+  "file": "whoosh.wav",
+  "id": "whoosh",
+  "name": "シュッ（場面転換）",
+  "cat": "トランジション",
+  "dur": 0.55
+ },
+ {
+  "file": "swipe.wav",
+  "id": "swipe",
+  "name": "スッ（スワイプ）",
+  "cat": "トランジション",
+  "dur": 0.22
+ },
+ {
+  "file": "hyun.wav",
+  "id": "hyun",
+  "name": "ヒューン（上がる）",
+  "cat": "トランジション",
+  "dur": 0.45
+ },
+ {
+  "file": "byun.wav",
+  "id": "byun",
+  "name": "ビューン（下がる）",
+  "cat": "トランジション",
+  "dur": 0.4
+ },
+ {
+  "file": "don.wav",
+  "id": "don",
+  "name": "ドン（衝撃）",
+  "cat": "インパクト",
+  "dur": 0.9
+ },
+ {
+  "file": "dodon.wav",
+  "id": "dodon",
+  "name": "ドドン",
+  "cat": "インパクト",
+  "dur": 1.08
+ },
+ {
+  "file": "jan.wav",
+  "id": "jan",
+  "name": "ジャーン",
+  "cat": "インパクト",
+  "dur": 1.2
+ },
+ {
+  "file": "zun.wav",
+  "id": "zun",
+  "name": "ズーン（重い・落ち込み）",
+  "cat": "インパクト",
+  "dur": 1.6
+ },
+ {
+  "file": "seikai.wav",
+  "id": "seikai",
+  "name": "ピンポン（正解）",
+  "cat": "リアクション",
+  "dur": 0.82
+ },
+ {
+  "file": "buzzer.wav",
+  "id": "buzzer",
+  "name": "ブブー（不正解）",
+  "cat": "リアクション",
+  "dur": 0.7
+ },
+ {
+  "file": "chin.wav",
+  "id": "chin",
+  "name": "チーン",
+  "cat": "リアクション",
+  "dur": 2.0
+ },
+ {
+  "file": "boing.wav",
+  "id": "boing",
+  "name": "ボヨーン（ツッコミ・笑い）",
+  "cat": "リアクション",
+  "dur": 0.7
+ },
+ {
+  "file": "clap.wav",
+  "id": "clap",
+  "name": "拍手",
+  "cat": "リアクション",
+  "dur": 1.83
+ },
+ {
+  "file": "drumroll.wav",
+  "id": "drumroll",
+  "name": "ドラムロール",
+  "cat": "演出",
+  "dur": 2.5
+ },
+ {
+  "file": "shutter.wav",
+  "id": "shutter",
+  "name": "カシャ（シャッター）",
+  "cat": "演出",
+  "dur": 0.15
+ },
+ {
+  "file": "type.wav",
+  "id": "type",
+  "name": "カタカタ（タイピング）",
+  "cat": "演出",
+  "dur": 0.71
+ }
+]

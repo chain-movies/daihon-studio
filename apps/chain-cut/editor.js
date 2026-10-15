@@ -546,6 +546,89 @@
   const pctx = program.getContext('2d');
   const octx = overlay.getContext('2d');
 
+  /* ---------- キーフレーム・トランジション・エフェクト ---------- */
+  const KF_PROPS = ['x', 'y', 'scale', 'opacity', 'rotation'];
+  const KF_DEFAULT = { x: 0, y: 0, scale: 100, opacity: 100, rotation: 0 };
+  const EASE = {
+    linear: (x) => x,
+    easeIn: (x) => x * x * x,
+    easeOut: (x) => 1 - Math.pow(1 - x, 3),
+    easeInOut: (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2),
+    back: (x) => easeOutBack(x),
+    hold: () => 0,
+  };
+  function baseVal(c, prop) { const v = c[prop]; return v == null ? KF_DEFAULT[prop] : v; }
+  function hasKf(c, prop) { return !!(c.kf && c.kf[prop] && c.kf[prop].length); }
+  function kfValue(c, prop, t) {
+    const k = c.kf && c.kf[prop];
+    if (!k || !k.length) return baseVal(c, prop);
+    const lt = t - c.start;
+    if (lt <= k[0][0]) return k[0][1];
+    for (let i = 0; i < k.length - 1; i++) {
+      const [t0, v0, e] = k[i], [t1, v1] = k[i + 1];
+      if (lt < t1) return v0 + (v1 - v0) * (EASE[e] || EASE.easeInOut)(clamp((lt - t0) / Math.max(1e-6, t1 - t0), 0, 1));
+    }
+    return k[k.length - 1][1];
+  }
+  function setKf(c, prop, lt, v, ease) {
+    c.kf = c.kf || {};
+    const k = c.kf[prop] = c.kf[prop] || [];
+    lt = clamp(Math.round(lt * fps()) / fps(), 0, c.dur);
+    const i = k.findIndex((x) => Math.abs(x[0] - lt) < 0.5 / fps());
+    if (i >= 0) k[i][1] = v; else { k.push([lt, v, ease || 'easeInOut']); k.sort((a, b) => a[0] - b[0]); }
+  }
+  function noise(seed, t) { return Math.sin(t * 37.1 + seed) * 0.6 + Math.sin(t * 61.7 + seed * 2.3) * 0.4; }
+  const TRANSITIONS = [['', 'なし'], ['zoom', 'ズーム'], ['zoomOut', 'ズームアウト'], ['slideL', 'スライド（横）'], ['slideUp', 'スライド（縦）'], ['whip', 'ホイップ（高速パン）'], ['spin', 'スピン'], ['flash', 'フラッシュ（白）'], ['dip', '暗転'], ['blur', 'ぼかし']];
+  /** 時刻 t の見た目（キーフレーム・トランジション・揺れを反映） */
+  function animated(c, t, W, H) {
+    const e = { x: kfValue(c, 'x', t), y: kfValue(c, 'y', t), scale: kfValue(c, 'scale', t), opacity: kfValue(c, 'opacity', t), rotation: kfValue(c, 'rotation', t), blur: 0, flash: 0, dip: 0 };
+    const lt = t - c.start, rem = clipEnd(c) - t;
+    const tr = (spec, p, dir) => { // p: 0→1（1 で通常の状態）
+      p = clamp(p, 0, 1);
+      const q = 1 - EASE.easeOut(p);
+      switch (spec.type) {
+        case 'zoom': e.scale *= 1 + 0.3 * q; break;
+        case 'zoomOut': e.scale *= 1 - 0.25 * q; break;
+        case 'slideL': e.x += dir * W * q; break;
+        case 'slideUp': e.y += dir * H * q; break;
+        case 'whip': e.x += dir * W * 0.5 * q; e.blur = Math.max(e.blur, 40 * q); break;
+        case 'spin': e.rotation += dir * -120 * q; e.scale *= 1 - 0.6 * q; break;
+        case 'flash': e.flash = Math.max(e.flash, 1 - p); break;
+        case 'dip': e.dip = Math.max(e.dip, 1 - p); break;
+        case 'blur': e.blur = Math.max(e.blur, 30 * q); break;
+        default:
+      }
+    };
+    if (c.trIn && c.trIn.type && c.trIn.dur > 0 && lt < c.trIn.dur) tr(c.trIn, (lt + 1 / fps()) / (c.trIn.dur + 1 / fps()), 1);
+    if (c.trOut && c.trOut.type && c.trOut.dur > 0 && rem < c.trOut.dur) tr(c.trOut, rem / c.trOut.dur, -1);
+    const fx = c.fx || {};
+    if (fx.shake > 0) { e.x += fx.shake * noise(1.3, t); e.y += fx.shake * noise(4.1, t); }
+    return e;
+  }
+  function filterOf(c, e) {
+    const fx = c.fx || {}, f = [];
+    if (fx.brightness != null && fx.brightness !== 100) f.push(`brightness(${fx.brightness}%)`);
+    if (fx.contrast != null && fx.contrast !== 100) f.push(`contrast(${fx.contrast}%)`);
+    if (fx.saturate != null && fx.saturate !== 100) f.push(`saturate(${fx.saturate}%)`);
+    if (fx.hue) f.push(`hue-rotate(${fx.hue}deg)`);
+    if (fx.grayscale) f.push(`grayscale(${fx.grayscale}%)`);
+    if (fx.sepia) f.push(`sepia(${fx.sepia}%)`);
+    const b = (fx.blur || 0) + (e ? e.blur : 0);
+    if (b > 0.3) f.push(`blur(${b.toFixed(1)}px)`);
+    return f.length ? f.join(' ') : 'none';
+  }
+  function drawOverlays(ctx, c, e, W, H) {
+    const fx = c.fx || {};
+    if (fx.vignette > 0) {
+      ctx.save();
+      const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.hypot(W, H) / 2);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, `rgba(0,0,0,${clamp(fx.vignette / 100, 0, 1)})`);
+      ctx.globalAlpha = 1; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); ctx.restore();
+    }
+    if (e.flash > 0.001) { ctx.save(); ctx.globalAlpha = e.flash; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+    if (e.dip > 0.001) { ctx.save(); ctx.globalAlpha = e.dip; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+  }
+
   function visualRect(c, sw, sh, W, H) {
     const fit = c.fit === 'cover' ? Math.max(W / sw, H / sh) : c.fit === 'stretch' ? null : Math.min(W / sw, H / sh);
     const k = (c.scale || 100) / 100;
@@ -571,8 +654,9 @@
       if (tr.hidden) continue;
       const cs = P.clips.filter((c) => c.track === tr.id && isActive(c, t)).sort((a, b) => a.start - b.start);
       for (const c of cs) {
-        const alpha = clamp((c.opacity == null ? 100 : c.opacity) / 100, 0, 1) * fadeFactor(c, t);
-        if (alpha <= 0.001) continue;
+        const ea = animated(c, t, W, H);
+        const alpha = clamp(ea.opacity / 100, 0, 1) * fadeFactor(c, t);
+        if (alpha <= 0.001) { drawOverlays(ctx, c, ea, W, H); continue; }
         ctx.globalAlpha = alpha;
         if (c.type === 'video' || c.type === 'image') {
           let src = null, sw = 0, sh = 0;
@@ -587,9 +671,14 @@
             if (!media.has(c.mediaId)) { ctx.globalAlpha = 1; drawMissing(ctx, W, H); }
             continue;
           }
-          const r = visualRect(c, sw, sh, W, H);
+          const r = visualRect(Object.assign({}, c, { x: ea.x, y: ea.y, scale: ea.scale }), sw, sh, W, H);
+          ctx.save();
           ctx.imageSmoothingQuality = 'high';
+          ctx.filter = filterOf(c, ea);
+          if (ea.rotation) { const cx = r.x + r.w / 2, cy = r.y + r.h / 2; ctx.translate(cx, cy); ctx.rotate(ea.rotation * Math.PI / 180); ctx.translate(-cx, -cy); }
           ctx.drawImage(src, r.x, r.y, r.w, r.h);
+          ctx.restore();
+          drawOverlays(ctx, c, ea, W, H);
           rects[c.id] = r;
         } else if (c.type === 'telop') {
           const e = telopCanvas(c, W, H);
@@ -597,8 +686,17 @@
           const p = (t - c.start);
           const ad = 0.35;
           ctx.save();
-          let ox = c.x || 0, oy = c.y || 0;
+          let ox = ea.x, oy = ea.y;
           const r = e.rect || { x: 0, y: 0, w: W, h: H };
+          {
+            // キーフレームのスケール・回転は描画済みテロップへの変形で（毎フレーム描き直さない）
+            const ks = ea.scale / (c.scale || 100);
+            if (Math.abs(ks - 1) > 1e-3 || ea.rotation) {
+              const cx = r.x + r.w / 2 + ox, cy = r.y + r.h / 2 + oy;
+              ctx.translate(cx, cy); ctx.rotate((ea.rotation || 0) * Math.PI / 180); ctx.scale(ks, ks); ctx.translate(-cx, -cy);
+            }
+            ctx.filter = filterOf(c, ea);
+          }
           if (c.anim === 'pop' && p < ad) {
             const k = 0.6 + 0.4 * easeOutBack(clamp(p / ad, 0, 1));
             const cx = r.x + r.w / 2 + ox, cy = r.y + r.h / 2 + oy;
@@ -619,8 +717,9 @@
           }
           ctx.drawImage(e.canvas, ox, oy);
           ctx.restore();
-          rects[c.id] = { x: r.x + (c.x || 0), y: r.y + (c.y || 0), w: r.w, h: r.h };
+          rects[c.id] = { x: r.x + ea.x, y: r.y + ea.y, w: r.w, h: r.h };
           if (isLocked(c.designId) && !opt.noSample) drawSample(ctx, rects[c.id]);
+          drawOverlays(ctx, c, ea, W, H);
         }
       }
     }
@@ -880,7 +979,7 @@
     if (!st.sel.has(hit.id)) { st.sel = e.shiftKey ? new Set([...st.sel, hit.id]) : new Set([hit.id]); changed({ selection: true }); }
     const r0 = lastRects[hit.id];
     const corner = r0 && [[r0.x, r0.y], [r0.x + r0.w, r0.y], [r0.x, r0.y + r0.h], [r0.x + r0.w, r0.y + r0.h]].some(([hx, hy]) => Math.abs(hx - pt.x) < P.width / 60 && Math.abs(hy - pt.y) < P.width / 60);
-    const start = { x: hit.x || 0, y: hit.y || 0, scale: hit.scale || 100 };
+    const start = { x: kfValue(hit, 'x', st.time), y: kfValue(hit, 'y', st.time), scale: kfValue(hit, 'scale', st.time) };
     const cx = r0 ? r0.x + r0.w / 2 : P.width / 2, cy = r0 ? r0.y + r0.h / 2 : P.height / 2;
     const d0 = Math.hypot(pt.x - cx, pt.y - cy) || 1;
     let moved = false;
@@ -889,12 +988,12 @@
       const q = monitorPoint(ev);
       if (!moved) { pushUndo(); moved = true; }
       if (corner) {
-        hit.scale = clamp(Math.round(start.scale * Math.hypot(q.x - cx, q.y - cy) / d0), 5, 800);
+        setProp(hit, 'scale', clamp(Math.round(start.scale * Math.hypot(q.x - cx, q.y - cy) / d0), 5, 800));
       } else {
         let nx = Math.round(start.x + q.x - pt.x), ny = Math.round(start.y + q.y - pt.y);
         if (!ev.altKey && hit.type !== 'telop') { if (Math.abs(nx) < 12) nx = 0; if (Math.abs(ny) < 12) ny = 0; }
         if (ev.shiftKey) { if (Math.abs(nx - start.x) > Math.abs(ny - start.y)) ny = start.y; else nx = start.x; }
-        hit.x = nx; hit.y = ny;
+        setProp(hit, 'x', nx); setProp(hit, 'y', ny);
       }
       requestDraw(); renderInspectorValues();
     };
@@ -999,6 +1098,13 @@
     let inner = `<div class="cl">${escapeHtml(clipLabel(c))}${c.volume != null && c.volume !== 1 && c.type !== 'telop' && c.type !== 'image' ? ` ・ ${volToDb(c.volume)}dB` : ''}</div>`;
     if (c.fadeIn > 0) inner += `<div class="fade i" style="width:${c.fadeIn * st.pps}px"></div>`;
     if (c.fadeOut > 0) inner += `<div class="fade o" style="width:${c.fadeOut * st.pps}px"></div>`;
+    if (c.kf) {
+      const ts = new Set();
+      for (const k of Object.values(c.kf)) for (const x of k) ts.add(+x[0].toFixed(3));
+      for (const x of ts) inner += `<i class="kfd" style="left:${x * st.pps - 4}px"></i>`;
+    }
+    if (c.trIn && c.trIn.type) inner += `<i class="trm l" style="width:${c.trIn.dur * st.pps}px"></i>`;
+    if (c.trOut && c.trOut.type) inner += `<i class="trm r" style="width:${c.trOut.dur * st.pps}px"></i>`;
     inner += '<div class="eh l"></div><div class="eh r"></div>';
     el.innerHTML = inner;
     if (rt && rt.peaks && (c.type === 'audio' || c.type === 'video')) {
@@ -1308,7 +1414,7 @@
   /* ドラッグ＆ドロップ（ビン／テロップ → タイムライン、OSファイル → どこでも） */
   rows.addEventListener('dragover', (e) => {
     const types = e.dataTransfer.types;
-    if (!types.includes('text/x-cc-media') && !types.includes('text/x-cc-telop') && !types.includes('Files')) return;
+    if (!types.includes('text/x-cc-media') && !types.includes('text/x-cc-telop') && !types.includes('text/x-cc-se') && !types.includes('Files')) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';
     const tr = trackAtY(e.clientY);
@@ -1323,6 +1429,8 @@
     let tr = trackAtY(e.clientY);
     const mid = e.dataTransfer.getData('text/x-cc-media');
     const did = e.dataTransfer.getData('text/x-cc-telop');
+    const sef = e.dataTransfer.getData('text/x-cc-se');
+    if (sef) { await addSe(sef, t, tr && tr.id); return; }
     if (mid) {
       const meta = mediaMeta(mid); if (!meta) return;
       const kind = kindForType(meta.type);
@@ -1424,12 +1532,23 @@
   let thumbBusy = false;
   const thumbCanvas = document.createElement('canvas');
   thumbCanvas.getContext('2d', { willReadFrequently: true });
-  function setupLib() {
+  function projectDesigns() { return Array.isArray(P.designs) ? P.designs : []; }
+  function registerProjectDesigns() {
+    for (const d of projectDesigns()) { if (!d.pack) d.pack = 'project'; designById.set(d.id, d); }
+    refreshPackSelect();
+  }
+  function refreshPackSelect() {
+    const sel = $('#lib-pack'); if (!sel) return;
     const packs = {};
     for (const d of DESIGNS) packs[d.pack || 'tv-vol1'] = (packs[d.pack || 'tv-vol1'] || 0) + 1;
-    const sel = $('#lib-pack');
-    sel.innerHTML = '<option value="">すべてのパック（' + DESIGNS.length + '）</option>' +
+    const pd = projectDesigns().length;
+    sel.innerHTML = (pd ? `<option value="project">★ このプロジェクトのデザイン（${pd}）</option>` : '') + '<option value="">すべてのパック（' + DESIGNS.length + '）</option>' +
       Object.keys(packs).map((k) => `<option value="${k}">${escapeHtml((PACKS[k] && PACKS[k].short) || k)}（${packs[k]}）</option>`).join('');
+    sel.value = st.libPack && (st.libPack !== 'project' || pd) ? st.libPack : '';
+  }
+  function setupLib() {
+    const sel = $('#lib-pack');
+    refreshPackSelect();
     sel.addEventListener('change', () => { st.libPack = sel.value; renderLib(); });
     $('#lib-q').addEventListener('input', (e) => { st.libQ = e.target.value.trim(); renderLib(); });
     libObserver = new IntersectionObserver((ents) => {
@@ -1450,7 +1569,7 @@
   }
   function renderLib() {
     const q = st.libQ.toLowerCase();
-    const list = DESIGNS.filter((d) => (!st.libPack || d.pack === st.libPack) &&
+    const list = projectDesigns().concat(DESIGNS).filter((d) => (!st.libPack || d.pack === st.libPack) &&
       (!q || [d.name, d.category, d.sample, d.id, (PACKS[d.pack] || {}).short].join(' ').toLowerCase().includes(q)));
     libGrid.innerHTML = list.slice(0, 600).map((d) => `<div class="dcard${st.libDesign === d.id ? ' sel' : ''}${isLocked(d.id) ? ' locked' : ''}" draggable="true" data-design="${d.id}" title="${escapeHtml(d.name)}（${escapeHtml(d.category || '')}）${isLocked(d.id) ? ' ・ 製品版デザイン（試せますが書き出しに透かし）' : ''}"><canvas width="360" height="150"></canvas><div class="nm">${isLocked(d.id) ? '<span class="lock">PRO</span>' : ''}${escapeHtml(d.name)}</div></div>`).join('') || '<div class="note" style="padding:12px;color:var(--muted)">該当するデザインがありません</div>';
     thumbQueue.length = 0;
@@ -1484,6 +1603,46 @@
     box.innerHTML = vs.map((v, i) => `<button class="chip${i === st.libVariant ? ' on' : ''}" data-v="${i}">${escapeHtml(v.name || '色' + (i + 1))}</button>`).join('');
   }
   $('#lib-variants').addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (!b) return; st.libVariant = +b.dataset.v; renderVariants(); });
+
+  /* =================================================================
+     効果音（SE）パネル — se/ の自作効果音
+     ================================================================= */
+  let seList = null, seAudio = null;
+  async function renderSe() {
+    const box = $('#se-list');
+    if (!seList) { try { seList = await (await fetch('se/index.json')).json(); } catch (e) { seList = []; } }
+    if (!seList.length) { box.innerHTML = '<div class="note" style="padding:12px;color:var(--muted)">効果音を読み込めませんでした</div>'; return; }
+    const cats = {};
+    for (const s of seList) (cats[s.cat] = cats[s.cat] || []).push(s);
+    box.innerHTML = Object.entries(cats).map(([cat, arr]) => `<div class="se-cat">${escapeHtml(cat)}</div>` + arr.map((s) => `
+      <div class="se-item" draggable="true" data-se="${s.file}" title="ダブルクリックで再生ヘッドに追加・ドラッグでタイムラインへ">
+        <button class="ib" data-seplay="${s.file}"><svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg></button>
+        <span class="nm">${escapeHtml(s.name)}</span><span class="unit">${s.dur.toFixed(1)}s</span></div>`).join('')).join('');
+  }
+  async function seMedia(file) {
+    const name = 'SE_' + file;
+    const ex = P.media.find((m) => m.name === name && media.has(m.id));
+    if (ex) return ex;
+    const b = await (await fetch('se/' + file)).blob();
+    const added = await importFiles([new File([b], name, { type: 'audio/wav' })]);
+    return added[0];
+  }
+  async function addSe(file, t, trackId) {
+    const m = await seMedia(file); if (!m) return;
+    let tr = trackId ? trackById(trackId) : null;
+    if (!tr || tr.kind !== 'audio') tr = trackById('A2') || firstTrack('audio');
+    pushUndo();
+    const c = makeMediaClip(m, tr.id, t); c.volume = 0.7;
+    P.clips.push(c); st.sel = new Set([c.id]);
+    changed({ structure: true });
+  }
+  $('#se-list').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-seplay]'); if (!b) return;
+    if (seAudio) seAudio.pause();
+    seAudio = new Audio('se/' + b.dataset.seplay); seAudio.play().catch(() => {});
+  });
+  $('#se-list').addEventListener('dblclick', (e) => { const it = e.target.closest('[data-se]'); if (it) addSe(it.dataset.se, st.time); });
+  $('#se-list').addEventListener('dragstart', (e) => { const it = e.target.closest('[data-se]'); if (!it) return; e.dataTransfer.setData('text/x-cc-se', it.dataset.se); e.dataTransfer.effectAllowed = 'copy'; });
 
   /* =================================================================
      インスペクター
@@ -1537,14 +1696,40 @@
       </div></div>`;
     }
     if (c.type !== 'audio') {
-      h += `<div class="sec"><h4>モーション</h4><div class="in">
-        ${field('位置 X', scrub('x', c.x || 0, { step: 1, unit: 'px' }))}
-        ${field('位置 Y', scrub('y', c.y || 0, { step: 1, unit: 'px' }))}
-        ${field('スケール', scrub('scale', c.scale || 100, { step: 1, min: 5, max: 800, unit: '%' }))}
-        ${field('不透明度', scrub('opacity', c.opacity == null ? 100 : c.opacity, { step: 1, min: 0, max: 100, unit: '%' }))}
+      const kv = (pr) => kfValue(c, pr, clamp(st.time, c.start, clipEnd(c)));
+      h += `<div class="sec"><h4>モーション<span class="unit" style="margin-left:auto;font-weight:400">◆＝キーフレーム</span></h4><div class="in">
+        ${field('位置 X', scrub('x', kv('x'), { step: 1, unit: 'px' }) + kfBtn(c, 'x'))}
+        ${field('位置 Y', scrub('y', kv('y'), { step: 1, unit: 'px' }) + kfBtn(c, 'y'))}
+        ${field('スケール', scrub('scale', kv('scale'), { step: 1, min: 5, max: 800, unit: '%' }) + kfBtn(c, 'scale'))}
+        ${field('回転', scrub('rotation', kv('rotation'), { step: 1, min: -3600, max: 3600, unit: '°' }) + kfBtn(c, 'rotation'))}
+        ${field('不透明度', scrub('opacity', kv('opacity'), { step: 1, min: 0, max: 100, unit: '%' }) + kfBtn(c, 'opacity'))}
         ${c.type !== 'telop' ? field('フィット', `<select id="c-fit"><option value="contain"${c.fit === 'contain' ? ' selected' : ''}>全体を表示（余白あり）</option><option value="cover"${c.fit === 'cover' ? ' selected' : ''}>画面を埋める（はみ出しカット）</option><option value="stretch"${c.fit === 'stretch' ? ' selected' : ''}>引き伸ばす</option></select>`) : ''}
         <div class="btnrow"><button class="btn sm" id="c-reset">モーションをリセット</button></div>
-        <div class="note">プログラムモニター上でドラッグして移動、四隅をドラッグで拡大縮小。Shift で水平・垂直に固定。</div>
+        <div class="note">プログラムモニター上でドラッグして移動、四隅をドラッグで拡大縮小。◆ を押すと再生ヘッドの位置にキーフレームを打ち、以降の変更はその時刻の値になります。</div>
+      </div></div>`;
+      const fx = c.fx || {};
+      h += `<div class="sec"><h4>演出プリセット</h4><div class="in">
+        <div class="btnrow"><button class="btn sm" data-preset="zoomIn">じわっとズーム</button><button class="btn sm" data-preset="kenburns">ケンバーンズ</button></div>
+        <div class="btnrow"><button class="btn sm" data-preset="punch">パンチイン（再生ヘッド）</button><button class="btn sm" data-preset="shake">揺れ</button></div>
+        <div class="btnrow"><button class="btn sm" data-preset="pop">ポンと出る</button><button class="btn sm danger" data-preset="clear">演出をすべて解除</button></div>
+      </div></div>`;
+      h += `<div class="sec"><h4>トランジション</h4><div class="in">
+        ${field('入り', `<select id="tr-in">${TRANSITIONS.map(([v, l]) => `<option value="${v}"${((c.trIn || {}).type || '') === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`)}
+        ${field('入りの長さ', scrub('trIn.dur', (c.trIn || {}).dur || 0.3, { step: 0.05, min: 0.05, max: 3, unit: '秒', dec: 2 }))}
+        ${field('出', `<select id="tr-out">${TRANSITIONS.map(([v, l]) => `<option value="${v}"${((c.trOut || {}).type || '') === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`)}
+        ${field('出の長さ', scrub('trOut.dur', (c.trOut || {}).dur || 0.3, { step: 0.05, min: 0.05, max: 3, unit: '秒', dec: 2 }))}
+      </div></div>`;
+      h += `<div class="sec"><h4>エフェクト（色・質感）</h4><div class="in">
+        ${field('明るさ', scrub('fx.brightness', fx.brightness == null ? 100 : fx.brightness, { step: 1, min: 0, max: 300, unit: '%' }))}
+        ${field('コントラスト', scrub('fx.contrast', fx.contrast == null ? 100 : fx.contrast, { step: 1, min: 0, max: 300, unit: '%' }))}
+        ${field('彩度', scrub('fx.saturate', fx.saturate == null ? 100 : fx.saturate, { step: 1, min: 0, max: 300, unit: '%' }))}
+        ${field('色相', scrub('fx.hue', fx.hue || 0, { step: 1, min: -180, max: 180, unit: '°' }))}
+        ${field('モノクロ', scrub('fx.grayscale', fx.grayscale || 0, { step: 1, min: 0, max: 100, unit: '%' }))}
+        ${field('セピア', scrub('fx.sepia', fx.sepia || 0, { step: 1, min: 0, max: 100, unit: '%' }))}
+        ${field('ぼかし', scrub('fx.blur', fx.blur || 0, { step: 0.5, min: 0, max: 80, unit: 'px', dec: 1 }))}
+        ${field('周辺減光', scrub('fx.vignette', fx.vignette || 0, { step: 1, min: 0, max: 100, unit: '%' }))}
+        ${field('揺れ', scrub('fx.shake', fx.shake || 0, { step: 1, min: 0, max: 200, unit: 'px' }))}
+        <div class="btnrow"><button class="btn sm" data-look="cinema">シネマ風</button><button class="btn sm" data-look="vivid">鮮やか</button><button class="btn sm" data-look="retro">レトロ</button><button class="btn sm" data-look="mono">モノクロ</button><button class="btn sm" data-look="none">元に戻す</button></div>
       </div></div>`;
     }
     if (c.type !== 'telop') {
@@ -1591,8 +1776,35 @@
       <button class="btn sm" data-cmd="shortcuts" style="margin-top:8px">すべてのショートカットを見る・変更する</button>`;
   }
 
+  function kfBtn(c, prop) {
+    const on = hasKf(c, prop);
+    const lt = st.time - c.start;
+    const here = on && c.kf[prop].some((k) => Math.abs(k[0] - lt) < 0.5 / fps());
+    return `<button class="kfb${on ? ' on' : ''}${here ? ' here' : ''}" data-kf="${prop}" title="${on ? (here ? 'このキーフレームを削除' : '再生ヘッドにキーフレームを追加') : 'キーフレームを有効にする'}（右クリックで全キーフレーム削除）">${here ? '◆' : '◇'}</button>`;
+  }
+  const LOOKS = {
+    cinema: { contrast: 115, saturate: 85, brightness: 95, vignette: 45, hue: 0, sepia: 0, grayscale: 0 },
+    vivid: { contrast: 110, saturate: 140, brightness: 103, vignette: 0, hue: 0, sepia: 0, grayscale: 0 },
+    retro: { contrast: 90, saturate: 80, brightness: 105, sepia: 35, vignette: 35, hue: -8, grayscale: 0 },
+    mono: { grayscale: 100, contrast: 120, saturate: 100, brightness: 100, vignette: 25, sepia: 0, hue: 0 },
+    none: { contrast: 100, saturate: 100, brightness: 100, vignette: 0, sepia: 0, grayscale: 0, hue: 0, blur: 0 },
+  };
+  function applyPreset(c, name) {
+    const lt = clamp(st.time - c.start, 0, c.dur);
+    const s0 = c.scale || 100;
+    if (name === 'zoomIn') { c.kf = Object.assign(c.kf || {}, { scale: [[0, s0, 'easeInOut'], [c.dur, s0 * 1.15, 'easeInOut']] }); }
+    if (name === 'kenburns') { c.kf = Object.assign(c.kf || {}, { scale: [[0, s0 * 1.08, 'linear'], [c.dur, s0 * 1.2, 'linear']], x: [[0, -40, 'linear'], [c.dur, 40, 'linear']] }); }
+    if (name === 'punch') { const k = (c.kf && c.kf.scale) || [[0, s0, 'hold']]; k.forEach((x) => { x[2] = 'hold'; }); const at = Math.round(lt * fps()) / fps(); c.kf = Object.assign(c.kf || {}, { scale: k.filter((x) => x[0] < at - 1e-3).concat([[at, s0 * 1.25, 'hold']]) }); if (!c.kf.scale.length || c.kf.scale[0][0] > 0) c.kf.scale.unshift([0, s0, 'hold']); }
+    if (name === 'shake') { c.fx = Object.assign(c.fx || {}, { shake: (c.fx && c.fx.shake) ? 0 : 14 }); }
+    if (name === 'pop') { c.kf = Object.assign(c.kf || {}, { scale: [[0, s0 * 0.4, 'back'], [Math.min(0.3, c.dur / 2), s0, 'easeInOut']] }); }
+    if (name === 'clear') { delete c.kf; delete c.fx; delete c.trIn; delete c.trOut; }
+  }
+
   function setProp(c, prop, v) {
     if (prop === 'volumeDb') { c.volume = v <= -60 ? 0 : Math.pow(10, v / 20); return; }
+    if (KF_PROPS.includes(prop) && hasKf(c, prop)) { setKf(c, prop, st.time - c.start, v); return; }
+    if (prop.startsWith('fx.')) { c.fx = c.fx || {}; c.fx[prop.slice(3)] = v; return; }
+    if (prop === 'trIn.dur' || prop === 'trOut.dur') { const k = prop.split('.')[0]; c[k] = c[k] || { type: '', dur: 0.3 }; c[k].dur = v; return; }
     if (prop === 'dur') { c.dur = snapFrame(Math.max(MIN_DUR, v)); return; }
     c[prop] = v;
   }
@@ -1663,10 +1875,31 @@
     $$('[data-tv]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); c.variant = +b.dataset.tv; changed({ props: true }); }));
     const anim = $('#t-anim', insp);
     if (anim) anim.addEventListener('change', () => { pushUndo(); c.anim = anim.value; changed({ props: true }); const s = c.start; seek(s); });
+    $$('[data-kf]', insp).forEach((b) => {
+      const prop = b.dataset.kf;
+      b.addEventListener('click', () => {
+        pushUndo();
+        const lt = clamp(st.time - c.start, 0, c.dur);
+        if (!hasKf(c, prop)) { c.kf = c.kf || {}; c.kf[prop] = []; setKf(c, prop, lt, kfValue(c, prop, st.time)); if (lt > 0.01) { /* 先頭にも元の値を */ setKf(c, prop, 0, baseVal(c, prop)); } }
+        else {
+          const k = c.kf[prop], i = k.findIndex((x) => Math.abs(x[0] - lt) < 0.5 / fps());
+          if (i >= 0) { k.splice(i, 1); if (!k.length) { c[prop] = baseVal(c, prop); delete c.kf[prop]; } }
+          else setKf(c, prop, lt, kfValue(c, prop, st.time));
+        }
+        telopCache.delete(c.id); changed({ props: true });
+      });
+      b.addEventListener('contextmenu', (e) => { e.preventDefault(); if (!hasKf(c, prop)) return; pushUndo(); c[prop] = kfValue(c, prop, st.time); delete c.kf[prop]; changed({ props: true }); });
+    });
+    $$('[data-preset]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); applyPreset(c, b.dataset.preset); telopCache.delete(c.id); changed({ props: true }); }));
+    $$('[data-look]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); c.fx = Object.assign(c.fx || {}, LOOKS[b.dataset.look]); changed({ props: true }); }));
+    for (const k of ['in', 'out']) {
+      const sel = $('#tr-' + k, insp);
+      if (sel) sel.addEventListener('change', () => { pushUndo(); const key = k === 'in' ? 'trIn' : 'trOut'; c[key] = Object.assign({ dur: 0.3 }, c[key] || {}, { type: sel.value }); if (!sel.value) delete c[key]; changed({ props: true }); });
+    }
     const fit = $('#c-fit', insp);
     if (fit) fit.addEventListener('change', () => { pushUndo(); c.fit = fit.value; changed({ props: true }); });
     const rst = $('#c-reset', insp);
-    if (rst) rst.addEventListener('click', () => { pushUndo(); c.x = 0; c.y = 0; c.scale = 100; c.opacity = 100; telopCache.delete(c.id); changed({ props: true }); });
+    if (rst) rst.addEventListener('click', () => { pushUndo(); c.x = 0; c.y = 0; c.scale = 100; c.opacity = 100; c.rotation = 0; delete c.kf; telopCache.delete(c.id); changed({ props: true }); });
   }
   function renderInspectorValues() {
     const sel = P.clips.filter((c) => st.sel.has(c.id));
@@ -1674,7 +1907,8 @@
     const c = sel[0];
     $$('.scrub', insp).forEach((el) => {
       const p = el.dataset.prop, dec = +el.dataset.dec;
-      if (p in c) el.textContent = (+c[p]).toFixed(dec);
+      if (KF_PROPS.includes(p)) el.textContent = (+kfValue(c, p, clamp(st.time, c.start, clipEnd(c)))).toFixed(dec);
+      else if (p in c) el.textContent = (+c[p]).toFixed(dec);
     });
   }
 
@@ -1790,8 +2024,20 @@
   const freeDesigns = new Set();
   { const seen = {}; for (const d of DESIGNS) { const k = d.pack || 'tv-vol1'; seen[k] = (seen[k] || 0) + 1; if (seen[k] <= FREE_PER_PACK) freeDesigns.add(d.id); } }
   let licensed = false;
-  try { licensed = LICENSE_HASHES.includes(localStorage.getItem(LIC_LS)); } catch (e) { /* ignore */ }
-  function isLocked(designId) { return !licensed && !freeDesigns.has(designId); }
+  async function checkStoredLicense() {
+    try {
+      const code = localStorage.getItem(LIC_LS);
+      licensed = !!code && LICENSE_HASHES.includes(await hashCode(code));
+      if (code && !licensed) localStorage.removeItem(LIC_LS);
+    } catch (e) { licensed = false; }
+  }
+  async function unlockWithCode(code) {
+    if (!LICENSE_HASHES.includes(await hashCode(code))) return false;
+    try { localStorage.setItem(LIC_LS, String(code).toUpperCase().replace(/[^A-Z0-9]/g, '')); } catch (e) { /* ignore */ }
+    licensed = true; afterLicenseChange();
+    return true;
+  }
+  function isLocked(designId) { return !licensed && !freeDesigns.has(designId) && !projectDesigns().some((d) => d.id === designId); }
   async function hashCode(code) {
     const norm = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('chain-cut:' + norm));
@@ -1811,10 +2057,8 @@
     }
     let m;
     const tryUnlock = async () => {
-      const h = await hashCode($('#lic-code', m.el).value);
-      if (LICENSE_HASHES.includes(h)) {
-        try { localStorage.setItem(LIC_LS, h); } catch (e) { /* ignore */ }
-        licensed = true; afterLicenseChange(); m.close('ok');
+      if (await unlockWithCode($('#lic-code', m.el).value)) {
+        m.close('ok');
         toast('製品版になりました。すべてのテロップが使えます');
       } else { $('#lic-msg', m.el).innerHTML = '<span style="color:var(--danger)">コードが正しくありません（ハイフンの有無・大文字小文字は問いません）</span>'; }
     };
@@ -2114,7 +2358,8 @@
       let done = false;
       const fin = () => { if (done) return; done = true; el.removeEventListener('seeked', onSeek); clearTimeout(to); res(); };
       const onSeek = () => {
-        if (el.requestVideoFrameCallback) { let ok = false; el.requestVideoFrameCallback(() => { ok = true; fin(); }); setTimeout(() => { if (!ok) fin(); }, 60); }
+        // fastSeek：全フレームがキーフレームの素材（自動書き出しのプロキシ）なら seeked 直後に描ける
+        if (el.requestVideoFrameCallback && !window.__ccFastSeek) { let ok = false; el.requestVideoFrameCallback(() => { ok = true; fin(); }); setTimeout(() => { if (!ok) fin(); }, 60); }
         else fin();
       };
       el.addEventListener('seeked', onSeek);
@@ -2395,6 +2640,7 @@
     for (const id of Array.from(players.keys())) disposePlayer(id);
     delete o.app; delete o.savedAt;
     P = Object.assign(newProject(o.aspect, o.fps), o);
+    registerProjectDesigns();
     for (const mm of P.media) if (mm.type === 'image') mm.duration = Infinity;
     media.clear(); telopCache.clear();
     await restoreMedia();
@@ -2523,10 +2769,10 @@
   $$('[data-ltab]').forEach((b) => b.addEventListener('click', () => {
     st.ltab = b.dataset.ltab;
     $$('[data-ltab]').forEach((x) => x.classList.toggle('on', x === b));
-    $('#tab-bin').classList.toggle('hidden', st.ltab !== 'bin');
-    $('#tab-lib').classList.toggle('hidden', st.ltab !== 'lib');
+    for (const k of ['bin', 'lib', 'se']) $('#tab-' + k).classList.toggle('hidden', st.ltab !== k);
     $('#btn-import').classList.toggle('hidden', st.ltab !== 'bin');
     if (st.ltab === 'lib' && !libGrid.children.length) renderLib();
+    if (st.ltab === 'se') renderSe();
   }));
 
   $('#file-media').addEventListener('change', (e) => { importFiles(e.target.files); e.target.value = ''; });
@@ -2726,6 +2972,7 @@
      起動
      ================================================================= */
   async function boot() {
+    await checkStoredLicense();
     setupLib();
     rebuildKeyIndex();
     updateLicenseBadge();
@@ -2737,6 +2984,7 @@
         await restoreMedia();
       }
     } catch (e) { console.warn('restore failed', e); }
+    registerProjectDesigns();
     document.title = `${P.name} — Chain Cut`;
     layoutMonitor();
     changed({ structure: true });
@@ -2749,7 +2997,8 @@
   // テスト・自動操作用の小さな公開 API
   window.ChainCut = {
     get project() { return P; }, get state() { return st; }, media,
-    importFiles, cmd, seek, drawFrame, detectKeeps, applySilenceCut, parseSrt, runExport, getBuffer,
+    importFiles, cmd, seek, drawFrame, openProjectFile, unlockWithCode, registerProjectDesigns, kfValue, animated,
+    isLocked: (id) => isLocked(id), detectKeeps, applySilenceCut, parseSrt, runExport, getBuffer,
     select: (ids) => { st.sel = new Set(ids); changed({ selection: true }); },
   };
 
