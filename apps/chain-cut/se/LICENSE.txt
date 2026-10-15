@@ -1,0 +1,2 @@
+これらの効果音は factory/chain-cut/make_se.py で数式から合成した Chain-Movies のオリジナル音源です。
+Chain Cut で作った動画では、商用・非商用を問わず自由に使えます。
