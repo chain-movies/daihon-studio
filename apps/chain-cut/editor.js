@@ -506,7 +506,7 @@
      ================================================================= */
   const telopCache = new Map(); // clipId → {key, canvas, rect}
   const fontReady = new Set();
-  function telopKey(c, W, H) { return [c.designId, c.variant, c.text, c.sub, c.scale, W, H, fontReady.size].join('|'); }
+  function telopKey(c, W, H) { return [c.designId, c.variant, c.text, c.sub, c.scale, W, H, fontReady.size, c.colorOv ? JSON.stringify(c.colorOv) : ''].join('|'); }
   function telopCanvas(c, W, H) {
     const d = designById.get(c.designId);
     if (!d || !R) return null;
@@ -517,7 +517,8 @@
     if (!canvas) { canvas = document.createElement('canvas'); canvas.getContext('2d', { willReadFrequently: true }); }
     let rect = null;
     try {
-      const out = R.render(canvas, d, { width: W, height: H, variant: c.variant || 0, text: c.text || '', sub: c.sub || '', scale: (c.scale || 100) / 100 });
+      const td = telopDesignFor(c);
+      const out = R.render(canvas, td.d, { width: W, height: H, variant: td.variant, text: c.text || '', sub: c.sub || '', scale: (c.scale || 100) / 100 });
       rect = out && out.rect;
       const b = R.contentBounds ? R.contentBounds(canvas, 4) : null;
       if (b && b.w > 0) rect = { x: b.x, y: b.y, w: b.w, h: b.h };
@@ -682,6 +683,9 @@
           ctx.restore();
           drawOverlays(ctx, c, ea, W, H);
           rects[c.id] = r;
+        } else if (c.type === 'shape') {
+          rects[c.id] = drawShape(ctx, c, ea, W, H);
+          drawOverlays(ctx, c, ea, W, H);
         } else if (c.type === 'telop') {
           const e = telopCanvas(c, W, H);
           if (!e) continue;
@@ -1086,6 +1090,7 @@
 
   function clipLabel(c) {
     if (c.type === 'telop') return (c.text || '').replace(/\n/g, ' ') || '（空のテロップ）';
+    if (c.type === 'shape') return 'シェイプ：' + (SHAPE_NAME[c.shape] || c.shape);
     const m = mediaMeta(c.mediaId);
     return m ? m.name : '（素材なし）';
   }
@@ -1093,7 +1098,7 @@
     const el = document.createElement('div');
     const tr = trackById(c.track);
     const rt = media.get(c.mediaId);
-    el.className = `clip t-${c.type}` + (st.sel.has(c.id) ? ' sel' : '') + (tr && (tr.hidden || tr.muted) && (tr.kind !== 'video' || tr.hidden) ? ' off' : '') + (c.type !== 'telop' && !rt ? ' unlinked' : '');
+    el.className = `clip t-${c.type}` + (st.sel.has(c.id) ? ' sel' : '') + (tr && (tr.hidden || tr.muted) && (tr.kind !== 'video' || tr.hidden) ? ' off' : '') + (c.type !== 'telop' && c.type !== 'shape' && !rt ? ' unlinked' : '');
     el.dataset.clip = c.id;
     el.style.left = (c.start * st.pps) + 'px';
     el.style.width = Math.max(2, c.dur * st.pps) + 'px';
@@ -1367,7 +1372,7 @@
         } else {
           c.start = snapFrame(o.start + delta); c.in = o.in + delta; c.dur = snapFrame(o.dur - delta);
         }
-        if (c.type === 'image' || c.type === 'telop') c.in = 0;
+        if (c.type === 'image' || c.type === 'telop' || c.type === 'shape') c.in = 0;
       } else {
         // 移動：スナップは選択の先頭と末尾どちらでも
         const minStart = Math.min(...sel.map((x) => orig.get(x.id).start));
@@ -1699,9 +1704,9 @@
     }
     const c = sel[0];
     const m = mediaMeta(c.mediaId);
-    const TL = { video: ['ビデオクリップ', 'var(--c-video)'], image: ['画像クリップ', 'var(--c-image)'], audio: ['オーディオクリップ', 'var(--c-audio)'], telop: ['テロップ', 'var(--c-telop)'] }[c.type];
+    const TL = { video: ['ビデオクリップ', 'var(--c-video)'], image: ['画像クリップ', 'var(--c-image)'], audio: ['オーディオクリップ', 'var(--c-audio)'], telop: ['テロップ', 'var(--c-telop)'], shape: ['シェイプ', 'var(--c-shape)'] }[c.type];
     let h = `<div class="sec"><h4><span class="sw" style="background:${TL[1]}"></span>${TL[0]}</h4><div class="in">
-      ${c.type !== 'telop' ? `<div class="note" style="word-break:break-all">${escapeHtml(m ? m.name : '素材なし')}${m && m.width ? ` ・ ${m.width}×${m.height}` : ''}</div>` : ''}
+      ${c.type !== 'telop' && c.type !== 'shape' ? `<div class="note" style="word-break:break-all">${escapeHtml(m ? m.name : '素材なし')}${m && m.width ? ` ・ ${m.width}×${m.height}` : ''}</div>` : ''}
       ${field('開始', `<span class="unit" style="color:var(--ink2)">${tc(c.start)}</span>`)}
       ${field('長さ', scrub('dur', c.dur, { step: 1 / fps(), min: MIN_DUR, max: maxSourceDur(c) - (c.in || 0), unit: '秒', dec: 2 }))}
       ${c.type === 'video' || c.type === 'audio' ? field('素材の開始', `<span class="unit" style="color:var(--ink2)">${tc(c.in || 0)}</span>`) : ''}
@@ -1724,7 +1729,33 @@
         ${field('フェードアウト', scrub('fadeOut', c.fadeOut || 0, { step: 0.05, min: 0, max: 5, unit: '秒', dec: 2 }))}
       </div></div>`;
     }
+    if (c.type === 'shape') {
+      h += `<div class="sec"><h4>シェイプ</h4><div class="in">
+        ${field('形', `<select id="sh-kind">${SHAPES.map(([v, l]) => `<option value="${v}"${c.shape === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`)}
+        ${field('幅', scrub('w', c.w || 200, { step: 2, min: 2, max: 8000, unit: 'px' }))}
+        ${field('高さ', scrub('h', c.h || 100, { step: 2, min: 2, max: 8000, unit: 'px' }))}
+        ${c.shape === 'round' || c.shape === 'speech' ? field('角の丸み', scrub('radius', c.radius || 0, { step: 1, min: 0, max: 2000, unit: 'px' })) : ''}
+        <label class="field" style="gap:6px;min-height:22px"><input type="checkbox" id="sh-fillon"${c.fillOn !== false ? ' checked' : ''}> 塗りつぶす</label>
+        ${colorField('塗り', 'fill', c.fill || '#000000')}
+        ${colorField('線', 'stroke', c.stroke || '#ffffff')}
+        ${field('線の太さ', scrub('strokeW', c.strokeW || 0, { step: 1, min: 0, max: 200, unit: 'px' }))}
+        ${recentRow()}
+        <div class="btnrow"><button class="btn sm" data-shfit="w">横幅いっぱい</button><button class="btn sm" data-shfit="all">画面いっぱい</button></div>
+        <div class="unit">シェイプのプリセット</div>${presetChips('shape')}
+        <div class="btnrow"><button class="btn sm primary" id="ps-save-shape">＋ このシェイプを保存</button></div>
+        <div class="note">不透明度は「モーション」で。テロップの後ろに敷く座布団は、シェイプのトラックをテロップより下に置きます（テロップは常に映像より手前）。</div>
+      </div></div>`;
+    }
     if (c.type === 'telop') {
+      const d0 = designById.get(c.designId);
+      const slots = d0 ? colorSlots(R.resolve(d0, c.variant || 0)) : [];
+      if (slots.length) {
+        h += `<div class="sec"><h4>テロップの色<button class="btn sm" id="tc-reset" style="margin-left:auto;padding:1px 6px">元の色に戻す</button></h4><div class="in">
+          ${slots.map((x) => colorField(colorLabel(x.path), x.path, (c.colorOv && c.colorOv[x.path]) || x.value)).join('')}
+          ${recentRow()}
+          <div class="note">スポイトを押して画面のどこか（参考画像・ほかのアプリでも可）をクリックすると、その色を読み込みます。</div>
+        </div></div>`;
+      }
       h += `<div class="sec"><h4>テロップのプリセット</h4><div class="in">
         ${presetChips('telop')}
         <div class="btnrow"><button class="btn sm primary" id="ps-save-telop">＋ このテロップの見た目を保存</button></div>
@@ -1739,7 +1770,7 @@
         ${field('スケール', scrub('scale', kv('scale'), { step: 1, min: 5, max: 800, unit: '%' }) + kfBtn(c, 'scale'))}
         ${field('回転', scrub('rotation', kv('rotation'), { step: 1, min: -3600, max: 3600, unit: '°' }) + kfBtn(c, 'rotation'))}
         ${field('不透明度', scrub('opacity', kv('opacity'), { step: 1, min: 0, max: 100, unit: '%' }) + kfBtn(c, 'opacity'))}
-        ${c.type !== 'telop' ? field('フィット', `<select id="c-fit"><option value="native"${c.fit === 'native' ? ' selected' : ''}>原寸（横のときと同じ大きさ）</option><option value="contain"${c.fit === 'contain' ? ' selected' : ''}>全体を表示（余白あり）</option><option value="cover"${c.fit === 'cover' ? ' selected' : ''}>画面を埋める（はみ出しカット）</option><option value="stretch"${c.fit === 'stretch' ? ' selected' : ''}>引き伸ばす</option></select>`) : ''}
+        ${c.type !== 'telop' && c.type !== 'shape' ? field('フィット', `<select id="c-fit"><option value="native"${c.fit === 'native' ? ' selected' : ''}>原寸（横のときと同じ大きさ）</option><option value="contain"${c.fit === 'contain' ? ' selected' : ''}>全体を表示（余白あり）</option><option value="cover"${c.fit === 'cover' ? ' selected' : ''}>画面を埋める（はみ出しカット）</option><option value="stretch"${c.fit === 'stretch' ? ' selected' : ''}>引き伸ばす</option></select>`) : ''}
         <div class="btnrow"><button class="btn sm" id="c-reset">モーションをリセット</button></div>
         <div class="note">プログラムモニター上でドラッグして移動、四隅をドラッグで拡大縮小。◆ を押すと再生ヘッドの位置にキーフレームを打ち、以降の変更はその時刻の値になります。</div>
       </div></div>`;
@@ -1770,8 +1801,9 @@
       </div></div>`;
     }
     if (c.type !== 'telop') {
-      h += `<div class="sec"><h4>${c.type === 'image' ? 'フェード' : '音声とフェード'}</h4><div class="in">
-        ${c.type !== 'image' ? field('音量', scrub('volumeDb', c.volume <= 0.0001 ? -60 : 20 * Math.log10(c.volume == null ? 1 : c.volume), { step: 0.5, min: -60, max: 12, unit: 'dB', dec: 1 })) : ''}
+      const noAudio = c.type === 'image' || c.type === 'shape';
+      h += `<div class="sec"><h4>${noAudio ? 'フェード' : '音声とフェード'}</h4><div class="in">
+        ${!noAudio ? field('音量', scrub('volumeDb', c.volume <= 0.0001 ? -60 : 20 * Math.log10(c.volume == null ? 1 : c.volume), { step: 0.5, min: -60, max: 12, unit: 'dB', dec: 1 })) : ''}
         ${field('フェードイン', scrub('fadeIn', c.fadeIn || 0, { step: 0.05, min: 0, max: 10, unit: '秒', dec: 2 }))}
         ${field('フェードアウト', scrub('fadeOut', c.fadeOut || 0, { step: 0.05, min: 0, max: 10, unit: '秒', dec: 2 }))}
         ${c.type === 'audio' ? '<div class="note">BGM は −18〜−24dB くらいが声の邪魔をしにくい目安です。</div>' : ''}
@@ -1788,7 +1820,7 @@
 
   function projectInspector() {
     const d = duration();
-    const counts = { video: 0, image: 0, audio: 0, telop: 0 };
+    const counts = { video: 0, image: 0, audio: 0, telop: 0, shape: 0 };
     for (const c of P.clips) counts[c.type]++;
     return `<div class="sec"><h4>プロジェクト</h4><div class="in">
       ${field('画面サイズ', `<select id="p-aspect">${Object.entries(ASPECTS).map(([k, a]) => `<option value="${k}"${P.aspect === k ? ' selected' : ''}>${a.label}（${a.w}×${a.h}）</option>`).join('')}</select>`)}
@@ -1843,6 +1875,7 @@
     if (prop.startsWith('fx.')) { c.fx = c.fx || {}; c.fx[prop.slice(3)] = v; return; }
     if (prop === 'trIn.dur' || prop === 'trOut.dur') { const k = prop.split('.')[0]; c[k] = c[k] || { type: '', dur: 0.3 }; c[k].dur = v; return; }
     if (prop === 'dur') { c.dur = snapFrame(Math.max(MIN_DUR, v)); return; }
+    if (prop === 'w' || prop === 'h' || prop === 'radius' || prop === 'strokeW') { c[prop] = v; return; }
     c[prop] = v;
   }
 
@@ -1950,13 +1983,27 @@
     });
     $$('[data-papply]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); applyPresetById(c, b.dataset.papply); telopCache.delete(c.id); changed({ props: true }); }));
     $$('[data-pmenu]', insp).forEach((b) => b.addEventListener('click', () => presetMenu(b.dataset.pmenu)));
-    for (const k of ['effect', 'telop']) { const b = $('#ps-save-' + k, insp); if (b) b.addEventListener('click', () => savePresetDialog(c, k)); }
+    for (const k of ['effect', 'telop', 'shape']) { const b = $('#ps-save-' + k, insp); if (b) b.addEventListener('click', () => savePresetDialog(c, k)); }
     { const b = $('#ps-reset', insp); if (b) b.addEventListener('click', resetPresets); }
     $$('[data-preset]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); applyPreset(c, b.dataset.preset); telopCache.delete(c.id); changed({ props: true }); }));
     $$('[data-look]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); c.fx = Object.assign(c.fx || {}, LOOKS[b.dataset.look]); changed({ props: true }); }));
     for (const k of ['in', 'out']) {
       const sel = $('#tr-' + k, insp);
       if (sel) sel.addEventListener('change', () => { pushUndo(); const key = k === 'in' ? 'trIn' : 'trOut'; c[key] = Object.assign({ dur: 0.3 }, c[key] || {}, { type: sel.value }); if (!sel.value) delete c[key]; changed({ props: true }); });
+    }
+    if (c.type === 'shape') {
+      bindColorFields(insp, (k) => c[k], (k, v, final) => { pushUndo('color-' + k + c.id); c[k] = v; if (final) changed({ props: true, light: true }); else requestDraw(); });
+      const kind = $('#sh-kind', insp); if (kind) kind.addEventListener('change', () => { pushUndo(); c.shape = kind.value; if (['ellipse', 'star', 'triangle'].includes(c.shape) && Math.max(c.w, c.h) / Math.max(1, Math.min(c.w, c.h)) > 2) { c.w = c.h = Math.round(Math.min(P.width, P.height) * 0.3); } if ((c.shape === 'line' || c.shape === 'arrow') && c.h > 80) c.h = 24; changed({ props: true }); });
+      const fo = $('#sh-fillon', insp); if (fo) fo.addEventListener('change', () => { pushUndo(); c.fillOn = fo.checked; changed({ props: true, light: true }); });
+      $$('[data-shfit]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); c.w = P.width; c.x = 0; if (b.dataset.shfit === 'all') { c.h = P.height; c.y = 0; c.radius = 0; } c.scale = 100; changed({ props: true }); }));
+    }
+    if (c.type === 'telop') {
+      const d0 = designById.get(c.designId);
+      bindColorFields(insp, (k) => (c.colorOv && c.colorOv[k]) || (colorSlots(R.resolve(d0, c.variant || 0)).find((x) => x.path === k) || {}).value, (k, v, final) => {
+        pushUndo('tcolor-' + k + c.id); c.colorOv = Object.assign({}, c.colorOv || {}, { [k]: v }); telopCache.delete(c.id);
+        if (final) changed({ props: true, light: true }); else requestDraw();
+      });
+      const rs = $('#tc-reset', insp); if (rs) rs.addEventListener('click', () => { pushUndo(); delete c.colorOv; telopCache.delete(c.id); changed({ props: true }); });
     }
     const fit = $('#c-fit', insp);
     if (fit) fit.addEventListener('change', () => { pushUndo(); c.fit = fit.value; changed({ props: true }); });
@@ -2553,9 +2600,10 @@
     for (const k of ['scale', 'x', 'y', 'rotation', 'opacity']) if (c[k] != null && c[k] !== KF_DEFAULT[k]) d[k] = c[k];
     if (kind === 'telop') {
       Object.assign(d, { designId: c.designId, variant: c.variant || 0, anim: c.anim || 'none', fadeIn: c.fadeIn, fadeOut: c.fadeOut });
+      if (c.colorOv) d.colorOv = clone(c.colorOv);
       const pd = projectDesigns().find((x) => x.id === c.designId);
       if (pd) d.design = clone(pd); // 独自デザインは中身ごと持ち運ぶ
-    } else if (c.type !== 'audio') { d.fit = c.fit; }
+    } else if (c.type === 'shape') { Object.assign(d, { shape: c.shape, w: c.w, h: c.h, radius: c.radius, fill: c.fill, fillOn: c.fillOn, stroke: c.stroke, strokeW: c.strokeW }); } else if (c.type !== 'audio') { d.fit = c.fit; }
     return d;
   }
   function applyEffectPresetData(c, d) {
@@ -2565,17 +2613,20 @@
     if (d.trIn) c.trIn = clone(d.trIn);
     if (d.trOut) c.trOut = clone(d.trOut);
     for (const k of ['scale', 'x', 'y', 'rotation', 'opacity', 'fit']) if (d[k] != null && !(d.kfRel && d.kfRel[k])) c[k] = d[k];
+    if (c.type === 'shape') for (const k of ['shape', 'w', 'h', 'radius', 'fill', 'fillOn', 'stroke', 'strokeW']) if (d[k] != null) c[k] = d[k];
   }
   function applyTelopPresetData(c, d) {
     if (d.design && !designById.has(d.design.id)) { P.designs = projectDesigns().concat([clone(d.design)]); registerProjectDesigns(); }
     if (d.designId && designById.has(d.designId)) c.designId = d.designId;
     for (const k of ['variant', 'anim', 'fadeIn', 'fadeOut']) if (d[k] != null) c[k] = d[k];
+    if (d.colorOv) c.colorOv = clone(d.colorOv);
     applyEffectPresetData(c, d);
     telopCache.delete(c.id);
   }
   function applyPresetById(c, id) {
     const p = presets.find((x) => x.id === id); if (!p) return;
     if (p.kind === 'telop') { if (c.type === 'telop') applyTelopPresetData(c, p.data); }
+    else if (p.kind === 'shape') { if (c.type === 'shape') applyEffectPresetData(c, p.data); }
     else applyEffectPresetData(c, p.data);
   }
   function presetChips(kind) {
@@ -2584,8 +2635,8 @@
   }
   async function savePresetDialog(c, kind) {
     const same = presets.filter((p) => p.kind === kind);
-    const m = openModal(kind === 'telop' ? 'テロップのプリセットとして保存' : '演出のプリセットとして保存', `
-      <p>今のクリップの${kind === 'telop' ? 'デザイン・色・アニメーション・位置・大きさ' : '動き（キーフレーム）・エフェクト・トランジション・位置・大きさ'}を保存します。保存したプリセットは、どのプロジェクトでもボタン一つで使えます。</p>
+    const m = openModal(kind === 'telop' ? 'テロップのプリセットとして保存' : kind === 'shape' ? 'シェイプのプリセットとして保存' : '演出のプリセットとして保存', `
+      <p>今のクリップの${kind === 'telop' ? 'デザイン・色・アニメーション・位置・大きさ' : kind === 'shape' ? '形・大きさ・色・線・動き' : '動き（キーフレーム）・エフェクト・トランジション・位置・大きさ'}を保存します。保存したプリセットは、どのプロジェクトでもボタン一つで使えます。</p>
       ${field('保存先', `<select id="ps-target"><option value="">新しいプリセット</option>${same.map((p) => `<option value="${p.id}">上書き：${escapeHtml(p.name)}</option>`).join('')}</select>`)}
       ${field('名前', '<input type="text" id="ps-name" placeholder="例：強調ドン、商品紹介ズーム">')}
     `, [['キャンセル', null], ['保存', 'go', true]]);
@@ -2639,6 +2690,383 @@
     changed({ structure: true });
     setTimeout(() => { const ta = $('#t-text'); if (ta) { ta.focus(); ta.select(); } }, 30);
   });
+
+  /* =================================================================
+     シェイプ
+     ================================================================= */
+  const SHAPES = [['rect', '四角'], ['round', '角丸'], ['ellipse', '丸'], ['triangle', '三角'], ['star', '星'], ['line', '線'], ['arrow', '矢印'], ['speech', '吹き出し']];
+  const SHAPE_NAME = Object.fromEntries(SHAPES);
+  function makeShapeClip(track, start, kind) {
+    const c = baseClip('shape', track, start, 3);
+    const tall = P.height > P.width;
+    Object.assign(c, {
+      shape: kind || 'round', w: Math.round(P.width * (tall ? 0.8 : 0.5)), h: Math.round(P.height * (tall ? 0.08 : 0.14)),
+      fill: '#000000', fillOn: true, stroke: '#ffffff', strokeW: 0, radius: 24, opacity: 70, fadeIn: 0.1, fadeOut: 0.1,
+    });
+    if (kind === 'ellipse' || kind === 'star' || kind === 'triangle') { c.w = c.h = Math.round(Math.min(P.width, P.height) * 0.3); c.fill = '#ffd400'; c.opacity = 100; }
+    if (kind === 'line' || kind === 'arrow') { c.w = Math.round(P.width * 0.4); c.h = 24; c.fill = '#ffd400'; c.opacity = 100; }
+    if (kind === 'speech') { c.fill = '#ffffff'; c.opacity = 100; c.stroke = '#111111'; c.strokeW = 6; c.h = Math.round(P.height * 0.16); }
+    return c;
+  }
+  function shapePath(ctx, c, w, h) {
+    const x = -w / 2, y = -h / 2;
+    ctx.beginPath();
+    switch (c.shape) {
+      case 'rect': ctx.rect(x, y, w, h); break;
+      case 'round': { const r = Math.min(c.radius || 0, w / 2, h / 2); ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h); break; }
+      case 'ellipse': ctx.ellipse(0, 0, Math.abs(w / 2), Math.abs(h / 2), 0, 0, Math.PI * 2); break;
+      case 'triangle': ctx.moveTo(0, y); ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h); ctx.closePath(); break;
+      case 'star': {
+        for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? 0.45 : 1; const px = Math.cos(a) * w / 2 * rr, py = Math.sin(a) * h / 2 * rr; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+        ctx.closePath(); break;
+      }
+      case 'line': ctx.rect(x, -h / 2, w, h); break;
+      case 'arrow': { const hw = Math.min(w * 0.35, h * 2.2); ctx.moveTo(x, -h / 2); ctx.lineTo(x + w - hw, -h / 2); ctx.lineTo(x + w - hw, -h * 1.4); ctx.lineTo(x + w, 0); ctx.lineTo(x + w - hw, h * 1.4); ctx.lineTo(x + w - hw, h / 2); ctx.lineTo(x, h / 2); ctx.closePath(); break; }
+      case 'speech': {
+        const r = Math.min(c.radius || 24, w / 2, h / 2), tw = Math.min(w * 0.12, 60);
+        ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.lineTo(x + w * 0.3 + tw, y + h); ctx.lineTo(x + w * 0.22, y + h + tw * 1.1); ctx.lineTo(x + w * 0.3, y + h);
+        ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); break;
+      }
+      default: ctx.rect(x, y, w, h);
+    }
+  }
+  /** シェイプを描いて、選択枠用の矩形を返す */
+  function drawShape(ctx, c, ea, W, H) {
+    const k = ea.scale / 100, w = (c.w || 200) * k, h = (c.h || 100) * k;
+    const cx = W / 2 + ea.x, cy = H / 2 + ea.y;
+    ctx.save();
+    ctx.filter = filterOf(c, ea);
+    ctx.translate(cx, cy);
+    if (ea.rotation) ctx.rotate(ea.rotation * Math.PI / 180);
+    shapePath(ctx, c, w, h);
+    if (c.fillOn !== false) { ctx.fillStyle = c.fill || '#000'; ctx.fill(); }
+    if (c.strokeW > 0) { ctx.lineWidth = c.strokeW * k; ctx.strokeStyle = c.stroke || '#fff'; ctx.lineJoin = 'round'; ctx.stroke(); }
+    ctx.restore();
+    const ext = c.shape === 'arrow' ? h * 0.9 : c.shape === 'speech' ? h * 0.2 : 0;
+    return { x: cx - w / 2, y: cy - h / 2 - ext, w, h: h + ext * 2 };
+  }
+  function addShape(kind) {
+    // 再生ヘッドの位置が空いている一番上のビデオトラックへ（なければ新しく作る）
+    let tr = P.tracks.filter((t) => t.kind === 'video').find((t) => !P.clips.some((c) => c.track === t.id && isActive(c, st.time)) && t.id !== 'V1');
+    pushUndo();
+    if (!tr) { const before = new Set(P.tracks.map((t) => t.id)); addTrack('video'); undoStack.pop(); tr = P.tracks.find((t) => !before.has(t.id)); }
+    const c = makeShapeClip(tr.id, st.time, kind);
+    P.clips.push(c); st.sel = new Set([c.id]);
+    changed({ structure: true });
+    return c;
+  }
+
+  /* =================================================================
+     カラーピッカー（スポイト付き）
+     ================================================================= */
+  function parseColor(s) {
+    s = String(s || '').trim();
+    let m = s.match(/^#([0-9a-f]{3,8})$/i);
+    if (m) {
+      let h = m[1];
+      if (h.length === 3 || h.length === 4) h = h.split('').map((x) => x + x).join('');
+      return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16), a: h.length === 8 ? parseInt(h.slice(6, 8), 16) / 255 : 1 };
+    }
+    m = s.match(/^rgba?\(([^)]+)\)$/i);
+    if (m) { const p = m[1].split(/[,\s/]+/).filter(Boolean).map(Number); return { r: p[0] | 0, g: p[1] | 0, b: p[2] | 0, a: p[3] == null ? 1 : p[3] }; }
+    // 色名などはブラウザに解釈させる
+    const cx = document.createElement('canvas').getContext('2d'); cx.fillStyle = '#000'; cx.fillStyle = s;
+    return cx.fillStyle.startsWith('#') ? parseColor(cx.fillStyle) : (cx.fillStyle.startsWith('rgba') ? parseColor(cx.fillStyle) : null);
+  }
+  const hex2 = (n) => clamp(Math.round(n), 0, 255).toString(16).padStart(2, '0');
+  function toHex(c) { return '#' + hex2(c.r) + hex2(c.g) + hex2(c.b); }
+  /** 新しい色（#rrggbb）に、元の色の透明度を引き継ぐ */
+  function withAlpha(hex, orig) {
+    const o = parseColor(orig), n = parseColor(hex);
+    if (!n) return orig;
+    const a = n.a < 1 ? n.a : (o ? o.a : 1);
+    return a < 0.999 ? `rgba(${n.r},${n.g},${n.b},${+a.toFixed(3)})` : toHex(n);
+  }
+  const RECENT_LS = 'cc-colors';
+  function recentColors() { try { return JSON.parse(localStorage.getItem(RECENT_LS) || '[]'); } catch (e) { return []; } }
+  function pushRecent(hex) { const l = [hex].concat(recentColors().filter((x) => x !== hex)).slice(0, 10); try { localStorage.setItem(RECENT_LS, JSON.stringify(l)); } catch (e) { /* ignore */ } }
+
+  function colorField(label, key, value) {
+    const p = parseColor(value) || { r: 0, g: 0, b: 0, a: 1 };
+    return field(label, `<span class="cf" data-cf="${escapeHtml(key)}">
+      <input type="color" value="${toHex(p)}" data-cfpick title="クリックで色を選ぶ">
+      <input type="text" class="hex" value="${escapeHtml(String(value))}" data-cfhex spellcheck="false" title="カラーコード（#ff0000 / rgba(…)）">
+      <button class="cf-eye" data-cfeye title="スポイト：画面のどこかをクリックすると、その色を読み取ります"><svg viewBox="0 0 24 24"><path d="M20.7 5.6l-2.3-2.3a1 1 0 00-1.4 0l-3.1 3.1-1.9-1.9-1.4 1.4 1.4 1.4L4 15.3V20h4.7l8-8 1.4 1.4 1.4-1.4-1.9-1.9 3.1-3.1a1 1 0 000-1.4zM7.9 18H6v-1.9l8-8 1.9 1.9z"/></svg></button></span>`);
+  }
+  function recentRow() {
+    const l = recentColors();
+    return l.length ? `<div class="recent"><span class="unit">最近の色</span>${l.map((c) => `<button class="sw" data-sw="${c}" style="background:${c}" title="${c}（最後に触った色の欄に入れる）"></button>`).join('')}</div>` : '';
+  }
+  /** スポイト：EyeDropper API（Chrome / Edge）。無ければモニターをクリックして取る */
+  function pickColorFromScreen() {
+    if (window.EyeDropper) return new window.EyeDropper().open().then((r) => r.sRGBHex).catch(() => null);
+    return new Promise((resolve) => {
+      toast('プログラムモニター上の、色を取りたい場所をクリックしてください（Esc でやめる）');
+      overlay.style.cursor = 'crosshair';
+      const done = (v) => { overlay.removeEventListener('pointerdown', on, true); document.removeEventListener('keydown', esc, true); overlay.style.cursor = ''; resolve(v); };
+      const on = (e) => {
+        e.stopPropagation(); e.preventDefault();
+        const pt = monitorPoint(e);
+        const d = pctx.getImageData(clamp(Math.round(pt.x), 0, P.width - 1), clamp(Math.round(pt.y), 0, P.height - 1), 1, 1).data;
+        done(toHex({ r: d[0], g: d[1], b: d[2] }));
+      };
+      const esc = (e) => { if (e.key === 'Escape') { e.stopPropagation(); done(null); } };
+      overlay.addEventListener('pointerdown', on, true);
+      document.addEventListener('keydown', esc, true);
+    });
+  }
+  let lastColorKey = null;
+  /** root 内のカラー欄をつなぐ。onChange(key, color, final) */
+  function bindColorFields(root, getValue, onChange) {
+    $$('[data-cf]', root).forEach((wrap) => {
+      const key = wrap.dataset.cf;
+      const pick = $('[data-cfpick]', wrap), hex = $('[data-cfhex]', wrap), eye = $('[data-cfeye]', wrap);
+      const set = (v, final) => {
+        const nv = withAlpha(v, getValue(key));
+        hex.value = nv; const p = parseColor(nv); if (p) pick.value = toHex(p);
+        onChange(key, nv, final);
+        if (final && p) pushRecent(toHex(p));
+      };
+      wrap.addEventListener('focusin', () => { lastColorKey = key; });
+      pick.addEventListener('input', () => set(pick.value, false));
+      pick.addEventListener('change', () => set(pick.value, true));
+      hex.addEventListener('change', () => { const p = parseColor(hex.value); if (p) { onChange(key, hex.value.trim(), true); pick.value = toHex(p); pushRecent(toHex(p)); } else toast('カラーコードを読めませんでした（例：#ff3355、rgba(0,0,0,0.6)）', true); });
+      hex.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') hex.blur(); });
+      eye.addEventListener('click', async () => { lastColorKey = key; const v = await pickColorFromScreen(); if (v) { set(v, true); toast(`色 ${v} を読み込みました`); } });
+    });
+    $$('[data-sw]', root).forEach((b) => b.addEventListener('click', () => {
+      const key = lastColorKey && $(`[data-cf="${CSS.escape(lastColorKey)}"]`, root) ? lastColorKey : ($('[data-cf]', root) || {}).dataset.cf;
+      if (!key) return;
+      const wrap = $(`[data-cf="${CSS.escape(key)}"]`, root);
+      const nv = withAlpha(b.dataset.sw, getValue(key));
+      $('[data-cfhex]', wrap).value = nv; $('[data-cfpick]', wrap).value = b.dataset.sw;
+      onChange(key, nv, true);
+    }));
+  }
+
+  /* ---------- テロップの色（デザインの色を上書き） ---------- */
+  const COLOR_LABEL = [
+    [/^fill\.color$/, '文字色'], [/^fill\.stops\.(\d+)$/, (m) => `文字色（グラデ${+m[1] + 1}）`], [/^fill\.(a|b)$/, (m) => `文字色（しま${m[1] === 'a' ? 1 : 2}）`],
+    [/^strokes\.(\d+)\.color$/, (m) => `縁取り${+m[1] + 1}`], [/^shadow\.color$/, '影'], [/^extrude\.color$/, '立体'], [/^glow\.color$/, '光彩'],
+    [/^box\.fill\.color$/, '帯・座布団'], [/^box\.fill\.stops\.(\d+)$/, (m) => `帯（グラデ${+m[1] + 1}）`], [/^box\.fill\.(a|b)$/, (m) => `帯（しま${m[1] === 'a' ? 1 : 2}）`], [/^box\.accent\.color$/, '帯のアクセント'], [/^box\.stroke\.color$|^box\.border\.color$/, '帯の線'],
+    [/^sub\.fill\.color$/, 'サブ文字'], [/^sub\.strokes\.(\d+)\.color$/, (m) => `サブの縁${+m[1] + 1}`], [/^sub\.box\.fill\.color$/, 'サブの帯'],
+    [/^tag\.fill\.color$/, 'タグ文字'], [/^tag\.box\.fill\.color$/, 'タグの帯'], [/^deco\.(\d+)\.color$/, (m) => `飾り${+m[1] + 1}`],
+  ];
+  function colorLabel(path) {
+    for (const [re, l] of COLOR_LABEL) { const m = path.match(re); if (m) return typeof l === 'function' ? l(m) : l; }
+    return path;
+  }
+  function isColorStr(v) { return typeof v === 'string' && /^(#|rgba?\(|hsla?\()/i.test(v.trim()); }
+  /** 解決済みスペックの中の色をすべて拾う → [{path, value}] */
+  function colorSlots(spec) {
+    const out = [];
+    const walk = (o, path) => {
+      if (!o || typeof o !== 'object') return;
+      if (Array.isArray(o)) {
+        if (path.endsWith('stops')) o.forEach((st2, i) => { if (Array.isArray(st2) && isColorStr(st2[1])) out.push({ path: `${path}.${i}`, value: st2[1] }); });
+        else o.forEach((x, i) => walk(x, `${path}.${i}`));
+        return;
+      }
+      for (const [k, v] of Object.entries(o)) {
+        if (k === 'variants' || k === 'font') continue;
+        const p = path ? `${path}.${k}` : k;
+        // グラデーション・しま模様の塗りでは、使われていない color は出さない
+        if (k === 'color' && (o.type === 'gradient' || o.type === 'stripes')) continue;
+        if (isColorStr(v) && (k === 'color' || ((k === 'a' || k === 'b') && o.type === 'stripes'))) out.push({ path: p, value: v });
+        else if (v && typeof v === 'object') walk(v, p);
+      }
+    };
+    walk(spec, '');
+    return out;
+  }
+  function setAtPath(o, path, v) {
+    const ks = path.split('.');
+    let cur = o;
+    for (let i = 0; i < ks.length - 1; i++) { if (cur[ks[i]] == null) return; cur = cur[ks[i]]; }
+    const last = ks[ks.length - 1];
+    if (Array.isArray(cur) && Array.isArray(cur[last])) cur[last][1] = v; // グラデの [位置, 色]
+    else cur[last] = v;
+  }
+  /** 色の上書きを反映したデザイン（variants は解決済み） */
+  function telopDesignFor(c) {
+    const d = designById.get(c.designId);
+    if (!d || !c.colorOv || !Object.keys(c.colorOv).length) return { d, variant: c.variant || 0 };
+    const spec = R.resolve(d, c.variant || 0);
+    delete spec.variants;
+    for (const [p, v] of Object.entries(c.colorOv)) setAtPath(spec, p, v);
+    return { d: spec, variant: 0 };
+  }
+
+  /* =================================================================
+     音声で編集（Web Speech API・日本語）
+     「再生して」「止めて」「ここから」「ここまで」「その部分カット」「テロップ入れて こんにちは」など
+     ================================================================= */
+  const SE_WORDS = [
+    [/ピンポン|正解/, 'seikai'], [/ブブー|不正解/, 'buzzer'], [/ドドン/, 'dodon'], [/ドン|衝撃/, 'don'], [/ジャーン|ジャン/, 'jan'], [/ズーン/, 'zun'],
+    [/チーン|チン/, 'chin'], [/ボヨーン|ボヨン/, 'boing'], [/拍手/, 'clap'], [/キラーン|キラキラ|キラン/, 'kira'], [/ピコン/, 'pikon'],
+    [/シュッ|シュー|ヒュッ/, 'whoosh'], [/スッ|スワイプ/, 'swipe'], [/ポーン/, 'pon'], [/ポン|ポップ/, 'pop'], [/カシャ|シャッター/, 'shutter'],
+    [/カタカタ|タイピング/, 'type'], [/ドラムロール/, 'drumroll'], [/ヒューン/, 'hyun'], [/ビューン/, 'byun'],
+  ];
+  const KANJI_NUM = { 〇: 0, 零: 0, 一: 1, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
+  function parseNum(s) {
+    if (s == null) return null;
+    s = String(s).normalize('NFKC');
+    if (/^\d+(\.\d+)?$/.test(s)) return +s;
+    if (s === '半') return 0.5;
+    let n = 0, cur = 0;
+    for (const ch of s) {
+      if (ch in KANJI_NUM) cur = KANJI_NUM[ch];
+      else if (ch === '十') { n += (cur || 1) * 10; cur = 0; }
+      else return null;
+    }
+    return n + cur;
+  }
+  const NUM = '([0-9０-９.]+|[〇零一二三四五六七八九十]+|半)';
+  function pauseFor() { if (st.playing) pause(); }
+  function clipUnderPlayhead(kinds) {
+    const sel = P.clips.find((c) => st.sel.has(c.id) && isActive(c, st.time) && (!kinds || kinds.includes(c.type)));
+    if (sel) return sel;
+    const order = P.tracks.filter((t) => t.kind === 'video').map((t) => t.id).reverse(); // V1 を優先
+    return P.clips.filter((c) => isActive(c, st.time) && (!kinds || kinds.includes(c.type))).sort((a, b) => order.indexOf(a.track) - order.indexOf(b.track))[0];
+  }
+  function addTelopWithText(text) {
+    cmd.addTelop();
+    const c = P.clips.find((x) => st.sel.has(x.id) && x.type === 'telop');
+    if (c && text) { c.text = text.replace(/!/g, '！').replace(/\?/g, '？'); telopCache.delete(c.id); changed({ props: true }); }
+    return c;
+  }
+  /** 話した言葉 → 操作。実行した内容（説明）を返す。わからなければ null */
+  function voiceCommand(raw) {
+    // 空白と句読点だけ落とす（テロップの「！」「？」は残す）
+    const t = String(raw || '').normalize('NFKC').replace(/[\s。、,.]/g, '').replace(/[!?]+$/, (x) => (/[」』]/.test(String(raw)) ? x : ''));
+    if (!t) return null;
+    let m;
+    // --- テロップ ---
+    if (/テロップ|字幕/.test(t)) {
+      if (/消|削除/.test(t)) { pauseFor(); const c = clipUnderPlayhead(['telop']); if (!c) return 'ここにテロップはありません'; pushUndo(); P.clips = P.clips.filter((x) => x !== c); st.sel.delete(c.id); changed({ structure: true }); return 'テロップを削除'; }
+      if ((m = t.match(/テロップ(?:の文字)?を(.+?)に(?:変えて|変更|して|直して)/))) {
+        const c = clipUnderPlayhead(['telop']); if (!c) return 'ここにテロップはありません';
+        pushUndo(); c.text = m[1]; telopCache.delete(c.id); changed({ props: true }); return `テロップを「${m[1]}」に変更`;
+      }
+      // 「〇〇」ってテロップ入れて / テロップで〇〇 / テロップ入れて〇〇
+      let text = '';
+      if ((m = t.match(/^[「『]?(.+?)[」』]?(?:って|と)(?:テロップ|字幕)/))) text = m[1];
+      else if ((m = t.match(/(?:テロップ|字幕)(?:を)?(?:入れて|いれて|追加して?|出して|お願い)[:：]?(.+)$/))) text = m[1];
+      else if ((m = t.match(/(?:テロップ|字幕)(?:で|に|は)[「『]?(.+?)[」』]?(?:入れて|いれて|追加|出して|お願い)?$/))) text = m[1];
+      text = text.replace(/^[「『]|[」』]$/g, '').replace(/(?:入れて|いれて|お願い|追加して?)$/, '');
+      pauseFor();
+      addTelopWithText(text);
+      return text ? `テロップ「${text}」を追加` : 'テロップを追加（文字を入力してください）';
+    }
+    // --- 取り消し ---
+    if (/取り消|元に戻|戻して$|アンドゥ/.test(t) && !/秒/.test(t)) { undo(); return '取り消し'; }
+    if (/やり直/.test(t)) { redo(); return 'やり直し'; }
+    // --- 範囲 ---
+    if (/ここから|イン点|始まり(?:を)?(?:ここ|マーク)/.test(t) && !/ここまで/.test(t)) { setMark('in', st.time); return `イン点 ${tc(st.time)}`; }
+    if (/ここまで|アウト点/.test(t)) { setMark('out', st.time); return `アウト点 ${tc(st.time)}${/カット|消|削除/.test(t) ? '' : '（「その部分カット」で削除できます）'}`; }
+    // --- 前後を削除（Q / W） ---
+    if (/(?:前|手前)(?:を|は|全部)?(?:カット|消|削除|いらない)/.test(t)) { pauseFor(); rippleTrim(-1); return '前の編集点まで削除して詰めた'; }
+    if (/(?:後ろ|うしろ|後|あと)(?:を|は|全部)?(?:カット|消|削除|いらない)/.test(t)) { pauseFor(); rippleTrim(1); return '次の編集点まで削除して詰めた'; }
+    // --- 範囲・部分のカット ---
+    if (/(?:その|この|ここの)?(?:部分|範囲|ところ|とこ)(?:を|は)?(?:カット|消|削除|いらない|詰め)/.test(t) || /(?:カット|削除)して詰め/.test(t)) {
+      pauseFor();
+      if (inOut()) { liftOrExtract(true); return 'イン〜アウトを削除して詰めた'; }
+      if (st.sel.size) { deleteSelected(true); return '選択したクリップを削除して詰めた'; }
+      splitAtPlayhead();
+      return 'ここで分割（範囲を消すときは「ここから」「ここまで」のあとに「その部分カット」）';
+    }
+    if (/無音/.test(t)) { pauseFor(); silenceDialog(); return '無音カットの画面を開いた'; }
+    if (/文字起こし/.test(t)) { pauseFor(); st.ltab = 'tx'; $('[data-ltab="tx"]').click(); transcribe(); return '文字起こしを開始'; }
+    if (/(?:カット|切って|切る|分割|割って)/.test(t)) { pauseFor(); splitAtPlayhead(); return `${tc(st.time)} で分割`; }
+    if (/(?:削除|消して|消す)/.test(t)) { pauseFor(); if (!st.sel.size) { const c = clipUnderPlayhead(); if (c) st.sel = new Set([c.id]); } if (!st.sel.size) return '消すクリップがありません'; deleteSelected(false); return '削除'; }
+    // --- 効果音 ---
+    for (const [re, file] of SE_WORDS) { const mm = t.match(re); if (mm && (/入れ|鳴ら|追加|効果音|SE|音/.test(t) || t.length <= 6)) { addSe(file + '.wav', st.time); return `効果音「${mm[0]}」を追加`; } }
+    if (/効果音|SE/.test(t)) { $('[data-ltab="se"]').click(); return '効果音の一覧を開いた'; }
+    // --- シェイプ ---
+    if (/シェイプ|図形|四角|丸|星|矢印|吹き出し|三角|座布団/.test(t)) {
+      pauseFor();
+      const kind = /丸/.test(t) && !/角丸/.test(t) ? 'ellipse' : /星/.test(t) ? 'star' : /矢印/.test(t) ? 'arrow' : /吹き出し/.test(t) ? 'speech' : /三角/.test(t) ? 'triangle' : /線/.test(t) ? 'line' : 'round';
+      addShape(kind); return `シェイプ（${SHAPE_NAME[kind]}）を追加`;
+    }
+    // --- 演出 ---
+    if (/パンチ|寄って|アップ|拡大|ズームイン|ズーム/.test(t) && !/タイムライン/.test(t)) {
+      pauseFor(); const c = clipUnderPlayhead(['video', 'image']); if (!c) return 'ここに映像がありません';
+      pushUndo(); applyPreset(c, 'punch'); changed({ props: true }); return 'パンチイン';
+    }
+    if (/揺ら|揺れ|シェイク/.test(t)) { const c = clipUnderPlayhead(['video', 'image', 'telop', 'shape']); if (!c) return 'ここにクリップがありません'; pushUndo(); c.fx = Object.assign(c.fx || {}, { shake: 14 }); changed({ props: true }); return '揺れを追加'; }
+    // --- 移動 ---
+    if ((m = t.match(new RegExp(NUM + '秒(?:戻|前|巻き戻)')))) { const n = parseNum(m[1]) || 5; seek(snapFrame(st.time - n)); followPlayhead(); return `${n}秒戻った`; }
+    if ((m = t.match(new RegExp(NUM + '秒(?:進|先|後|飛ば|送)')))) { const n = parseNum(m[1]) || 5; seek(snapFrame(st.time + n)); followPlayhead(); return `${n}秒進んだ`; }
+    if ((m = t.match(new RegExp(NUM + '分' + NUM + '?秒?(?:に|へ|まで)?(?:移動|行って|飛んで|ジャンプ)')))) { const s2 = (parseNum(m[1]) || 0) * 60 + (parseNum(m[2]) || 0); seek(s2); followPlayhead(); return `${tc(s2)} へ移動`; }
+    if (/最初|先頭|頭から|始めから|はじめから/.test(t)) { seek(0); scroller.scrollLeft = 0; if (/再生/.test(t)) { st.rate = 1; play(); return '先頭から再生'; } return '先頭へ'; }
+    if (/最後|末尾|終わり/.test(t)) { pause(); seek(duration()); followPlayhead(); return '末尾へ'; }
+    if (/次の(?:編集点|カット|切れ目)|次へ/.test(t)) { cmd.nextEdit(); return '次の編集点へ'; }
+    if (/前の(?:編集点|カット|切れ目)|前へ/.test(t)) { cmd.prevEdit(); return '前の編集点へ'; }
+    if (/戻って|巻き戻/.test(t)) { seek(snapFrame(st.time - 5)); followPlayhead(); return '5秒戻った'; }
+    if (/早送り|進んで|飛ばして/.test(t)) { seek(snapFrame(st.time + 5)); followPlayhead(); return '5秒進んだ'; }
+    // --- 再生 ---
+    if (/止め|止ま|ストップ|停止|待って|ポーズ|一時停止/.test(t)) { pause(); return '停止'; }
+    if (/再生|プレイ|スタート|流して|見せて/.test(t)) { if (!st.playing) { st.rate = 1; play(); } return '再生'; }
+    // --- その他 ---
+    if (/全体/.test(t)) { zoomFit(); return '全体を表示'; }
+    if (/書き出/.test(t)) { pauseFor(); exportDialog(); return '書き出しの画面を開いた'; }
+    if (/保存/.test(t)) { saveProjectFile(); return 'プロジェクトを保存'; }
+    return null;
+  }
+
+  // ---- マイクと表示 ----
+  let rec = null, voiceOn = false;
+  const VOICE_HELP = [
+    ['再生して ／ 止めて', '再生・停止'], ['5秒戻って ／ 10秒進んで', '移動'], ['最初から再生 ／ 最後へ', '先頭・末尾'],
+    ['ここから … ここまで', '範囲を指定'], ['その部分カット', '範囲（なければ選択）を削除して詰める'], ['カット ／ ここで切って', '再生ヘッドで分割'],
+    ['前をカット ／ 後ろをカット', 'Q / W と同じ'], ['テロップ入れて こんにちは', '文字つきでテロップを追加'], ['「すごい」ってテロップ', '同上'],
+    ['テロップを〇〇に変えて', 'ここにあるテロップの文字を変更'], ['ドン入れて ／ 拍手', '効果音'], ['パンチイン ／ 揺らして', '演出'],
+    ['四角入れて ／ 矢印 ／ 吹き出し', 'シェイプ'], ['無音カット ／ 文字起こし', '各機能'], ['取り消し ／ やり直し', 'Undo / Redo'],
+  ];
+  function voiceHud(heard, result, interim) {
+    let el = $('#voice-hud');
+    if (!el) {
+      el = document.createElement('div'); el.id = 'voice-hud';
+      el.innerHTML = '<div class="vh-top"><span class="vh-dot"></span><b>音声で編集</b><span class="unit" style="margin-left:6px">話しかけてください</span><button class="vh-help" title="話せる言葉の一覧">？</button><button class="vh-x" title="終了">×</button></div><div class="vh-heard"></div><div class="vh-res"></div>';
+      document.body.appendChild(el);
+      $('.vh-x', el).addEventListener('click', () => toggleVoice(false));
+      $('.vh-help', el).addEventListener('click', () => openModal('音声で使える言葉', `<div class="keys">${VOICE_HELP.map(([a, b]) => `<span><kbd style="font-size:11.5px">${a}</kbd></span><span>${b}</span>`).join('')}</div><p class="note" style="font-size:11px;color:var(--muted);margin-top:8px">言い方は多少違っても大丈夫です。再生中は動画の音をマイクが拾うことがあるので、イヤホンを使うか、止めてから話すと確実です。</p>`, [['閉じる', null, true]]));
+    }
+    el.classList.toggle('hidden', !voiceOn);
+    if (heard != null) $('.vh-heard', el).textContent = heard ? `「${heard}」` : '';
+    $('.vh-heard', el).classList.toggle('interim', !!interim);
+    if (result !== undefined) { const r = $('.vh-res', el); r.textContent = result || ''; r.classList.toggle('ng', result != null && result.startsWith('？')); }
+  }
+  function toggleVoice(on) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (on === undefined) on = !voiceOn;
+    if (on && !SR) { openModal('音声操作が使えません', '<p>このブラウザは音声認識に対応していません。<b>Chrome</b> か <b>Edge</b>（パソコン）でお使いください。</p>', [['閉じる', null, true]]); return; }
+    voiceOn = on;
+    $('#btn-voice').classList.toggle('on', on);
+    if (on) {
+      if (!rec) {
+        rec = new SR();
+        rec.lang = 'ja-JP'; rec.continuous = true; rec.interimResults = true;
+        rec.onresult = (e) => {
+          for (let i = e.resultIndex; i < e.results.length; i++) {
+            const r = e.results[i], text = r[0].transcript;
+            if (!r.isFinal) { voiceHud(text, undefined, true); continue; }
+            const done = voiceCommand(text);
+            voiceHud(text, done ? '✓ ' + done : '？ わかりませんでした（「？」で一覧）');
+          }
+        };
+        rec.onerror = (e) => {
+          if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { toast('マイクの使用が許可されていません。アドレスバーのマイクのアイコンから許可してください', true); toggleVoice(false); }
+          else if (e.error === 'network') voiceHud(null, '？ 音声認識のサーバーにつながりません（ネット接続を確認）');
+        };
+        rec.onend = () => { if (voiceOn) { try { rec.start(); } catch (e2) { /* ignore */ } } };
+      }
+      try { rec.start(); } catch (e) { /* 既に開始済み */ }
+      voiceHud('', '');
+    } else if (rec) { try { rec.stop(); } catch (e) { /* ignore */ } voiceHud(null); }
+    voiceHud(null);
+  }
 
   /* =================================================================
      変更通知
@@ -2939,7 +3367,7 @@
     pause();
     const total = duration();
     if (total <= 0) return toast('タイムラインが空です', true);
-    const missing = P.clips.filter((c) => c.type !== 'telop' && !media.has(c.mediaId));
+    const missing = P.clips.filter((c) => c.type !== 'telop' && c.type !== 'shape' && !media.has(c.mediaId));
     if (missing.length && !confirm(`${missing.length} 個のクリップの素材が見つかりません（未リンク）。このまま書き出しますか？`)) return;
     const lockedUsed = P.clips.filter((c) => c.type === 'telop' && isLocked(c.designId));
     if (lockedUsed.length) {
@@ -3251,6 +3679,8 @@
     split: splitAtPlayhead,
     silence: silenceDialog,
     closeGaps,
+    addShape: () => addShape('round'),
+    voice: () => toggleVoice(),
     addTelop: () => {
       const sel = P.clips.find((c) => st.sel.has(c.id) && c.type === 'telop');
       const tr = sel ? trackById(sel.track) : firstTrack('telop');
@@ -3377,6 +3807,8 @@
     ['toolRipple', 'リップルツール', 'ツール', ['B']],
     ['toggleSnap', 'スナップ切替', 'ツール', ['S']],
     ['addTelop', 'テロップを追加', '編集', ['T']],
+    ['addShape', 'シェイプを追加', '編集', ['Shift+T']],
+    ['voice', '音声で編集（マイク オン／オフ）', '編集', ['Ctrl+Shift+V']],
     ['undo', '取り消し', '編集', ['Ctrl+Z']],
     ['redo', 'やり直し', '編集', ['Ctrl+Shift+Z', 'Ctrl+Y']],
     ['copy', 'コピー', '編集', ['Ctrl+C']],
@@ -3414,12 +3846,24 @@
       span.textContent = keyLabel(k);
     });
   }
+  /** 物理キー（e.code）→ 英数字のキー名（US 配列基準） */
+  const CODE_SYM = { Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']', Backslash: '\\', IntlYen: '\\', IntlRo: '\\', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/', Backquote: '`', Space: 'Space' };
+  function codeKey(code) {
+    if (!code) return null;
+    if (/^Key[A-Z]$/.test(code)) return code.slice(3);
+    if (/^Digit\d$/.test(code)) return code.slice(5);
+    if (/^Numpad\d$/.test(code)) return code.slice(6);
+    return CODE_SYM[code] || null;
+  }
   /** キーイベント → "Ctrl+Shift+K" 形式 */
   function comboOf(e) {
     let k = e.key;
     if (k === ' ' || k === 'Spacebar') k = 'Space';
     if (k === 'Esc') k = 'Escape';
-    if (['Control', 'Shift', 'Alt', 'Meta', 'Process', 'Unidentified', 'Dead'].includes(k)) return null;
+    if (['Control', 'Shift', 'Alt', 'Meta', 'CapsLock', 'KanaMode', 'HiraganaKatakana', 'Hankaku', 'Zenkaku', 'Romaji', 'Convert', 'NonConvert'].includes(k)) return null;
+    // 日本語入力（かな入力・ローマ字入力・全角英数）のときも、押したキーの場所で判定する
+    if (k.length === 1 && /[^\x20-\x7e]/.test(k)) { const n = k.normalize('NFKC'); k = /^[\x21-\x7e]$/.test(n) ? n : (codeKey(e.code) || k); }
+    if (k === 'Process' || k === 'Unidentified' || k === 'Dead') { k = codeKey(e.code); if (!k) return null; }
     if (k.length === 1) k = k.toUpperCase();
     // Alt で文字が変わる配列（Mac）対策：英字・数字は物理キーから
     if (e.altKey && e.code && /^Key[A-Z]$/.test(e.code)) k = e.code.slice(3);
@@ -3480,6 +3924,7 @@
   document.addEventListener('keydown', (e) => {
     const tag = (e.target.tagName || '').toLowerCase();
     if ($('.modal-bg')) return;
+    if (e.isComposing && (tag === 'input' || tag === 'textarea')) return; // 文字入力の変換中
     const combo = comboOf(e);
     if (!combo) return;
     const id = keyIndex.get(combo);
@@ -3535,6 +3980,7 @@
     setupLib();
     rebuildKeyIndex();
     updateLicenseBadge();
+    $('#btn-voice').addEventListener('click', () => toggleVoice());
     try {
       const saved = await idbGet('kv', 'project');
       if (saved && Array.isArray(saved.clips)) {
@@ -3557,6 +4003,7 @@
   // テスト・自動操作用の小さな公開 API
   window.ChainCut = {
     get project() { return P; }, get state() { return st; }, media,
+    voiceCommand, addShape, colorSlots, parseColor, comboOf,
     transcribe, captionsToTelops, addCaptionRow, splitLongRows, get presets() { return presets; }, applyPresetById,
     importFiles, cmd, seek, drawFrame, openProjectFile, unlockWithCode, registerProjectDesigns, kfValue, animated,
     isLocked: (id) => isLocked(id), detectKeeps, applySilenceCut, parseSrt, runExport, getBuffer,
