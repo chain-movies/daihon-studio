@@ -19,7 +19,7 @@
   --line:#0d0d0d;--line2:#3a3a3a;--ink:#e8e8e8;--ink2:#b4b4b4;--muted:#7d7d7d;
   --accent:#2d8ceb;--accent2:#4fa3f7;--accent-soft:rgba(45,140,235,.18);
   --val:#5aa9ff;--warn:#f0b429;--danger:#e5484d;--ok:#3ecf8e;
-  --c-video:#4a6fa5;--c-image:#7a5ea8;--c-audio:#3d8a5f;--c-telop:#b5692e;--c-shape:#8a6d1f;
+  --c-video:#4a6fa5;--c-image:#7a5ea8;--c-audio:#3d8a5f;--c-telop:#b5692e;--c-shape:#8a6d1f;--c-graphic:#2f7d7a;
   --tl-head:150px;
   color-scheme:dark;
 }
@@ -231,6 +231,32 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
 .clip.t-audio{background-color:var(--c-audio)}
 .clip.t-telop{background-color:var(--c-telop)}
 .clip.t-shape{background-color:var(--c-shape)}
+.clip.t-graphic{background-color:var(--c-graphic)}
+#kfstrip{flex:none;border-top:1px solid var(--line);background:var(--panel)}
+#kfstrip .kf-head{display:flex;align-items:center;gap:4px;padding:4px 8px}
+#kfstrip .kf-head .sp{flex:1}
+#kfstrip .kf-head #kf-title{margin-left:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%}
+#kf-auto.on{background:#e5484d;border-color:#e5484d;color:#fff}
+#kf-canvas{display:block;width:100%;cursor:pointer}
+.layers{border:1px solid var(--line2);border-radius:6px;overflow:hidden;max-height:220px;overflow-y:auto}
+.lrow{display:flex;align-items:center;gap:4px;padding:3px 6px;border-bottom:1px solid #2a2a2a;cursor:pointer;background:var(--panel2)}
+.lrow:hover{background:var(--panel3)}
+.lrow.on{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.lrow.off .lname{opacity:.45}
+.lrow .lb{background:none;border:0;width:22px;font-size:12px;opacity:.8}
+.lrow .lic{width:18px;text-align:center;font-weight:800;color:var(--accent2)}
+.lrow .lname{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow .lkf{color:#ffd84d;font-size:10px}
+.edge{border:1px solid var(--line2);border-radius:6px;padding:5px 6px;display:flex;flex-direction:column;gap:4px;background:#1b1b1b}
+.edge-h{display:flex;align-items:center;gap:4px}
+.edge-h .btn{padding:1px 6px}
+.gbar{height:12px;border-radius:3px;border:1px solid #444;margin:2px 0}
+.gstop{display:flex;align-items:center;gap:4px}
+.gstop .field{flex:1}
+.gpos{flex:none}
+.gstop .btn{padding:1px 6px}
+.seg{display:inline-flex;gap:2px}
+.in.dim{opacity:.45}
 .cf{display:flex;align-items:center;gap:4px;width:100%}
 .cf input[type=color]{width:30px;height:24px;padding:0;border:1px solid #3a3a3a;border-radius:4px;background:none;cursor:pointer;flex:none}
 .cf .hex{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;padding:3px 6px}
@@ -347,6 +373,7 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
       <hr>
       <button data-cmd="addTelop">テロップを追加<span class="k">T</span></button>
       <button data-cmd="addShape">シェイプを追加</button>
+      <button data-cmd="addText">テキスト（レイヤー）を追加<span class="k">Alt+T</span></button>
       <button data-cmd="addTrackVideo">ビデオトラックを追加</button>
       <button data-cmd="addTrackTelop">テロップトラックを追加</button>
       <button data-cmd="addTrackAudio">オーディオトラックを追加</button>
@@ -418,6 +445,7 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
             <button class="btn primary" style="flex:1" data-cmd="addTelop">再生ヘッドに追加</button>
             <button class="btn" data-cmd="applyDesign" title="選択中のテロップのデザインを入れ替え">選択に適用</button>
           </div>
+          <button class="btn sm" data-cmd="addGraphicFromDesign" title="選んだデザインを、帯・文字などのレイヤーに分けたグラフィックとして追加（塗り・エッジ・影を細かく編集できる）">レイヤーとして追加（細かく編集）</button>
           <button class="btn sm" data-cmd="importSrt">SRT 字幕を読み込んでテロップ化…</button>
         </div>
       </div>
@@ -450,6 +478,7 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
         <button class="ib" data-cmd="toggleLoop" id="btn-loop" title="ループ再生"><svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg></button>
       </div>
       <div class="mon-right">
+        <button class="ib" id="kf-toggle" title="キーフレームパネル (Shift+K)"><svg viewBox="0 0 24 24"><path d="M12 2l6 10-6 10-6-10z"/></svg></button>
         <button class="ib" data-cmd="toggleSafe" id="btn-safe" title="セーフエリアガイド (G)"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3zm2 2v14h14V5zm2 2h10v10H7zm2 2v6h6V9z"/></svg></button>
         <button class="ib" data-cmd="snapshot" title="フレームを PNG 保存"><svg viewBox="0 0 24 24"><path d="M9 3L7.2 5H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.2L15 3zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg></button>
         <div class="tc total" id="tc-total">00:00:00:00</div>
@@ -482,11 +511,21 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
         <button class="btn sm" data-cmd="silence" title="Ctrl+Alt+X">無音カット</button>
         <button class="btn sm" data-cmd="addTelop" title="T">＋テロップ</button>
         <button class="btn sm" data-cmd="addShape" title="Shift+T">＋シェイプ</button>
+        <button class="btn sm" data-cmd="addText" title="Alt+T：文字・塗り・エッジ・影・テクスチャを細かく作れるレイヤー">＋テキスト</button>
         <div class="sp"></div>
         <span class="unit">ズーム</span>
         <input type="range" id="zoom" min="0" max="100" value="40">
         <button class="btn sm" data-cmd="zoomFit">全体</button>
       </div>
+      <div id="kfstrip" class="hidden">
+      <div class="kf-head"><b>キーフレーム</b><span id="kf-title" class="unit"></span><span class="sp"></span>
+        <button class="btn sm" id="kf-auto" title="オンにすると、モニターやインスペクターで動かすたびに再生ヘッドの位置へキーフレームを打ちます (Alt+K)">● 自動キー</button>
+        <button class="btn sm" id="kf-add" title="今の位置とスケールをキーフレームにする">◆ 記録</button>
+        <button class="btn sm" id="kf-easy" title="選んだキーフレームの前後をゆっくりに (F9)">イージーイーズ</button>
+        <button class="btn sm" id="kf-curve" title="緩急のカーブを調整 (Ctrl+F9)">カーブ</button>
+        <button class="btn sm danger" id="kf-del">削除</button></div>
+      <canvas id="kf-canvas"></canvas>
+    </div>
       <div id="tl-scroll">
         <div id="tl-content">
           <div id="tl-rulerrow"><div id="tl-corner"></div><canvas id="tl-ruler"></canvas></div>
