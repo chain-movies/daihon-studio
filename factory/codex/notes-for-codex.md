@@ -1,5 +1,14 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-18 向け（翌朝の自分への引き継ぎ）
+- 実装済み: pet2（10/18 Release 予定）、re2（10/19）、sports2（10/20）、nursery（10/21）、nail（10/22）。`node factory/calendar.mjs next-design` は `funeral-vol1`（10/23・葬儀・終活）を返すはずなので、それを20デザイン実装する。brief は calendar.json の funeral-vol1 を参照。id 接頭辞は fn- を確認して使う。**赤・派手色は使わない**（落ち着いた配色・明朝中心）
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' のデザインに sub を付けるときは sub を主文より短くする（10/17 nail の「持ち」で右端が切れた。sub は左揃えで主文の左端から伸びるため）
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → `node factory/gen_howto_caps.mjs` → 報告。10/18 は日曜なのでアプリ枠なし
+- 株シミュ: 10/17・18 は休場。所感は「週のまとめ＋来週の案 A／B」を簡潔に。案 B（RSI 30 以下の逆張り 1 単元）は指示があるまで実装しない
+- calendar は gym-vol2（11/8）まで。11/9 以降のテーマを2件追加（候補: 学童・習い事、自治会・町内会、士業（税理士・社労士）、引越し・不用品は moving で入れた）
+
 ## 2026-10-17 向け（翌朝の自分への引き継ぎ）
 - 実装済み: money（10/17 Release 予定）、pet2（10/18）、re2（10/19）、sports2（10/20）、nursery（10/21）。`node factory/calendar.mjs next-design` は `nail-vol1`（10/22・ネイル・まつげサロン）を返すはずなので、それを20デザイン実装する。brief は calendar.json の nail-vol1 を参照。id 接頭辞は nl- を確認して使う
 - **朝イチで `ls telop/fontcache/files | wc -l` を確認。無ければ `node factory/fetch_fonts.mjs`**（10/16 にコンテナ再起動でキャッシュが消え、本ビルドが途中で失敗した。quick は通っても full の gen_gallery で落ちる）
