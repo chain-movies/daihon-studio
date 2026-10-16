@@ -69,7 +69,7 @@ button{cursor:pointer}
 
 .panel{background:var(--panel);display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
 .ptabs{display:flex;align-items:stretch;height:30px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;padding-left:4px}
-.ptabs button{background:none;border:0;padding:0 12px;color:var(--muted);border-bottom:2px solid transparent;font-weight:600}
+.ptabs button{background:none;border:0;padding:0 9px;white-space:nowrap;flex:none;color:var(--muted);border-bottom:2px solid transparent;font-weight:600}
 .ptabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
 .ptabs .sp{flex:1}
 .ptabs .tool{align-self:center;margin-right:6px}
@@ -118,6 +118,28 @@ button{cursor:pointer}
 .se-item:hover{border-color:#555}
 .se-item .nm{flex:1;color:var(--ink2)}
 .se-item .ib{width:24px;height:22px}
+#cap{display:flex;flex-direction:column;height:100%}
+.cap-head{padding:8px;display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line)}
+.cap-bar2{display:flex;align-items:center;gap:4px;padding:5px 8px;border-bottom:1px solid var(--line)}
+#cap-list{flex:1;overflow:auto;padding:4px 6px 30px}
+.cap-row{border:1px solid transparent;border-radius:6px;padding:3px 4px;margin-bottom:2px}
+.cap-row:hover{background:var(--panel2)}
+.cap-row.on{border-color:var(--accent);background:var(--accent-soft)}
+.cap-row.gone{opacity:.45}
+.cap-t{display:flex;align-items:center;gap:4px}
+.cap-tc{background:none;border:0;color:var(--val);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;padding:0 2px}
+.cap-tools{margin-left:auto;display:none;gap:2px}
+.cap-row:hover .cap-tools,.cap-row:focus-within .cap-tools{display:flex}
+.cap-tools button{background:var(--panel3);border:1px solid var(--line2);border-radius:3px;font-size:11px;width:22px;height:18px;line-height:1;color:var(--ink2)}
+.cap-text{width:100%;background:transparent;border:1px solid transparent;resize:none;min-height:0;padding:2px 4px;font-size:13px;line-height:1.45;overflow:hidden}
+.cap-text:hover{border-color:#333}
+.cap-text:focus{background:#161616}
+.pchips{display:flex;flex-wrap:wrap;gap:4px}
+.pchip{display:inline-flex;border:1px solid var(--line2);border-radius:5px;overflow:hidden;background:var(--panel3)}
+.pchip button{background:none;border:0;padding:3px 8px;font-size:11px;color:var(--ink)}
+.pchip .pc-apply:hover{background:var(--accent)}
+.pchip .pc-menu{border-left:1px solid var(--line2);padding:3px 5px;color:var(--muted)}
+.pchip .pc-menu:hover{background:var(--panel4);color:var(--ink)}
 .dcard .nm{padding:3px 6px;font-size:10.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--panel2)}
 #lib .lfoot{flex:none;border-top:1px solid var(--line);padding:8px;display:flex;flex-direction:column;gap:6px}
 .chips{display:flex;flex-wrap:wrap;gap:4px}
@@ -192,6 +214,8 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
 .thead .ib{width:22px;height:22px}
 .thead .ib svg{width:13px;height:13px}
 .thead .ib.off{color:var(--danger)}
+.trow.k-video .thead .tl,.trow.k-audio .thead .tl{display:none}
+.trow.k-video .thead .tn,.trow.k-audio .thead .tn{margin-right:auto}
 .thead .tdel{display:none}
 .trow:hover .thead .tdel{display:grid}
 .lane{position:relative;flex:1}
@@ -201,7 +225,7 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
 .trow.dropok .lane{background:rgba(45,140,235,.12)}
 .clip{position:absolute;top:2px;bottom:2px;border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.6);cursor:pointer;background-repeat:repeat-x;background-size:auto 100%}
 .clip .cl{position:absolute;left:0;right:0;top:0;padding:1px 6px;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(0,0,0,.35);color:#fff;z-index:2;pointer-events:none}
-.clip canvas.wf{position:absolute;left:0;bottom:0;width:100%;pointer-events:none}
+.clip canvas.wf{position:absolute;left:0;bottom:0;width:100%;pointer-events:none;image-rendering:auto}
 .clip.t-video{background-color:var(--c-video)}
 .clip.t-image{background-color:var(--c-image)}
 .clip.t-audio{background-color:var(--c-audio)}
@@ -333,10 +357,29 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
       <button class="on" data-ltab="bin">プロジェクト</button>
       <button data-ltab="lib">テロップ</button>
       <button data-ltab="se">効果音</button>
+      <button data-ltab="tx">文字起こし</button>
       <div class="sp"></div>
-      <button class="btn sm tool" data-cmd="import" id="btn-import">＋ 読み込み</button>
+      <button class="btn sm tool" data-cmd="import" id="btn-import" title="素材を読み込み (Ctrl+I)">＋</button>
     </div>
     <div class="pbody" id="tab-bin"><div id="bin"></div></div>
+    <div class="pbody hidden" id="tab-tx">
+      <div id="cap">
+        <div class="cap-head">
+          <div style="display:flex;gap:6px"><button class="btn primary" id="cap-run" style="flex:1">文字起こし</button><button class="btn" id="cap-add" title="再生ヘッドの位置に、自分で打つ行を追加">＋ 行を追加</button></div>
+          <div class="field"><label style="width:64px">精度</label><div class="ctl"><select id="cap-model"></select></div></div>
+          <div class="field"><label style="width:64px">1行の文字</label><div class="ctl"><input type="number" id="cap-max" min="6" max="40" style="width:64px"><span class="unit">文字まで（超えたら2行）</span></div></div>
+          <label class="field" style="gap:6px;min-height:20px"><input type="checkbox" id="cap-auto"> 終わったら自動でテロップにする</label>
+          <div class="prog" style="display:none"><div id="cap-bar"></div></div>
+          <div id="cap-status" class="unit">選択中のクリップ（なければ V1 の動画）の声を文字にします。ブラウザの中で処理するので、音声は外に送信されません。</div>
+        </div>
+        <div class="cap-bar2"><span id="cap-count" class="unit"></span><span style="flex:1"></span>
+          <button class="btn sm" id="cap-telop" title="左の「テロップ」タブで選んだデザインで作り直します">テロップにする</button>
+          <button class="btn sm" id="cap-split" title="長い行を句読点で分ける">分割</button>
+          <button class="btn sm" id="cap-srt">SRT</button>
+          <button class="btn sm danger" id="cap-clear">全削除</button></div>
+        <div id="cap-list"></div>
+      </div>
+    </div>
     <div class="pbody hidden" id="tab-se"><div id="se-list"></div></div>
     <div class="pbody hidden" id="tab-lib">
       <div id="lib">
@@ -346,6 +389,7 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
         </div>
         <div class="lgrid" id="lib-grid"></div>
         <div class="lfoot">
+          <div class="chips" id="lib-presets"></div>
           <div class="chips" id="lib-variants"></div>
           <div style="display:flex;gap:6px">
             <button class="btn primary" style="flex:1" data-cmd="addTelop">再生ヘッドに追加</button>
