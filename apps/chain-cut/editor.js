@@ -70,6 +70,7 @@
     const o = JSON.parse(s);
     P.tracks = o.tracks; P.clips = o.clips; P.media = o.media; P.name = o.name; P.inPoint = o.inPoint; P.outPoint = o.outPoint; P.captions = o.captions || []; P.designs = o.designs || [];
     for (const id of Array.from(st.sel)) if (!clipById(id)) st.sel.delete(id);
+    st.kfSel.clear(); layerCache.clear();
     changed({ structure: true });
   }
   function undo() { if (!undoStack.length) return toast('これ以上取り消せません'); redoStack.push(snapshot()); restore(undoStack.pop()); lastCoalesce.key = null; }
@@ -564,13 +565,7 @@
   function kfValue(c, prop, t) {
     const k = c.kf && c.kf[prop];
     if (!k || !k.length) return baseVal(c, prop);
-    const lt = t - c.start;
-    if (lt <= k[0][0]) return k[0][1];
-    for (let i = 0; i < k.length - 1; i++) {
-      const [t0, v0, e] = k[i], [t1, v1] = k[i + 1];
-      if (lt < t1) return v0 + (v1 - v0) * (EASE[e] || EASE.easeInOut)(clamp((lt - t0) / Math.max(1e-6, t1 - t0), 0, 1));
-    }
-    return k[k.length - 1][1];
+    return kfAt(k, t - c.start);
   }
   function setKf(c, prop, lt, v, ease) {
     c.kf = c.kf || {};
@@ -683,6 +678,9 @@
           ctx.restore();
           drawOverlays(ctx, c, ea, W, H);
           rects[c.id] = r;
+        } else if (c.type === 'graphic') {
+          rects[c.id] = drawGraphic(ctx, c, ea, W, H, t);
+          drawOverlays(ctx, c, ea, W, H);
         } else if (c.type === 'shape') {
           rects[c.id] = drawShape(ctx, c, ea, W, H);
           drawOverlays(ctx, c, ea, W, H);
@@ -774,7 +772,20 @@
       octx.restore();
     }
     if (!st.playing) {
+      // 選択中のレイヤー（グラフィックの中）
       for (const id of st.sel) {
+        const c = clipById(id); const L = selectedLayer(c);
+        const r = L && layerRects[id] && layerRects[id][L.id];
+        if (!r) continue;
+        octx.save(); octx.strokeStyle = '#ffd84d'; octx.lineWidth = Math.max(2, W / 600); octx.setLineDash([10, 6]);
+        octx.strokeRect(r.x, r.y, r.w, r.h); octx.setLineDash([]);
+        const hs = Math.max(10, W / 120); octx.fillStyle = '#ffd84d';
+        for (const [hx, hy] of [[r.x, r.y], [r.x + r.w, r.y], [r.x, r.y + r.h], [r.x + r.w, r.y + r.h]]) octx.fillRect(hx - hs / 2, hy - hs / 2, hs, hs);
+        octx.restore();
+      }
+      drawMotionPath();
+      for (const id of st.sel) {
+        if (selectedLayer(clipById(id))) continue;
         const r = lastRects[id]; if (!r) continue;
         octx.save();
         octx.strokeStyle = '#2d8ceb'; octx.lineWidth = Math.max(2, W / 700);
@@ -954,8 +965,8 @@
      ================================================================= */
   function layoutMonitor() {
     const stage = $('#mon-stage');
-    const sw = stage.clientWidth - 24, sh = stage.clientHeight - 24;
-    const k = Math.min(sw / P.width, sh / P.height);
+    const sw = Math.max(40, stage.clientWidth - 24), sh = Math.max(40, stage.clientHeight - 24);
+    const k = Math.max(0.02, Math.min(sw / P.width, sh / P.height));
     const wrap = $('#mon-wrap');
     wrap.style.width = Math.max(10, Math.floor(P.width * k)) + 'px';
     wrap.style.height = Math.max(10, Math.floor(P.height * k)) + 'px';
@@ -973,6 +984,8 @@
   overlay.addEventListener('pointerdown', (e) => {
     if (st.playing) return;
     const pt = monitorPoint(e);
+    if (pathPointerDown(e, pt)) return;
+    if (graphicPointerDown(e, pt)) return;
     // 前面から当たり判定
     const order = [];
     for (const tr of compositeTracks()) for (const c of P.clips.filter((x) => x.track === tr.id && isActive(x, st.time))) order.push(c);
@@ -1009,6 +1022,46 @@
     };
     overlay.addEventListener('pointermove', move); overlay.addEventListener('pointerup', up);
   });
+  /** グラフィックのレイヤーをクリック・ドラッグ。処理したら true */
+  function graphicPointerDown(e, pt) {
+    const order = [];
+    for (const tr of compositeTracks()) if (!tr.hidden) for (const c of P.clips.filter((x) => x.track === tr.id && isActive(x, st.time))) order.push(c);
+    for (let i = order.length - 1; i >= 0; i--) {
+      const c = order[i];
+      if (c.type !== 'graphic') { const r = lastRects[c.id]; if (r && pt.x >= r.x && pt.x <= r.x + r.w && pt.y >= r.y && pt.y <= r.y + r.h) return false; continue; }
+      const rs = layerRects[c.id] || {};
+      const hitL = (c.layers || []).slice().reverse().find((L) => { const r = rs[L.id]; return L.visible !== false && !L.locked && r && pt.x >= r.x - 6 && pt.x <= r.x + r.w + 6 && pt.y >= r.y - 6 && pt.y <= r.y + r.h + 6; });
+      if (!hitL) continue;
+      if (e.altKey) return false; // Alt+ドラッグはグラフィック全体
+      st.sel = new Set([c.id]);
+      const changedSel = !st.selLayer || st.selLayer.layerId !== hitL.id;
+      st.selLayer = { clipId: c.id, layerId: hitL.id };
+      if (changedSel) { st.kfSel.clear(); changed({ selection: true }); }
+      const r0 = rs[hitL.id];
+      const corner = [[r0.x, r0.y], [r0.x + r0.w, r0.y], [r0.x, r0.y + r0.h], [r0.x + r0.w, r0.y + r0.h]].some(([hx, hy]) => Math.abs(hx - pt.x) < P.width / 60 && Math.abs(hy - pt.y) < P.width / 60);
+      const lt = st.time - c.start, gk = kfValue(c, 'scale', st.time) / 100;
+      const sx = layerVal(hitL, 'x', lt), sy = layerVal(hitL, 'y', lt), ss = layerVal(hitL, 'scale', lt);
+      const d0 = Math.hypot(pt.x - r0.cx, pt.y - r0.cy) || 1;
+      let moved = false;
+      overlay.setPointerCapture(e.pointerId);
+      const mv = (ev) => {
+        const q = monitorPoint(ev);
+        if (!moved) { pushUndo(); moved = true; }
+        if (corner) setLayerProp(c, hitL, 'scale', clamp(Math.round(ss * Math.hypot(q.x - r0.cx, q.y - r0.cy) / d0), 1, 2000));
+        else {
+          let nx = Math.round(sx + (q.x - pt.x) / gk), ny = Math.round(sy + (q.y - pt.y) / gk);
+          if (ev.shiftKey) { if (Math.abs(nx - sx) > Math.abs(ny - sy)) ny = sy; else nx = sx; }
+          setLayerProp(c, hitL, 'x', nx); setLayerProp(c, hitL, 'y', ny);
+        }
+        requestDraw(); renderInspectorValues(); drawKfStrip();
+      };
+      const up = () => { overlay.removeEventListener('pointermove', mv); overlay.removeEventListener('pointerup', up); if (moved) changed({ props: true, light: true }); };
+      overlay.addEventListener('pointermove', mv); overlay.addEventListener('pointerup', up);
+      return true;
+    }
+    return false;
+  }
+  overlay.addEventListener('dblclick', () => { const ta = $('#L-text') || $('#t-text'); if (ta) { ta.focus(); ta.select(); } });
   overlay.addEventListener('pointermove', (e) => {
     if (st.playing || e.buttons) return;
     const pt = monitorPoint(e);
@@ -1034,6 +1087,7 @@
     const d = duration();
     $('#tc-cur').textContent = tc(st.time);
     highlightCaption();
+    if (!st.playing || (performance.now() % 4 < 1)) drawKfStrip();
     $('#tl-tc').textContent = tc(st.time);
     $('#tc-total').textContent = tc(d);
     $('#scrubbar .fill').style.width = (d > 0 ? clamp(st.time / d, 0, 1) * 100 : 0) + '%';
@@ -1091,6 +1145,7 @@
   function clipLabel(c) {
     if (c.type === 'telop') return (c.text || '').replace(/\n/g, ' ') || '（空のテロップ）';
     if (c.type === 'shape') return 'シェイプ：' + (SHAPE_NAME[c.shape] || c.shape);
+    if (c.type === 'graphic') return (c.name || 'グラフィック') + `（${(c.layers || []).length}レイヤー）`;
     const m = mediaMeta(c.mediaId);
     return m ? m.name : '（素材なし）';
   }
@@ -1098,7 +1153,7 @@
     const el = document.createElement('div');
     const tr = trackById(c.track);
     const rt = media.get(c.mediaId);
-    el.className = `clip t-${c.type}` + (st.sel.has(c.id) ? ' sel' : '') + (tr && (tr.hidden || tr.muted) && (tr.kind !== 'video' || tr.hidden) ? ' off' : '') + (c.type !== 'telop' && c.type !== 'shape' && !rt ? ' unlinked' : '');
+    el.className = `clip t-${c.type}` + (st.sel.has(c.id) ? ' sel' : '') + (tr && (tr.hidden || tr.muted) && (tr.kind !== 'video' || tr.hidden) ? ' off' : '') + (!['telop', 'shape', 'graphic'].includes(c.type) && !rt ? ' unlinked' : '');
     el.dataset.clip = c.id;
     el.style.left = (c.start * st.pps) + 'px';
     el.style.width = Math.max(2, c.dur * st.pps) + 'px';
@@ -1372,7 +1427,7 @@
         } else {
           c.start = snapFrame(o.start + delta); c.in = o.in + delta; c.dur = snapFrame(o.dur - delta);
         }
-        if (c.type === 'image' || c.type === 'telop' || c.type === 'shape') c.in = 0;
+        if (['image', 'telop', 'shape', 'graphic'].includes(c.type)) c.in = 0;
       } else {
         // 移動：スナップは選択の先頭と末尾どちらでも
         const minStart = Math.min(...sel.map((x) => orig.get(x.id).start));
@@ -1704,9 +1759,9 @@
     }
     const c = sel[0];
     const m = mediaMeta(c.mediaId);
-    const TL = { video: ['ビデオクリップ', 'var(--c-video)'], image: ['画像クリップ', 'var(--c-image)'], audio: ['オーディオクリップ', 'var(--c-audio)'], telop: ['テロップ', 'var(--c-telop)'], shape: ['シェイプ', 'var(--c-shape)'] }[c.type];
+    const TL = { video: ['ビデオクリップ', 'var(--c-video)'], image: ['画像クリップ', 'var(--c-image)'], audio: ['オーディオクリップ', 'var(--c-audio)'], telop: ['テロップ', 'var(--c-telop)'], shape: ['シェイプ', 'var(--c-shape)'], graphic: ['グラフィック（レイヤー）', 'var(--c-graphic)'] }[c.type];
     let h = `<div class="sec"><h4><span class="sw" style="background:${TL[1]}"></span>${TL[0]}</h4><div class="in">
-      ${c.type !== 'telop' && c.type !== 'shape' ? `<div class="note" style="word-break:break-all">${escapeHtml(m ? m.name : '素材なし')}${m && m.width ? ` ・ ${m.width}×${m.height}` : ''}</div>` : ''}
+      ${!['telop', 'shape', 'graphic'].includes(c.type) ? `<div class="note" style="word-break:break-all">${escapeHtml(m ? m.name : '素材なし')}${m && m.width ? ` ・ ${m.width}×${m.height}` : ''}</div>` : ''}
       ${field('開始', `<span class="unit" style="color:var(--ink2)">${tc(c.start)}</span>`)}
       ${field('長さ', scrub('dur', c.dur, { step: 1 / fps(), min: MIN_DUR, max: maxSourceDur(c) - (c.in || 0), unit: '秒', dec: 2 }))}
       ${c.type === 'video' || c.type === 'audio' ? field('素材の開始', `<span class="unit" style="color:var(--ink2)">${tc(c.in || 0)}</span>`) : ''}
@@ -1721,6 +1776,7 @@
         <div class="note">デザイン：<b style="color:var(--ink)">${escapeHtml(d ? d.name : '不明')}</b>${d ? `（${escapeHtml((PACKS[d.pack] || {}).short || '')}）` : ''}</div>
         <div class="chips">${vs.map((v, i) => `<button class="chip${i === (c.variant || 0) ? ' on' : ''}" data-tv="${i}">${escapeHtml(v.name || '色' + (i + 1))}</button>`).join('')}</div>
         <div class="note">左の「テロップ」タブでデザインを選び「選択に適用」で入れ替えできます。</div>
+        <div class="btnrow"><button class="btn sm primary" id="t-tographic" title="帯・文字・サブなどをレイヤーに分け、塗り・エッジ・影・テクスチャ・動きを個別に編集できるようにします">レイヤーに分解して細かく編集</button></div>
         ${isLocked(c.designId) ? '<div class="note" style="color:var(--warn)">製品版デザインです（書き出すと透かしが入ります）。<a href="#" data-cmd="unlock" style="color:var(--accent2)">解除コードを入力</a></div>' : ''}
       </div></div>`;
       h += `<div class="sec"><h4>アニメーション</h4><div class="in">
@@ -1729,6 +1785,7 @@
         ${field('フェードアウト', scrub('fadeOut', c.fadeOut || 0, { step: 0.05, min: 0, max: 5, unit: '秒', dec: 2 }))}
       </div></div>`;
     }
+    if (c.type === 'graphic') h += graphicInspectorHtml(c);
     if (c.type === 'shape') {
       h += `<div class="sec"><h4>シェイプ</h4><div class="in">
         ${field('形', `<select id="sh-kind">${SHAPES.map(([v, l]) => `<option value="${v}"${c.shape === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`)}
@@ -1764,13 +1821,13 @@
     }
     if (c.type !== 'audio') {
       const kv = (pr) => kfValue(c, pr, clamp(st.time, c.start, clipEnd(c)));
-      h += `<div class="sec"><h4>モーション<span class="unit" style="margin-left:auto;font-weight:400">◆＝キーフレーム</span></h4><div class="in">
+      h += `<div class="sec"><h4>${c.type === 'graphic' ? 'グラフィック全体のモーション' : 'モーション'}<span class="unit" style="margin-left:auto;font-weight:400">◆＝キーフレーム</span></h4><div class="in">
         ${field('位置 X', scrub('x', kv('x'), { step: 1, unit: 'px' }) + kfBtn(c, 'x'))}
         ${field('位置 Y', scrub('y', kv('y'), { step: 1, unit: 'px' }) + kfBtn(c, 'y'))}
         ${field('スケール', scrub('scale', kv('scale'), { step: 1, min: 5, max: 800, unit: '%' }) + kfBtn(c, 'scale'))}
         ${field('回転', scrub('rotation', kv('rotation'), { step: 1, min: -3600, max: 3600, unit: '°' }) + kfBtn(c, 'rotation'))}
         ${field('不透明度', scrub('opacity', kv('opacity'), { step: 1, min: 0, max: 100, unit: '%' }) + kfBtn(c, 'opacity'))}
-        ${c.type !== 'telop' && c.type !== 'shape' ? field('フィット', `<select id="c-fit"><option value="native"${c.fit === 'native' ? ' selected' : ''}>原寸（横のときと同じ大きさ）</option><option value="contain"${c.fit === 'contain' ? ' selected' : ''}>全体を表示（余白あり）</option><option value="cover"${c.fit === 'cover' ? ' selected' : ''}>画面を埋める（はみ出しカット）</option><option value="stretch"${c.fit === 'stretch' ? ' selected' : ''}>引き伸ばす</option></select>`) : ''}
+        ${!['telop', 'shape', 'graphic'].includes(c.type) ? field('フィット', `<select id="c-fit"><option value="native"${c.fit === 'native' ? ' selected' : ''}>原寸（横のときと同じ大きさ）</option><option value="contain"${c.fit === 'contain' ? ' selected' : ''}>全体を表示（余白あり）</option><option value="cover"${c.fit === 'cover' ? ' selected' : ''}>画面を埋める（はみ出しカット）</option><option value="stretch"${c.fit === 'stretch' ? ' selected' : ''}>引き伸ばす</option></select>`) : ''}
         <div class="btnrow"><button class="btn sm" id="c-reset">モーションをリセット</button></div>
         <div class="note">プログラムモニター上でドラッグして移動、四隅をドラッグで拡大縮小。◆ を押すと再生ヘッドの位置にキーフレームを打ち、以降の変更はその時刻の値になります。</div>
       </div></div>`;
@@ -1801,7 +1858,7 @@
       </div></div>`;
     }
     if (c.type !== 'telop') {
-      const noAudio = c.type === 'image' || c.type === 'shape';
+      const noAudio = c.type === 'image' || c.type === 'shape' || c.type === 'graphic';
       h += `<div class="sec"><h4>${noAudio ? 'フェード' : '音声とフェード'}</h4><div class="in">
         ${!noAudio ? field('音量', scrub('volumeDb', c.volume <= 0.0001 ? -60 : 20 * Math.log10(c.volume == null ? 1 : c.volume), { step: 0.5, min: -60, max: 12, unit: 'dB', dec: 1 })) : ''}
         ${field('フェードイン', scrub('fadeIn', c.fadeIn || 0, { step: 0.05, min: 0, max: 10, unit: '秒', dec: 2 }))}
@@ -1820,7 +1877,7 @@
 
   function projectInspector() {
     const d = duration();
-    const counts = { video: 0, image: 0, audio: 0, telop: 0, shape: 0 };
+    const counts = { video: 0, image: 0, audio: 0, telop: 0, shape: 0, graphic: 0 };
     for (const c of P.clips) counts[c.type]++;
     return `<div class="sec"><h4>プロジェクト</h4><div class="in">
       ${field('画面サイズ', `<select id="p-aspect">${Object.entries(ASPECTS).map(([k, a]) => `<option value="${k}"${P.aspect === k ? ' selected' : ''}>${a.label}（${a.w}×${a.h}）</option>`).join('')}</select>`)}
@@ -1871,7 +1928,8 @@
 
   function setProp(c, prop, v) {
     if (prop === 'volumeDb') { c.volume = v <= -60 ? 0 : Math.pow(10, v / 20); return; }
-    if (KF_PROPS.includes(prop) && hasKf(c, prop)) { setKf(c, prop, st.time - c.start, v); return; }
+    if (prop.startsWith('L.')) { const L = selectedLayer(c); if (L) setLayerProp(c, L, prop.slice(2), v); return; }
+    if (KF_PROPS.includes(prop) && (hasKf(c, prop) || st.autoKey)) { setKf(c, prop, st.time - c.start, v); return; }
     if (prop.startsWith('fx.')) { c.fx = c.fx || {}; c.fx[prop.slice(3)] = v; return; }
     if (prop === 'trIn.dur' || prop === 'trOut.dur') { const k = prop.split('.')[0]; c[k] = c[k] || { type: '', dur: 0.3 }; c[k].dur = v; return; }
     if (prop === 'dur') { c.dur = snapFrame(Math.max(MIN_DUR, v)); return; }
@@ -1952,6 +2010,7 @@
       });
     });
 
+    { const b = $('#t-tographic', insp); if (b) b.addEventListener('click', () => convertTelopToGraphic(c)); }
     const txt = $('#t-text', insp);
     if (txt) {
       txt.addEventListener('input', () => {
@@ -1991,6 +2050,7 @@
       const sel = $('#tr-' + k, insp);
       if (sel) sel.addEventListener('change', () => { pushUndo(); const key = k === 'in' ? 'trIn' : 'trOut'; c[key] = Object.assign({ dur: 0.3 }, c[key] || {}, { type: sel.value }); if (!sel.value) delete c[key]; changed({ props: true }); });
     }
+    if (c.type === 'graphic') bindGraphicInspector(c);
     if (c.type === 'shape') {
       bindColorFields(insp, (k) => c[k], (k, v, final) => { pushUndo('color-' + k + c.id); c[k] = v; if (final) changed({ props: true, light: true }); else requestDraw(); });
       const kind = $('#sh-kind', insp); if (kind) kind.addEventListener('change', () => { pushUndo(); c.shape = kind.value; if (['ellipse', 'star', 'triangle'].includes(c.shape) && Math.max(c.w, c.h) / Math.max(1, Math.min(c.w, c.h)) > 2) { c.w = c.h = Math.round(Math.min(P.width, P.height) * 0.3); } if ((c.shape === 'line' || c.shape === 'arrow') && c.h > 80) c.h = 24; changed({ props: true }); });
@@ -2016,7 +2076,12 @@
     const c = sel[0];
     $$('.scrub', insp).forEach((el) => {
       const p = el.dataset.prop, dec = +el.dataset.dec;
-      if (KF_PROPS.includes(p)) el.textContent = (+kfValue(c, p, clamp(st.time, c.start, clipEnd(c)))).toFixed(dec);
+      if (p.startsWith('L.')) {
+        const L = selectedLayer(c); if (!L) return;
+        const path = p.slice(2);
+        const v = KF_PROPS.includes(path) ? layerVal(L, path, clamp(st.time - c.start, 0, c.dur)) : getPath(L, path);
+        if (v != null) el.textContent = (+(/\.stops\.\d+\.0$/.test(path) ? v * 100 : v)).toFixed(dec);
+      } else if (KF_PROPS.includes(p)) el.textContent = (+kfValue(c, p, clamp(st.time, c.start, clipEnd(c)))).toFixed(dec);
       else if (p in c) el.textContent = (+c[p]).toFixed(dec);
     });
   }
@@ -3069,6 +3134,1045 @@
   }
 
   /* =================================================================
+     グラフィック（レイヤー）— 1つのクリップに テキスト / シェイプ / 画像 を重ねる
+     clip = { type:'graphic', layers:[ 下から順に ] , x,y,scale,rotation,opacity,kf,fx,trIn,trOut }
+     layer = { id, kind:'text'|'shape'|'image', name, visible, locked, x, y, scale, rotation, opacity, kf, ... }
+     paint = { type:'solid', color } | { type:'linear'|'radial', angle, stops:[[0..1, color], ...] }
+     ================================================================= */
+  const FONT_LIST = Object.keys((D && D.FONTS) || {}).concat(['sans-serif', 'serif']);
+  const solidPaint = (color) => ({ type: 'solid', color });
+  function defaultTextLayer(text) {
+    return {
+      id: uid('L'), kind: 'text', name: 'テキスト', visible: true, locked: false, x: 0, y: 0, scale: 100, rotation: 0, opacity: 100,
+      text: text || 'テキスト', font: { family: 'Noto Sans JP', weight: 900, size: 110, letterSpacing: 0.02, lineHeight: 1.2, italic: false }, align: 'center',
+      fill: { on: true, paint: solidPaint('#ffffff') },
+      strokes: [{ on: true, width: 12, paint: solidPaint('#111111'), join: 'round', opacity: 100 }],
+      shadow: { on: true, paint: solidPaint('#000000'), opacity: 55, distance: 8, angle: 135, length: 0, hardness: 70 },
+      texture: { on: false, kind: 'stripes', mediaId: null, scale: 100, opacity: 60, blend: 'multiply' },
+    };
+  }
+  function defaultShapeLayer(kind) {
+    return {
+      id: uid('L'), kind: 'shape', name: 'シェイプ', visible: true, locked: false, x: 0, y: 0, scale: 100, rotation: 0, opacity: 100,
+      shape: kind || 'round', w: Math.round(P.width * 0.55), h: Math.round(P.height * 0.16), radius: 24,
+      fill: { on: true, paint: solidPaint('rgba(0,0,0,0.7)') }, strokes: [], shadow: { on: false, paint: solidPaint('#000000'), opacity: 50, distance: 10, angle: 135, length: 0, hardness: 40 },
+    };
+  }
+  function defaultImageLayer(mediaId) {
+    const m = mediaMeta(mediaId) || {};
+    const w = Math.round(Math.min(P.width * 0.4, m.width || 400));
+    return { id: uid('L'), kind: 'image', name: m.name || '画像', visible: true, locked: false, x: 0, y: 0, scale: 100, rotation: 0, opacity: 100, mediaId, w };
+  }
+  function makeGraphicClip(track, start, layers) {
+    const c = baseClip('graphic', track, start, 4);
+    Object.assign(c, { name: 'グラフィック', layers: layers || [defaultTextLayer()], fadeIn: 0.1, fadeOut: 0.1 });
+    return c;
+  }
+  function addGraphic(layers, name) {
+    let tr = P.tracks.filter((t) => t.kind === 'video').find((t) => t.id !== 'V1' && !P.clips.some((c) => c.track === t.id && isActive(c, st.time)));
+    pushUndo();
+    if (!tr) { const before = new Set(P.tracks.map((t) => t.id)); addTrack('video'); undoStack.pop(); tr = P.tracks.find((t) => !before.has(t.id)); }
+    const c = makeGraphicClip(tr.id, st.time, layers);
+    if (name) c.name = name;
+    P.clips.push(c); st.sel = new Set([c.id]);
+    st.selLayer = { clipId: c.id, layerId: c.layers[c.layers.length - 1].id };
+    changed({ structure: true });
+    return c;
+  }
+
+  /* ---------- 塗り（単色・グラデーション） ---------- */
+  function paintStyle(ctx, paint, w, h, alphaMul) {
+    if (!paint) return '#fff';
+    if (typeof paint === 'string') return paint;
+    if (paint.type === 'linear' || paint.type === 'radial') {
+      const stops = (paint.stops && paint.stops.length ? paint.stops : [[0, '#fff'], [1, '#000']]);
+      let g;
+      if (paint.type === 'radial') g = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(w, h) / 2);
+      else {
+        const a = ((paint.angle == null ? 90 : paint.angle) * Math.PI) / 180;
+        const len = Math.abs(w * Math.sin(a)) + Math.abs(h * Math.cos(a));
+        const dx = (Math.sin(a) * len) / 2, dy = (-Math.cos(a) * len) / 2;
+        g = ctx.createLinearGradient(-dx, -dy, dx, dy);
+      }
+      for (const [pos, col] of stops) { try { g.addColorStop(clamp(pos, 0, 1), col); } catch (e) { /* ignore */ } }
+      return g;
+    }
+    return paint.color || '#fff';
+  }
+  /** テロップデザインの塗り → paint */
+  function paintFromSpec(f) {
+    if (!f) return solidPaint('#ffffff');
+    if (typeof f === 'string') return solidPaint(f);
+    if (f.type === 'gradient') return { type: 'linear', angle: f.angle == null ? 90 : f.angle, stops: (f.stops || []).map((s) => [s[0], s[1]]) };
+    if (f.type === 'stripes') return { type: 'linear', angle: 0, stops: [[0, f.a || '#fff'], [1, f.b || '#000']] };
+    return solidPaint(f.color || '#ffffff');
+  }
+
+  /* ---------- テクスチャ ---------- */
+  const texCache = new Map();
+  function texturePattern(ctx, tex) {
+    if (tex.kind === 'image') {
+      const rt = media.get(tex.mediaId);
+      if (!rt || !rt.img) return null;
+      return { img: rt.img };
+    }
+    const key = tex.kind;
+    if (!texCache.has(key)) {
+      const c = document.createElement('canvas'); const s = 64; c.width = c.height = s;
+      const g = c.getContext('2d');
+      if (key === 'stripes') { g.fillStyle = '#fff'; g.fillRect(0, 0, s, s); g.fillStyle = '#000'; for (let i = -s; i < s * 2; i += 16) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i + 8, 0); g.lineTo(i + 8 - s, s); g.lineTo(i - s, s); g.closePath(); g.fill(); } }
+      else if (key === 'dots') { g.fillStyle = '#fff'; g.fillRect(0, 0, s, s); g.fillStyle = '#000'; for (let y = 8; y < s; y += 16) for (let x = 8; x < s; x += 16) { g.beginPath(); g.arc(x + ((y / 16) % 2) * 8, y, 4, 0, Math.PI * 2); g.fill(); } }
+      else if (key === 'check') { g.fillStyle = '#fff'; g.fillRect(0, 0, s, s); g.fillStyle = '#000'; for (let y = 0; y < s; y += 16) for (let x = 0; x < s; x += 16) if (((x + y) / 16) % 2 === 0) g.fillRect(x, y, 16, 16); }
+      else if (key === 'grain') { const im = g.createImageData(s, s); for (let i = 0; i < im.data.length; i += 4) { const v = 120 + Math.random() * 135; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; } g.putImageData(im, 0, 0); }
+      else if (key === 'metal') { const gr = g.createLinearGradient(0, 0, 0, s); gr.addColorStop(0, '#fff'); gr.addColorStop(0.45, '#888'); gr.addColorStop(0.5, '#333'); gr.addColorStop(1, '#ccc'); g.fillStyle = gr; g.fillRect(0, 0, s, s); }
+      else if (key === 'paper') { g.fillStyle = '#ddd'; g.fillRect(0, 0, s, s); for (let i = 0; i < 300; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.15})`; g.fillRect(Math.random() * s, Math.random() * s, 1 + Math.random() * 3, 1); } }
+      texCache.set(key, c);
+    }
+    return { img: texCache.get(key) };
+  }
+  const TEXTURES = [['stripes', 'ストライプ'], ['dots', 'ドット'], ['check', 'チェック'], ['grain', 'ざらざら'], ['metal', 'メタル'], ['paper', '紙'], ['image', '画像を使う']];
+
+  /* ---------- テキストレイヤーの描画（オフスクリーンに描いてキャッシュ） ---------- */
+  const layerCache = new Map();
+  function fontStr(f) { return `${f.italic ? 'italic ' : ''}${f.weight || 400} ${Math.max(1, f.size || 100)}px "${f.family || 'Noto Sans JP'}", sans-serif`; }
+  function ensureFontLoaded(f, text) {
+    const k = fontStr(f);
+    if (fontReady.has(k) || !document.fonts) return;
+    document.fonts.load(k, text || 'あA').then(() => { if (!fontReady.has(k)) { fontReady.add(k); layerCache.clear(); requestDraw(); } }).catch(() => {});
+  }
+  function measureText(ctx, L) {
+    const f = L.font, size = f.size || 100;
+    ctx.font = fontStr(f);
+    const ls = (f.letterSpacing || 0) * size;
+    const lines = String(L.text || '').split('\n');
+    const widths = lines.map((l) => { let w = 0; for (const ch of l) w += ctx.measureText(ch).width + ls; return Math.max(0, w - ls); });
+    const lh = (f.lineHeight || 1.2) * size;
+    return { lines, widths, lh, ls, size, w: Math.max(1, ...widths), h: lh * lines.length };
+  }
+  function drawLines(ctx, L, m, mode, ox, oy) {
+    const align = L.align || 'center';
+    m.lines.forEach((line, i) => {
+      const lw = m.widths[i];
+      let x = align === 'left' ? -m.w / 2 : align === 'right' ? m.w / 2 - lw : -lw / 2;
+      const y = -m.h / 2 + m.lh * i + m.lh / 2;
+      for (const ch of line) {
+        if (mode === 'stroke') ctx.strokeText(ch, x + ox, y + oy); else ctx.fillText(ch, x + ox, y + oy);
+        x += ctx.measureText(ch).width + m.ls;
+      }
+    });
+  }
+  /** テキストレイヤー → { canvas, cx, cy（中心のずれ）, w, h（文字の箱） } */
+  function renderTextLayer(L) {
+    const key = JSON.stringify([L.text, L.font, L.align, L.fill, L.strokes, L.shadow, L.texture, fontReady.size, L.texture && L.texture.kind === 'image' && media.has(L.texture.mediaId)]);
+    const hit = layerCache.get(L.id);
+    if (hit && hit.key === key) return hit;
+    ensureFontLoaded(L.font, L.text);
+    const probe = document.createElement('canvas').getContext('2d');
+    const m = measureText(probe, L);
+    const strokes = (L.strokes || []).filter((s) => s.on !== false && s.width > 0);
+    const strokeSum = strokes.reduce((a, s) => a + s.width, 0);
+    const sh = L.shadow || {};
+    const shOn = sh.on && sh.opacity > 0;
+    const blur = shOn ? (100 - clamp(sh.hardness == null ? 70 : sh.hardness, 0, 100)) / 100 * 40 : 0;
+    const shReach = shOn ? (sh.distance || 0) + (sh.length || 0) + blur * 2 : 0;
+    const pad = Math.ceil(strokeSum + shReach + m.size * 0.3 + 8);
+    const W = Math.ceil(m.w + pad * 2), H = Math.ceil(m.h + pad * 2);
+    const cv = document.createElement('canvas'); cv.width = Math.min(8000, W); cv.height = Math.min(8000, H);
+    const ctx = cv.getContext('2d');
+    ctx.translate(W / 2, H / 2);
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.font = fontStr(L.font); ctx.miterLimit = 3;
+    // 文字の形（縁込み）をシルエットとして描く関数
+    const silhouette = (g, ox, oy) => {
+      g.textBaseline = 'middle'; g.textAlign = 'left'; g.font = fontStr(L.font); g.lineJoin = 'round'; g.miterLimit = 3;
+      g.fillStyle = '#000'; g.strokeStyle = '#000';
+      if (strokeSum > 0) { g.lineWidth = strokeSum * 2; g.lineJoin = (strokes[strokes.length - 1] || {}).join || 'round'; drawLines(g, L, m, 'stroke', ox, oy); }
+      drawLines(g, L, m, 'fill', ox, oy);
+    };
+    // 影（距離・角度・長さ・硬さ・不透明度・グラデ）
+    if (shOn) {
+      const sc = document.createElement('canvas'); sc.width = cv.width; sc.height = cv.height;
+      const g = sc.getContext('2d'); g.translate(W / 2, H / 2);
+      const a = ((sh.angle == null ? 135 : sh.angle) - 90) * Math.PI / 180; // 0°=上、時計回り
+      const ux = Math.cos(a), uy = Math.sin(a);
+      const steps = Math.min(240, Math.max(0, Math.round(sh.length || 0)));
+      for (let i = steps; i >= 0; i--) { const d = (sh.distance || 0) + i; silhouette(g, ux * d, uy * d); }
+      g.globalCompositeOperation = 'source-in';
+      g.fillStyle = paintStyle(g, sh.paint, m.w + strokeSum * 2, m.h + strokeSum * 2);
+      g.fillRect(-W / 2, -H / 2, W, H);
+      ctx.save();
+      ctx.globalAlpha = clamp(sh.opacity / 100, 0, 1);
+      if (blur > 0.3) ctx.filter = `blur(${blur.toFixed(1)}px)`;
+      ctx.drawImage(sc, -W / 2, -H / 2);
+      ctx.restore();
+    }
+    // エッジ（外側から順に）。各エッジの太さは内側のエッジの外に積み上がる
+    let acc = strokeSum;
+    for (let i = strokes.length - 1; i >= 0; i--) {
+      const s = strokes[i];
+      ctx.save();
+      ctx.globalAlpha = clamp((s.opacity == null ? 100 : s.opacity) / 100, 0, 1);
+      ctx.lineJoin = s.join || 'round'; ctx.lineCap = 'round';
+      ctx.lineWidth = acc * 2;
+      ctx.strokeStyle = paintStyle(ctx, s.paint, m.w + acc * 2, m.h + acc * 2);
+      // 不透明度が 100 未満のとき下のエッジが透けないよう、まず内側を抜く
+      drawLines(ctx, L, m, 'stroke', 0, 0);
+      ctx.restore();
+      acc -= s.width;
+    }
+    // 塗り＋テクスチャ
+    if (!L.fill || L.fill.on !== false) {
+      const fc = document.createElement('canvas'); fc.width = cv.width; fc.height = cv.height;
+      const g = fc.getContext('2d'); g.translate(W / 2, H / 2);
+      g.textBaseline = 'middle'; g.textAlign = 'left'; g.font = fontStr(L.font);
+      g.fillStyle = paintStyle(g, L.fill && L.fill.paint, m.w, m.h);
+      drawLines(g, L, m, 'fill', 0, 0);
+      const tex = L.texture;
+      if (tex && tex.on) {
+        const tp = texturePattern(g, tex);
+        if (tp) {
+          g.save();
+          g.globalCompositeOperation = 'source-atop';
+          g.globalAlpha = clamp((tex.opacity == null ? 60 : tex.opacity) / 100, 0, 1);
+          const k = (tex.scale || 100) / 100;
+          if (tex.kind === 'image') { const iw = tp.img.naturalWidth || tp.img.width, ih = tp.img.naturalHeight || tp.img.height; const s2 = Math.max(m.w / iw, m.h / ih) * k; g.drawImage(tp.img, -iw * s2 / 2, -ih * s2 / 2, iw * s2, ih * s2); }
+          else { const pat = g.createPattern(tp.img, 'repeat'); if (pat && pat.setTransform) pat.setTransform(new DOMMatrix().scale(k)); g.fillStyle = pat; g.globalCompositeOperation = tex.blend === 'normal' ? 'source-atop' : 'source-atop'; g.fillRect(-W / 2, -H / 2, W, H); }
+          g.restore();
+        }
+      }
+      ctx.save();
+      ctx.globalAlpha = clamp(((L.fill && L.fill.opacity) == null ? 100 : L.fill.opacity) / 100, 0, 1);
+      ctx.drawImage(fc, -W / 2, -H / 2);
+      ctx.restore();
+    }
+    const out = { key, canvas: cv, w: m.w + strokeSum * 2, h: m.h + strokeSum * 2, W, H };
+    layerCache.set(L.id, out);
+    return out;
+  }
+
+  /* ---------- シェイプレイヤー ---------- */
+  function drawShapeLayer(ctx, L) {
+    const w = L.w || 200, h = L.h || 100;
+    const strokes = (L.strokes || []).filter((s) => s.on !== false && s.width > 0);
+    const sh = L.shadow || {};
+    const fake = { shape: L.shape, radius: L.radius };
+    if (sh.on && sh.opacity > 0) {
+      ctx.save();
+      const a = ((sh.angle == null ? 135 : sh.angle) - 90) * Math.PI / 180;
+      const blur = (100 - clamp(sh.hardness == null ? 40 : sh.hardness, 0, 100)) / 100 * 40;
+      ctx.globalAlpha *= clamp(sh.opacity / 100, 0, 1);
+      if (blur > 0.3) ctx.filter = `blur(${blur.toFixed(1)}px)`;
+      const steps = Math.min(240, Math.round(sh.length || 0));
+      ctx.fillStyle = paintStyle(ctx, sh.paint, w, h);
+      for (let i = steps; i >= 0; i--) { const d = (sh.distance || 0) + i; ctx.save(); ctx.translate(Math.cos(a) * d, Math.sin(a) * d); shapePath(ctx, fake, w, h); ctx.fill(); ctx.restore(); }
+      ctx.restore();
+    }
+    let acc = strokes.reduce((x, s) => x + s.width, 0);
+    for (let i = strokes.length - 1; i >= 0; i--) {
+      const s = strokes[i];
+      ctx.save(); ctx.globalAlpha *= clamp((s.opacity == null ? 100 : s.opacity) / 100, 0, 1);
+      ctx.lineJoin = s.join || 'round'; ctx.lineWidth = acc * 2; ctx.strokeStyle = paintStyle(ctx, s.paint, w, h);
+      shapePath(ctx, fake, w, h); ctx.stroke(); ctx.restore();
+      acc -= s.width;
+    }
+    if (!L.fill || L.fill.on !== false) { ctx.fillStyle = paintStyle(ctx, L.fill && L.fill.paint, w, h); shapePath(ctx, fake, w, h); ctx.fill(); }
+    return { w, h };
+  }
+
+  /* ---------- レイヤーごとのアニメーション（キーフレームはクリップの先頭からの秒） ---------- */
+  function layerVal(L, prop, lt) {
+    const k = L.kf && L.kf[prop];
+    const base = L[prop] == null ? KF_DEFAULT[prop] : L[prop];
+    if (!k || !k.length) return base;
+    return kfAt(k, lt);
+  }
+  /** グラフィックを描く。返り値：クリップ全体の矩形と、レイヤーごとの矩形 */
+  const layerRects = {};
+  function drawGraphic(ctx, c, ea, W, H, t) {
+    const lt = t - c.start;
+    const rects = {};
+    let ux0 = Infinity, uy0 = Infinity, ux1 = -Infinity, uy1 = -Infinity;
+    ctx.save();
+    ctx.filter = filterOf(c, ea);
+    ctx.translate(W / 2 + ea.x, H / 2 + ea.y);
+    if (ea.rotation) ctx.rotate(ea.rotation * Math.PI / 180);
+    const gk = ea.scale / 100;
+    ctx.scale(gk, gk);
+    const baseAlpha = ctx.globalAlpha;
+    for (const L of c.layers || []) {
+      if (L.visible === false) continue;
+      const lx = layerVal(L, 'x', lt), ly = layerVal(L, 'y', lt), ls = layerVal(L, 'scale', lt) / 100, lr = layerVal(L, 'rotation', lt), lo = layerVal(L, 'opacity', lt) / 100;
+      if (lo <= 0.001) continue;
+      ctx.save();
+      ctx.globalAlpha = baseAlpha * clamp(lo, 0, 1);
+      ctx.translate(lx, ly);
+      if (lr) ctx.rotate(lr * Math.PI / 180);
+      ctx.scale(ls, ls);
+      let bw = 0, bh = 0;
+      if (L.kind === 'text') {
+        const r = renderTextLayer(L);
+        ctx.drawImage(r.canvas, -r.W / 2, -r.H / 2);
+        bw = r.w; bh = r.h;
+      } else if (L.kind === 'shape') {
+        const r = drawShapeLayer(ctx, L); bw = r.w; bh = r.h;
+      } else if (L.kind === 'image') {
+        const rt = media.get(L.mediaId);
+        if (rt && rt.img) { const iw = rt.img.naturalWidth, ih = rt.img.naturalHeight; bw = L.w || iw; bh = bw * ih / iw; ctx.drawImage(rt.img, -bw / 2, -bh / 2, bw, bh); }
+      }
+      ctx.restore();
+      // フレーム座標の外接矩形（回転は近似）
+      const k = gk * ls;
+      const cx = W / 2 + ea.x + lx * gk, cy = H / 2 + ea.y + ly * gk;
+      const rad = (lr + (ea.rotation || 0)) * Math.PI / 180;
+      const hw = (Math.abs(Math.cos(rad)) * bw + Math.abs(Math.sin(rad)) * bh) * k / 2, hh = (Math.abs(Math.sin(rad)) * bw + Math.abs(Math.cos(rad)) * bh) * k / 2;
+      rects[L.id] = { x: cx - hw, y: cy - hh, w: hw * 2, h: hh * 2, cx, cy };
+      ux0 = Math.min(ux0, cx - hw); uy0 = Math.min(uy0, cy - hh); ux1 = Math.max(ux1, cx + hw); uy1 = Math.max(uy1, cy + hh);
+    }
+    ctx.restore();
+    layerRects[c.id] = rects;
+    return isFinite(ux0) ? { x: ux0, y: uy0, w: ux1 - ux0, h: uy1 - uy0 } : { x: W / 2, y: H / 2, w: 1, h: 1 };
+  }
+  function selectedLayer(c) {
+    if (!c || c.type !== 'graphic') return null;
+    const s = st.selLayer;
+    if (s && s.clipId === c.id) { const L = c.layers.find((x) => x.id === s.layerId); if (L) return L; }
+    return null;
+  }
+  async function ensureGraphicFonts() {
+    const jobs = [];
+    for (const c of P.clips) if (c.type === 'graphic') for (const L of c.layers || []) if (L.kind === 'text' && document.fonts) jobs.push(document.fonts.load(fontStr(L.font), L.text || 'あ').then(() => fontReady.add(fontStr(L.font))).catch(() => {}));
+    await Promise.all(jobs);
+    layerCache.clear();
+  }
+
+  /* ---------- テロップのデザイン → レイヤー ---------- */
+  /** テロップの文字スタイル（フォント・塗り・縁・影）を text レイヤーへ */
+  function styleFromSpec(spec, L, scale) {
+    const f = spec.font || {};
+    L.font = { family: f.family || 'Noto Sans JP', weight: +f.weight || 900, size: Math.round((f.size || 96) * scale), letterSpacing: f.letterSpacing || 0, lineHeight: spec.lineHeight || 1.18, italic: !!f.italic };
+    L.fill = { on: true, paint: paintFromSpec(spec.fill) };
+    const ss = (spec.strokes || []).slice().sort((a, b) => a.width - b.width);
+    let prev = 0;
+    L.strokes = ss.map((s) => { const w = Math.max(0.5, (s.width - prev) * scale); prev = s.width; return { on: true, width: Math.round(w * 10) / 10, paint: s.fill ? paintFromSpec(s.fill) : solidPaint(s.color || '#000'), join: 'round', opacity: 100 }; });
+    if (spec.extrude) {
+      const e = spec.extrude, dx = e.dx == null ? 1 : e.dx, dy = e.dy == null ? 1 : e.dy;
+      L.shadow = { on: true, paint: solidPaint(e.color || '#000'), opacity: 100, distance: 0, angle: Math.round(Math.atan2(dy, dx) * 180 / Math.PI + 90), length: Math.round(e.depth * Math.hypot(dx, dy) * scale), hardness: 100 };
+    } else if (spec.shadow) {
+      const s = spec.shadow, p = parseColor(s.color) || { a: 0.5 };
+      L.shadow = { on: true, paint: solidPaint(toHex(p.r != null ? p : { r: 0, g: 0, b: 0 })), opacity: Math.round((p.a == null ? 1 : p.a) * 100), distance: Math.round(Math.hypot(s.dx || 0, s.dy || 0) * scale), angle: Math.round(Math.atan2(s.dy || 0, s.dx || 0) * 180 / Math.PI + 90), length: 0, hardness: Math.round(clamp(100 - (s.blur || 0) * 2.5, 0, 100)) };
+    } else if (spec.glow) {
+      L.shadow = { on: true, paint: solidPaint(spec.glow.color || '#fff'), opacity: 90, distance: 0, angle: 135, length: 0, hardness: 20 };
+    } else L.shadow = Object.assign({}, L.shadow || {}, { on: false });
+  }
+  /** テロップクリップ（またはデザイン）→ グラフィックのレイヤー一式 */
+  function layersFromTelop(designId, variant, text, sub, colorOv, scalePct) {
+    const d = designById.get(designId); if (!d) return null;
+    let spec = R.resolve(d, variant || 0);
+    if (colorOv) for (const [p, v] of Object.entries(colorOv)) setAtPath(spec, p, v);
+    const W = P.width, H = P.height;
+    const tmp = document.createElement('canvas');
+    const res = R.render(tmp, Object.assign({}, spec, { variants: undefined }), { width: W, height: H, variant: 0, text: text || d.sample || 'テキスト', sub: sub || '', scale: (scalePct || 100) / 100 });
+    const rect = (res && res.rect) || { x: W / 4, y: H * 0.7, w: W / 2, h: 140 };
+    const scale = (W < H ? (spec.portraitScale || 0.8) : 1) * (scalePct || 100) / 100;
+    const layers = [];
+    const cx = rect.x + rect.w / 2 - W / 2, cy = rect.y + rect.h / 2 - H / 2;
+    const box = spec.box;
+    if (box && box.type && box.type !== 'none') {
+      const S = defaultShapeLayer('rect');
+      S.name = '帯';
+      S.shape = box.type === 'pill' ? 'round' : box.type === 'round' ? 'round' : box.type === 'speech' ? 'speech' : 'rect';
+      S.radius = box.type === 'pill' ? rect.h / 2 : (box.radius || 18) * scale;
+      S.w = Math.round(box.type === 'bar' ? W : rect.w); S.h = Math.round(rect.h); S.x = box.type === 'bar' ? 0 : Math.round(cx); S.y = Math.round(cy);
+      if (box.type === 'underline') { S.shape = 'rect'; S.h = Math.max(3, (box.thickness || 4) * scale); S.y = Math.round(cy + rect.h / 2 - S.h); }
+      S.fill = { on: true, paint: paintFromSpec(box.fill) };
+      S.strokes = box.stroke && box.stroke.color ? [{ on: true, width: (box.stroke.width || 3) * scale, paint: solidPaint(box.stroke.color), join: 'miter', opacity: 100 }] : [];
+      layers.push(S);
+      if (box.accent && box.accent.color) {
+        const A = defaultShapeLayer('rect'); A.name = '帯のアクセント'; A.shape = 'rect';
+        const side = box.accent.side || 'left', aw = (box.accent.width || 6) * scale;
+        if (side === 'top' || side === 'bottom') { A.w = S.w; A.h = aw; A.x = S.x; A.y = Math.round(S.y + (side === 'top' ? -1 : 1) * (S.h / 2 - aw / 2)); }
+        else { A.w = aw; A.h = S.h; A.y = S.y; A.x = Math.round(S.x + (side === 'left' ? -1 : 1) * (S.w / 2 - aw / 2)); }
+        A.fill = { on: true, paint: solidPaint(box.accent.color) };
+        layers.push(A);
+      }
+    }
+    const T = defaultTextLayer(text || d.sample || 'テキスト');
+    T.name = 'テキスト';
+    styleFromSpec(spec, T, scale);
+    T.x = Math.round(cx); T.y = Math.round(cy);
+    if (spec.align === 'left' || (box && box.type === 'bar')) { T.align = spec.align || 'left'; }
+    layers.push(T);
+    if (spec.sub && sub) {
+      const Sb = defaultTextLayer(sub); Sb.name = 'サブ';
+      styleFromSpec(Object.assign({ lineHeight: spec.sub.lineHeight || 1.2 }, spec.sub), Sb, scale);
+      const pos = spec.sub.position || 'above';
+      const mctx = document.createElement('canvas').getContext('2d');
+      const sm = measureText(mctx, Sb);
+      const salign = pos === 'right' ? 'left' : (spec.sub.align || 'center');
+      const gap = (spec.sub.gap == null ? 10 : spec.sub.gap) * scale;
+      Sb.y = Math.round(pos === 'above' ? cy - rect.h / 2 - gap - sm.h / 2 : pos === 'below' ? cy + rect.h / 2 + gap + sm.h / 2 : cy);
+      if (pos === 'right') Sb.x = Math.round(cx + rect.w / 2 + gap + sm.w / 2);
+      else if (salign === 'left') Sb.x = Math.round(cx - rect.w / 2 + (14 + (spec.sub.indent || 0)) * scale + sm.w / 2);
+      else Sb.x = Math.round(cx);
+      Sb.align = 'center';
+      if (spec.sub.box && spec.sub.box.type !== 'none') {
+        const sbx = spec.sub.box, spx = (spec.sub.padX == null ? 14 : spec.sub.padX) * scale, spy = (spec.sub.padY == null ? 0 : spec.sub.padY) * scale;
+        const SB = defaultShapeLayer('rect'); SB.name = 'サブの帯';
+        SB.w = Math.round(sm.w + spx * 2); SB.h = Math.round(sm.h + spy * 2); SB.x = Sb.x; SB.y = Sb.y;
+        SB.shape = sbx.type === 'pill' ? 'round' : sbx.type === 'round' ? 'round' : 'rect';
+        SB.radius = sbx.type === 'pill' ? SB.h / 2 : (sbx.radius || 8) * scale;
+        SB.fill = { on: true, paint: paintFromSpec(sbx.fill) };
+        layers.push(SB);
+      }
+      layers.push(Sb);
+    }
+    if (spec.tag && spec.tag.text) {
+      const tg = spec.tag;
+      const TB = defaultShapeLayer('rect'); TB.name = 'タグの帯';
+      const TT = defaultTextLayer(tg.text); TT.name = 'タグ';
+      styleFromSpec(Object.assign({ lineHeight: 1.2 }, tg), TT, scale);
+      const tw = TT.font.size * Array.from(tg.text).length * 0.95 + (tg.padX || 18) * 2 * scale, th = TT.font.size * 1.2 + (tg.padY || 8) * 2 * scale;
+      TB.w = Math.round(tw); TB.h = Math.round(th); TB.fill = { on: true, paint: paintFromSpec(tg.box && tg.box.fill) };
+      TB.x = Math.round(cx - rect.w / 2 + tw / 2 + 10 * scale); TB.y = Math.round((tg.position || 'left') === 'left' ? cy : cy - rect.h / 2 - th / 2);
+      TT.x = TB.x; TT.y = TB.y;
+      if ((tg.position || 'left') === 'left') T.x = Math.round(T.x + tw / 2);
+      layers.push(TB, TT);
+    }
+    return layers;
+  }
+  function convertTelopToGraphic(c) {
+    const layers = layersFromTelop(c.designId, c.variant, c.text, c.sub, c.colorOv, c.scale);
+    if (!layers) return toast('このテロップは変換できません', true);
+    pushUndo();
+    const g = makeGraphicClip(c.track, c.start, layers);
+    // テロップトラックには置けないので、空いているビデオトラックへ
+    let tr = P.tracks.filter((t) => t.kind === 'video').find((t) => t.id !== 'V1' && !P.clips.some((x) => x.track === t.id && x.start < clipEnd(c) && clipEnd(x) > c.start));
+    if (!tr) { const before = new Set(P.tracks.map((t) => t.id)); addTrack('video'); undoStack.pop(); tr = P.tracks.find((t) => !before.has(t.id)); }
+    Object.assign(g, { track: tr.id, dur: c.dur, fadeIn: c.fadeIn, fadeOut: c.fadeOut, x: c.x || 0, y: c.y || 0, kf: c.kf ? clone(c.kf) : undefined, fx: c.fx ? clone(c.fx) : undefined, trIn: c.trIn, trOut: c.trOut, name: (designById.get(c.designId) || {}).name || 'グラフィック' });
+    P.clips = P.clips.filter((x) => x.id !== c.id);
+    P.clips.push(g);
+    st.sel = new Set([g.id]); st.selLayer = { clipId: g.id, layerId: g.layers.find((L) => L.kind === 'text').id };
+    changed({ structure: true });
+    toast('テロップをレイヤーに分解しました。レイヤーごとに文字・色・縁・影・動きを変えられます');
+  }
+  /** ライブラリで選んだテロップのデザインを、選択中のテキストレイヤーに適用（文字と位置はそのまま） */
+  function applyDesignToTextLayer(L) {
+    const d = designById.get(st.libDesign); if (!d) return toast('左の「テロップ」タブでデザインを選んでください');
+    const spec = R.resolve(d, st.libVariant || 0);
+    const keepSize = L.font && L.font.size;
+    styleFromSpec(spec, L, 1);
+    if (keepSize) { const k = keepSize / L.font.size; L.font.size = keepSize; L.strokes.forEach((s) => { s.width = Math.round(s.width * k * 10) / 10; }); if (L.shadow) { L.shadow.distance = Math.round((L.shadow.distance || 0) * k); L.shadow.length = Math.round((L.shadow.length || 0) * k); } }
+  }
+
+  /* =================================================================
+     キーフレーム：ベジェのイージング、キーフレームパネル、モニター上のモーションパス、自動キー
+     キー = [クリップ先頭からの秒, 値, 次のキーまでのイージング]
+     イージング = 'linear' | 'hold' | 名前 | [x1, y1, x2, y2]（CSS の cubic-bezier と同じ）
+     ================================================================= */
+  const EASE_BEZ = { linear: [0, 0, 1, 1], easeIn: [0.42, 0, 1, 1], easeOut: [0, 0, 0.58, 1], easeInOut: [0.42, 0, 0.58, 1], back: [0.34, 1.56, 0.64, 1], easy: [0.33, 0, 0.67, 1] };
+  const bezCache = new Map();
+  function bezierFn(x1, y1, x2, y2) {
+    const key = [x1, y1, x2, y2].join(',');
+    if (bezCache.has(key)) return bezCache.get(key);
+    const bx = (t) => 3 * (1 - t) * (1 - t) * t * x1 + 3 * (1 - t) * t * t * x2 + t * t * t;
+    const by = (t) => 3 * (1 - t) * (1 - t) * t * y1 + 3 * (1 - t) * t * t * y2 + t * t * t;
+    const dbx = (t) => 3 * (1 - t) * (1 - t) * x1 + 6 * (1 - t) * t * (x2 - x1) + 3 * t * t * (1 - x2);
+    const f = (x) => {
+      if (x <= 0) return 0; if (x >= 1) return 1;
+      let t = x;
+      for (let i = 0; i < 8; i++) { const e = bx(t) - x; const d = dbx(t); if (Math.abs(e) < 1e-6) return by(t); if (Math.abs(d) < 1e-6) break; t -= e / d; }
+      let lo = 0, hi = 1; t = x;
+      for (let i = 0; i < 30; i++) { if (bx(t) < x) lo = t; else hi = t; t = (lo + hi) / 2; }
+      return by(t);
+    };
+    bezCache.set(key, f);
+    return f;
+  }
+  function easeFn(e) {
+    if (Array.isArray(e)) return bezierFn(e[0], e[1], e[2], e[3]);
+    if (e === 'hold') return () => 0;
+    return EASE[e] || EASE.easeInOut;
+  }
+  function toBez(e) { if (Array.isArray(e)) return e.slice(); return (EASE_BEZ[e] || EASE_BEZ.easeInOut).slice(); }
+  /** キー配列から時刻 lt の値 */
+  function kfAt(k, lt) {
+    if (lt <= k[0][0]) return k[0][1];
+    for (let i = 0; i < k.length - 1; i++) {
+      const [t0, v0, e] = k[i], [t1, v1] = k[i + 1];
+      if (lt < t1) return v0 + (v1 - v0) * easeFn(e)(clamp((lt - t0) / Math.max(1e-6, t1 - t0), 0, 1));
+    }
+    return k[k.length - 1][1];
+  }
+  function setKfObj(obj, prop, lt, v, dur) {
+    obj.kf = obj.kf || {};
+    const k = obj.kf[prop] = obj.kf[prop] || [];
+    lt = clamp(Math.round(lt * fps()) / fps(), 0, dur);
+    const i = k.findIndex((x) => Math.abs(x[0] - lt) < 0.5 / fps());
+    if (i >= 0) k[i][1] = v; else { k.push([lt, v, P.defaultEase || 'linear']); k.sort((a, b) => a[0] - b[0]); }
+  }
+
+  /* ---------- 対象（クリップ or グラフィックのレイヤー） ---------- */
+  const KF_LABEL = { x: '位置 X', y: '位置 Y', scale: 'スケール', rotation: '回転', opacity: '不透明度' };
+  function kfTarget() {
+    const c = P.clips.find((x) => st.sel.has(x.id) && x.type !== 'audio');
+    if (!c || st.sel.size !== 1) return null;
+    const L = selectedLayer(c);
+    return { c, obj: L || c, layer: L };
+  }
+  st.kfSel = new Set();
+  st.autoKey = false;
+
+  /* ---------- キーフレームパネル ---------- */
+  const kfc = $('#kf-canvas'), kctx = kfc.getContext('2d');
+  const KF_ROW = 17, KF_LABEL_W = 78;
+  let kfHits = [];
+  function drawKfStrip() {
+    const box = $('#kfstrip');
+    if (box.classList.contains('hidden')) return;
+    const tg = kfTarget();
+    const dpr = window.devicePixelRatio || 1;
+    const cw = kfc.clientWidth, ch = KF_ROW * KF_PROPS.length + 16;
+    kfc.style.height = ch + 'px';
+    if (kfc.width !== Math.round(cw * dpr) || kfc.height !== Math.round(ch * dpr)) { kfc.width = Math.round(cw * dpr); kfc.height = Math.round(ch * dpr); }
+    kctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    kctx.clearRect(0, 0, cw, ch);
+    kctx.fillStyle = '#181818'; kctx.fillRect(0, 0, cw, ch);
+    $('#kf-title').textContent = tg ? (tg.layer ? `レイヤー「${tg.layer.name}」` : clipLabel(tg.c)) : 'クリップを選ぶと、ここにキーフレームが出ます';
+    kfHits = [];
+    if (!tg) return;
+    const { c, obj } = tg;
+    const x0 = KF_LABEL_W, x1 = cw - 10, tw = x1 - x0;
+    const tx = (lt) => x0 + clamp(lt / c.dur, 0, 1) * tw;
+    kctx.font = '11px system-ui,sans-serif'; kctx.textBaseline = 'middle';
+    KF_PROPS.forEach((prop, r) => {
+      const y = 8 + r * KF_ROW + KF_ROW / 2;
+      kctx.fillStyle = r % 2 ? '#1c1c1c' : '#202020'; kctx.fillRect(0, y - KF_ROW / 2, cw, KF_ROW);
+      const k = obj.kf && obj.kf[prop];
+      kctx.fillStyle = k && k.length ? '#ddd' : '#777'; kctx.fillText(KF_LABEL[prop], 8, y);
+      if (!k || !k.length) return;
+      // 区間の線（イージングの種類で色分け）
+      for (let i = 0; i < k.length - 1; i++) {
+        const e = k[i][2];
+        kctx.strokeStyle = e === 'hold' ? '#e5484d' : (e === 'linear' || (Array.isArray(e) && e.join() === '0,0,1,1')) ? '#777' : '#4fa3f7';
+        kctx.lineWidth = 2; kctx.beginPath(); kctx.moveTo(tx(k[i][0]), y); kctx.lineTo(tx(k[i + 1][0]), y); kctx.stroke();
+      }
+      k.forEach((key, i) => {
+        const x = tx(key[0]);
+        const sel = st.kfSel.has(key);
+        const e = key[2], prevE = i > 0 ? k[i - 1][2] : null;
+        kctx.fillStyle = sel ? '#ffd84d' : '#d0d0d0'; kctx.strokeStyle = '#000'; kctx.lineWidth = 1;
+        kctx.beginPath();
+        if (e === 'hold') kctx.rect(x - 5, y - 5, 10, 10);
+        else {
+          const easedOut = Array.isArray(e) ? e[1] === 0 && e[0] > 0.05 : /easeOut|easeInOut|easy/.test(e);
+          const easedIn = prevE && (Array.isArray(prevE) ? prevE[3] === 1 && prevE[2] < 0.95 : /easeIn|easeInOut|easy/.test(prevE));
+          // 左右の形：イーズありは丸、なしはとがった形
+          kctx.moveTo(x, y - 6);
+          if (easedOut) kctx.arc(x, y, 6, -Math.PI / 2, Math.PI / 2); else { kctx.lineTo(x + 6, y); kctx.lineTo(x, y + 6); }
+          if (easedIn) kctx.arc(x, y, 6, Math.PI / 2, Math.PI * 1.5); else { kctx.lineTo(x - 6, y); kctx.closePath(); }
+        }
+        kctx.fill(); kctx.stroke();
+        kfHits.push({ x, y, key, prop, arr: k, i });
+      });
+    });
+    // 再生ヘッド
+    const lt = st.time - c.start;
+    if (lt >= 0 && lt <= c.dur) { kctx.fillStyle = '#e5484d'; kctx.fillRect(Math.round(tx(lt)), 0, 1, ch); }
+  }
+  function kfHitAt(e) {
+    const r = kfc.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    let best = null, bd = 9;
+    for (const h of kfHits) { const d = Math.hypot(h.x - x, h.y - y); if (d < bd) { bd = d; best = h; } }
+    return { hit: best, x, y };
+  }
+  kfc.addEventListener('pointerdown', (e) => {
+    const tg = kfTarget(); if (!tg) return;
+    const { hit, x } = kfHitAt(e);
+    const cw = kfc.clientWidth, x0 = KF_LABEL_W, tw = cw - 10 - x0;
+    const timeAt = (px) => clamp((px - x0) / tw, 0, 1) * tg.c.dur;
+    if (!hit) {
+      if (x > x0) { pause(); seek(tg.c.start + timeAt(x)); }
+      if (!e.shiftKey) st.kfSel.clear();
+      drawKfStrip();
+      return;
+    }
+    if (e.button === 2) return;
+    if (e.shiftKey) { if (st.kfSel.has(hit.key)) st.kfSel.delete(hit.key); else st.kfSel.add(hit.key); }
+    else if (!st.kfSel.has(hit.key)) st.kfSel = new Set([hit.key]);
+    pause(); seek(tg.c.start + hit.key[0]);
+    // ドラッグで時刻を動かす
+    const sx = e.clientX, orig = new Map([...st.kfSel].map((k) => [k, k[0]]));
+    let moved = false;
+    const snap0 = snapshot();
+    kfc.setPointerCapture(e.pointerId);
+    kfc.onpointermove = (ev) => {
+      const dt = (ev.clientX - sx) / tw * tg.c.dur;
+      if (!moved && Math.abs(ev.clientX - sx) < 3) return;
+      moved = true;
+      for (const [k, t0] of orig) k[0] = clamp(Math.round((t0 + dt) * fps()) / fps(), 0, tg.c.dur);
+      for (const arr of Object.values(tg.obj.kf || {})) arr.sort((a, b) => a[0] - b[0]);
+      layerCache.delete(tg.obj.id); requestDraw(); drawKfStrip();
+    };
+    kfc.onpointerup = () => {
+      kfc.onpointermove = null; kfc.onpointerup = null;
+      if (moved) { undoStack.push(snap0); redoStack.length = 0; changed({ props: true, light: true }); }
+      drawKfStrip();
+    };
+  });
+  kfc.addEventListener('dblclick', (e) => { const { hit } = kfHitAt(e); if (hit) easeEditor(); });
+  kfc.addEventListener('contextmenu', (e) => { e.preventDefault(); const { hit } = kfHitAt(e); if (!hit) return; if (!st.kfSel.has(hit.key)) st.kfSel = new Set([hit.key]); easeEditor(); });
+
+  /** 選んだキー（なければ再生ヘッドに一番近いキー）に関係する区間を返す */
+  function selectedKeyInfos() {
+    const tg = kfTarget(); if (!tg || !tg.obj.kf) return [];
+    let keys = [...st.kfSel];
+    if (!keys.length) {
+      const lt = st.time - tg.c.start;
+      for (const arr of Object.values(tg.obj.kf)) { const k = arr.find((x) => Math.abs(x[0] - lt) < 0.5 / fps()); if (k) keys.push(k); }
+    }
+    const out = [];
+    for (const [prop, arr] of Object.entries(tg.obj.kf)) arr.forEach((k, i) => { if (keys.includes(k)) out.push({ prop, arr, i, k }); });
+    return out;
+  }
+  /** イージーイーズ（F9）：in / out / both */
+  function easyEase(mode) {
+    const infos = selectedKeyInfos();
+    if (!infos.length) return toast('キーフレームを選んでください（キーフレームパネルでクリック、または再生ヘッドをキーに合わせる）');
+    pushUndo();
+    for (const { arr, i } of infos) {
+      if (mode !== 'in' && i < arr.length - 1) { const b = toBez(arr[i][2] === 'hold' ? 'linear' : arr[i][2]); b[0] = 0.33; b[1] = 0; arr[i][2] = b; }
+      if (mode !== 'out' && i > 0) { const b = toBez(arr[i - 1][2] === 'hold' ? 'linear' : arr[i - 1][2]); b[2] = 0.67; b[3] = 1; arr[i - 1][2] = b; }
+    }
+    changed({ props: true, light: true });
+    toast(mode === 'in' ? 'イーズイン（入りをゆっくり）' : mode === 'out' ? 'イーズアウト（出をゆっくり）' : 'イージーイーズ（前後をゆっくり）');
+  }
+  function setEaseSelected(e) {
+    const infos = selectedKeyInfos(); if (!infos.length) return toast('キーフレームを選んでください');
+    pushUndo();
+    for (const { arr, i } of infos) {
+      if (e === 'hold' || e === 'linear') { arr[i][2] = e; if (e === 'linear' && i > 0 && Array.isArray(arr[i - 1][2])) { arr[i - 1][2][2] = 1; arr[i - 1][2][3] = 1; } }
+      else arr[i][2] = e;
+    }
+    changed({ props: true, light: true });
+  }
+  function deleteSelectedKeys() {
+    const infos = selectedKeyInfos(); if (!infos.length) return;
+    pushUndo();
+    const tg = kfTarget();
+    for (const { prop, k } of infos) { const arr = tg.obj.kf[prop]; const j = arr.indexOf(k); if (j >= 0) arr.splice(j, 1); if (!arr.length) { tg.obj[prop] = kfAt([k], 0); delete tg.obj.kf[prop]; } }
+    st.kfSel.clear();
+    changed({ props: true });
+  }
+
+  /** イージングのカーブ編集（グラフのハンドルをドラッグして緩急を調整） */
+  function easeEditor() {
+    const infos = selectedKeyInfos().filter((x) => x.i < x.arr.length - 1);
+    if (!infos.length) return toast('次のキーフレームとの間（区間）がありません。2つ以上キーを打ってから調整してください');
+    let b = toBez(infos[0].k[2] === 'hold' ? 'linear' : infos[0].k[2]);
+    const m = openModal('イージング（緩急）の調整', `
+      <p class="note" style="font-size:11.5px">横＝時間、縦＝動いた量。2つの丸をドラッグして、動き出し（左下）と止まり方（右上）の緩急を決めます。<br>下の速さのグラフは、山の高い所ほど速く動きます。</p>
+      <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
+        <canvas id="ez-c" width="520" height="520" style="width:260px;height:260px;background:#151515;border-radius:8px;touch-action:none;cursor:pointer"></canvas>
+        <div style="display:flex;flex-direction:column;gap:6px;min-width:150px">
+          <button class="btn sm" data-ez="easy">イージーイーズ</button>
+          <button class="btn sm" data-ez="easeOut">ゆっくり止まる</button>
+          <button class="btn sm" data-ez="easeIn">ゆっくり動き出す</button>
+          <button class="btn sm" data-ez="easeInOut">強めのイーズ</button>
+          <button class="btn sm" data-ez="back">行き過ぎて戻る</button>
+          <button class="btn sm" data-ez="linear">一定の速さ（リニア）</button>
+          <button class="btn sm" data-ez="hold">停止（パッと切り替え）</button>
+          <div class="unit" id="ez-v" style="font-family:ui-monospace,monospace;margin-top:4px"></div>
+          <canvas id="ez-s" width="300" height="100" style="width:150px;height:50px;background:#151515;border-radius:6px"></canvas>
+        </div>
+      </div>
+      <p class="unit">選んだ区間：${infos.length} 個（${[...new Set(infos.map((x) => KF_LABEL[x.prop]))].join('・')}）</p>
+    `, [['キャンセル', null], ['適用', 'go', true]], { width: 520 });
+    const cv = $('#ez-c', m.el), g = cv.getContext('2d'), sv = $('#ez-s', m.el), sg = sv.getContext('2d');
+    let hold = false;
+    const S = 520, pad = 90, span = S - pad * 2;
+    const toPx = (x, y) => [pad + x * span, S - pad - y * span];
+    const draw = () => {
+      g.clearRect(0, 0, S, S);
+      g.strokeStyle = '#333'; g.lineWidth = 2; g.strokeRect(pad, pad, span, span);
+      g.strokeStyle = '#2a2a2a'; for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(pad + span * i / 4, pad); g.lineTo(pad + span * i / 4, S - pad); g.moveTo(pad, pad + span * i / 4); g.lineTo(S - pad, pad + span * i / 4); g.stroke(); }
+      const [ax, ay] = toPx(0, 0), [bx2, by2] = toPx(1, 1), [p1x, p1y] = toPx(b[0], b[1]), [p2x, p2y] = toPx(b[2], b[3]);
+      if (hold) { g.strokeStyle = '#e5484d'; g.lineWidth = 6; g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx2, ay); g.lineTo(bx2, by2); g.stroke(); }
+      else {
+        g.strokeStyle = '#888'; g.lineWidth = 3; g.beginPath(); g.moveTo(ax, ay); g.lineTo(p1x, p1y); g.moveTo(bx2, by2); g.lineTo(p2x, p2y); g.stroke();
+        g.strokeStyle = '#4fa3f7'; g.lineWidth = 6; g.beginPath(); g.moveTo(ax, ay); g.bezierCurveTo(p1x, p1y, p2x, p2y, bx2, by2); g.stroke();
+        for (const [x, y] of [[p1x, p1y], [p2x, p2y]]) { g.fillStyle = '#ffd84d'; g.beginPath(); g.arc(x, y, 16, 0, Math.PI * 2); g.fill(); }
+      }
+      $('#ez-v', m.el).textContent = hold ? '停止' : `(${b.map((v) => v.toFixed(2)).join(', ')})`;
+      // 速さのグラフ
+      sg.clearRect(0, 0, 300, 100);
+      if (!hold) {
+        const f = bezierFn(b[0], b[1], b[2], b[3]);
+        const vs = []; for (let i = 0; i <= 60; i++) { const x = i / 60, dx = 1 / 120; vs.push((f(Math.min(1, x + dx)) - f(Math.max(0, x - dx))) / (Math.min(1, x + dx) - Math.max(0, x - dx))); }
+        const mx = Math.max(1.5, ...vs.map(Math.abs));
+        sg.fillStyle = 'rgba(79,163,247,.35)'; sg.strokeStyle = '#4fa3f7'; sg.lineWidth = 2; sg.beginPath(); sg.moveTo(0, 100);
+        vs.forEach((v, i) => sg.lineTo(i / 60 * 300, 100 - clamp(v / mx, -0.2, 1) * 90)); sg.lineTo(300, 100); sg.closePath(); sg.fill(); sg.stroke();
+      }
+    };
+    draw();
+    let drag = -1;
+    cv.addEventListener('pointerdown', (e) => {
+      if (hold) return;
+      const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * 2, y = (e.clientY - r.top) * 2;
+      const d1 = Math.hypot(x - toPx(b[0], b[1])[0], y - toPx(b[0], b[1])[1]), d2 = Math.hypot(x - toPx(b[2], b[3])[0], y - toPx(b[2], b[3])[1]);
+      drag = d1 <= d2 ? 0 : 2; cv.setPointerCapture(e.pointerId);
+    });
+    cv.addEventListener('pointermove', (e) => {
+      if (drag < 0) return;
+      const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * 2, y = (e.clientY - r.top) * 2;
+      b[drag] = +clamp((x - pad) / span, 0, 1).toFixed(3); b[drag + 1] = +clamp((S - pad - y) / span, -1, 2).toFixed(3);
+      draw();
+    });
+    cv.addEventListener('pointerup', () => { drag = -1; });
+    $$('[data-ez]', m.el).forEach((btn) => btn.addEventListener('click', () => { const v = btn.dataset.ez; hold = v === 'hold'; if (!hold) b = toBez(v); draw(); }));
+    m.result.then((r) => {
+      if (r !== 'go') return;
+      pushUndo();
+      for (const { k } of infos) k[2] = hold ? 'hold' : b.slice();
+      changed({ props: true, light: true });
+    });
+  }
+
+  /* ---------- モニター上のモーションパス ---------- */
+  let pathKeys = [];
+  /** 対象の「中心」のフレーム座標（時刻 t） */
+  function targetCenter(tg, t) {
+    const c = tg.c, W = P.width, H = P.height;
+    const ex = kfValue(c, 'x', t), ey = kfValue(c, 'y', t);
+    if (!tg.layer) {
+      const r = lastRects[c.id];
+      const off = r ? { x: r.x + r.w / 2 - (W / 2 + kfValue(c, 'x', st.time)), y: r.y + r.h / 2 - (H / 2 + kfValue(c, 'y', st.time)) } : { x: 0, y: 0 };
+      return { x: W / 2 + ex + off.x, y: H / 2 + ey + off.y };
+    }
+    const gk = kfValue(c, 'scale', t) / 100, lt = t - c.start;
+    return { x: W / 2 + ex + layerVal(tg.layer, 'x', lt) * gk, y: H / 2 + ey + layerVal(tg.layer, 'y', lt) * gk };
+  }
+  function drawMotionPath() {
+    pathKeys = [];
+    const tg = kfTarget(); if (!tg || st.playing) return;
+    const kf = tg.obj.kf || {};
+    const kx = kf.x || [], ky = kf.y || [];
+    if (kx.length + ky.length < 2) return;
+    const c = tg.c, W = P.width;
+    const lw = Math.max(2, W / 700);
+    octx.save();
+    octx.setLineDash([lw * 3, lw * 3]); octx.strokeStyle = 'rgba(255,216,77,.85)'; octx.lineWidth = lw;
+    octx.beginPath();
+    const n = Math.max(2, Math.ceil(c.dur * 15));
+    for (let i = 0; i <= n; i++) { const p = targetCenter(tg, c.start + c.dur * i / n); i ? octx.lineTo(p.x, p.y) : octx.moveTo(p.x, p.y); }
+    octx.stroke(); octx.setLineDash([]);
+    // 途中の点（等間隔の時間）＝速さが見える
+    octx.fillStyle = 'rgba(255,216,77,.6)';
+    for (let i = 0; i <= n; i += 1) { const p = targetCenter(tg, c.start + c.dur * i / n); octx.fillRect(p.x - lw, p.y - lw, lw * 2, lw * 2); }
+    const times = [...new Set(kx.concat(ky).map((k) => +k[0].toFixed(4)))];
+    const s = Math.max(10, W / 110);
+    for (const lt of times) {
+      const p = targetCenter(tg, c.start + lt);
+      const sel = kx.concat(ky).some((k) => Math.abs(k[0] - lt) < 1e-3 && st.kfSel.has(k));
+      octx.fillStyle = sel ? '#ffd84d' : '#fff'; octx.strokeStyle = '#000'; octx.lineWidth = lw;
+      octx.beginPath(); octx.moveTo(p.x, p.y - s); octx.lineTo(p.x + s, p.y); octx.lineTo(p.x, p.y + s); octx.lineTo(p.x - s, p.y); octx.closePath(); octx.fill(); octx.stroke();
+      pathKeys.push({ lt, x: p.x, y: p.y });
+    }
+    const now = targetCenter(tg, st.time);
+    octx.strokeStyle = '#e5484d'; octx.lineWidth = lw * 1.5; octx.beginPath(); octx.arc(now.x, now.y, s * 0.8, 0, Math.PI * 2); octx.stroke();
+    octx.restore();
+  }
+  /** モーションパスのキーをドラッグ。処理したら true */
+  function pathPointerDown(e, pt) {
+    const tg = kfTarget(); if (!tg || !pathKeys.length) return false;
+    const s = Math.max(14, P.width / 80);
+    const hit = pathKeys.find((p) => Math.hypot(p.x - pt.x, p.y - pt.y) < s);
+    if (!hit) return false;
+    const obj = tg.obj, kf = obj.kf;
+    const kx = (kf.x || []).find((k) => Math.abs(k[0] - hit.lt) < 1e-3), ky = (kf.y || []).find((k) => Math.abs(k[0] - hit.lt) < 1e-3);
+    st.kfSel = new Set([kx, ky].filter(Boolean));
+    seek(tg.c.start + hit.lt);
+    const div = tg.layer ? kfValue(tg.c, 'scale', tg.c.start + hit.lt) / 100 : 1;
+    const x0 = kx ? kx[1] : null, y0 = ky ? ky[1] : null;
+    const snap0 = snapshot(); let moved = false;
+    overlay.setPointerCapture(e.pointerId);
+    const mv = (ev) => {
+      const q = monitorPoint(ev); moved = true;
+      if (kx) kx[1] = Math.round(x0 + (q.x - pt.x) / div);
+      if (ky) ky[1] = Math.round(y0 + (q.y - pt.y) / div);
+      requestDraw(); drawKfStrip();
+    };
+    const up = () => { overlay.removeEventListener('pointermove', mv); overlay.removeEventListener('pointerup', up); if (moved) { undoStack.push(snap0); redoStack.length = 0; changed({ props: true, light: true }); } };
+    overlay.addEventListener('pointermove', mv); overlay.addEventListener('pointerup', up);
+    return true;
+  }
+
+  // パネルのボタン
+  $('#kf-toggle').addEventListener('click', () => { $('#kfstrip').classList.toggle('hidden'); $('#kf-toggle').classList.toggle('on', !$('#kfstrip').classList.contains('hidden')); try { localStorage.setItem('cc-kfstrip', $('#kfstrip').classList.contains('hidden') ? '0' : '1'); } catch (e) { /* ignore */ } layoutMonitor(); drawKfStrip(); });
+  $('#kf-auto').addEventListener('click', () => { st.autoKey = !st.autoKey; $('#kf-auto').classList.toggle('on', st.autoKey); toast(st.autoKey ? '自動キー：オン（動かすと再生ヘッドの位置にキーフレームが打たれます）' : '自動キー：オフ'); });
+  $('#kf-add').addEventListener('click', () => {
+    const tg = kfTarget(); if (!tg) return toast('クリップを選んでください');
+    pushUndo();
+    const lt = st.time - tg.c.start;
+    for (const p of ['x', 'y', 'scale']) setKfObj(tg.obj, p, lt, tg.layer ? layerVal(tg.layer, p, lt) : kfValue(tg.c, p, st.time), tg.c.dur);
+    changed({ props: true, light: true }); toast('位置とスケールのキーフレームを打ちました');
+  });
+  $('#kf-easy').addEventListener('click', () => easyEase('both'));
+  $('#kf-curve').addEventListener('click', () => { if (!st.kfSel.size) { const infos = selectedKeyInfos(); st.kfSel = new Set(infos.map((x) => x.k)); } easeEditor(); });
+  $('#kf-del').addEventListener('click', deleteSelectedKeys);
+  try { if (localStorage.getItem('cc-kfstrip') === '1') { $('#kfstrip').classList.remove('hidden'); $('#kf-toggle').classList.add('on'); } } catch (e) { /* ignore */ }
+
+  /* =================================================================
+     インスペクター：グラフィック（レイヤーパネル・テキストの塗り/エッジ/シャドウ/テクスチャ）
+     ================================================================= */
+  function getPath(o, path) { return path.split('.').reduce((a, k) => (a == null ? a : a[k]), o); }
+  function setPath(o, path, v) {
+    const ks = path.split('.'); let cur = o;
+    for (let i = 0; i < ks.length - 1; i++) { if (cur[ks[i]] == null) cur[ks[i]] = /^\d+$/.test(ks[i + 1]) ? [] : {}; cur = cur[ks[i]]; }
+    cur[ks[ks.length - 1]] = v;
+  }
+  const L_ICON = { text: 'T', shape: '■', image: '▣' };
+  function kfBtnL(c, L, prop) {
+    const on = !!(L.kf && L.kf[prop] && L.kf[prop].length), lt = st.time - c.start;
+    const here = on && L.kf[prop].some((k) => Math.abs(k[0] - lt) < 0.5 / fps());
+    return `<button class="kfb${on ? ' on' : ''}${here ? ' here' : ''}" data-lkf="${prop}" title="${on ? (here ? 'このキーフレームを削除' : '再生ヘッドにキーフレームを追加') : 'キーフレームを有効にする'}">${here ? '◆' : '◇'}</button>`;
+  }
+  function paintEditor(label, path, paint) {
+    paint = paint || solidPaint('#ffffff');
+    const t = paint.type || 'solid';
+    let h = field(label, `<select data-ptype="${path}"><option value="solid"${t === 'solid' ? ' selected' : ''}>単色</option><option value="linear"${t === 'linear' ? ' selected' : ''}>グラデーション（直線）</option><option value="radial"${t === 'radial' ? ' selected' : ''}>グラデーション（円形）</option></select>`);
+    if (t === 'solid') h += colorField('　色', path + '.color', paint.color || '#ffffff');
+    else {
+      const stops = paint.stops || [];
+      const css = `linear-gradient(90deg,${stops.map(([p, col]) => `${col} ${Math.round(p * 100)}%`).join(',')})`;
+      h += `<div class="gbar" style="background:${css}"></div>`;
+      if (t === 'linear') h += field('　角度', scrub('L.' + path + '.angle', paint.angle == null ? 90 : paint.angle, { step: 1, min: -360, max: 360, unit: '°' }));
+      stops.forEach(([p, col], i) => {
+        h += `<div class="gstop">${colorField(`　${i + 1}`, `${path}.stops.${i}.1`, col)}<span class="gpos">${scrub(`L.${path}.stops.${i}.0`, p * 100, { step: 1, min: 0, max: 100, unit: '%' })}</span>${stops.length > 2 ? `<button class="btn sm" data-gdel="${path}" data-gi="${i}" title="この色を消す">×</button>` : ''}</div>`;
+      });
+      h += `<div class="btnrow"><button class="btn sm" data-gadd="${path}">＋ 色を追加</button></div>`;
+    }
+    return h;
+  }
+  function edgesEditor(L) {
+    const ss = L.strokes || [];
+    let h = `<div class="sec"><h4>エッジ（縁）<span class="unit" style="margin-left:6px;font-weight:400">上が内側</span><button class="btn sm" data-sadd style="margin-left:auto;padding:1px 6px">＋ エッジ</button></h4><div class="in">`;
+    if (!ss.length) h += '<div class="note">エッジなし。「＋ エッジ」で縁取りを追加できます（何本でも重ねられます）。</div>';
+    ss.forEach((s, i) => {
+      h += `<div class="edge"><div class="edge-h"><label><input type="checkbox" data-son="${i}"${s.on !== false ? ' checked' : ''}> エッジ ${i + 1}</label>
+        <span style="margin-left:auto"><button class="btn sm" data-smove="${i}" data-dir="-1" title="内側へ">↑</button><button class="btn sm" data-smove="${i}" data-dir="1" title="外側へ">↓</button><button class="btn sm danger" data-sdel="${i}">×</button></span></div>
+        ${field('太さ', scrub(`L.strokes.${i}.width`, s.width || 0, { step: 0.5, min: 0, max: 200, unit: 'px', dec: 1 }))}
+        ${paintEditor('色', `strokes.${i}.paint`, s.paint)}
+        ${field('形状', `<select data-sjoin="${i}"><option value="round"${(s.join || 'round') === 'round' ? ' selected' : ''}>丸</option><option value="miter"${s.join === 'miter' ? ' selected' : ''}>角（とがる）</option><option value="bevel"${s.join === 'bevel' ? ' selected' : ''}>面取り</option></select>`)}
+        ${field('不透明度', scrub(`L.strokes.${i}.opacity`, s.opacity == null ? 100 : s.opacity, { step: 1, min: 0, max: 100, unit: '%' }))}
+      </div>`;
+    });
+    return h + '</div></div>';
+  }
+  function shadowEditor(L) {
+    const s = L.shadow || {};
+    return `<div class="sec"><h4>シャドウ（影）<label style="margin-left:auto;font-weight:400"><input type="checkbox" data-shon${s.on ? ' checked' : ''}> オン</label></h4><div class="in${s.on ? '' : ' dim'}">
+      ${paintEditor('色', 'shadow.paint', s.paint)}
+      ${field('不透明度', scrub('L.shadow.opacity', s.opacity == null ? 50 : s.opacity, { step: 1, min: 0, max: 100, unit: '%' }))}
+      ${field('距離', scrub('L.shadow.distance', s.distance || 0, { step: 1, min: 0, max: 500, unit: 'px' }))}
+      ${field('角度', scrub('L.shadow.angle', s.angle == null ? 135 : s.angle, { step: 1, min: -360, max: 360, unit: '°' }))}
+      ${field('長さ', scrub('L.shadow.length', s.length || 0, { step: 1, min: 0, max: 240, unit: 'px' }))}
+      ${field('硬さ', scrub('L.shadow.hardness', s.hardness == null ? 70 : s.hardness, { step: 1, min: 0, max: 100, unit: '%' }))}
+      <div class="note">長さ＝影を伸ばして立体風に。硬さ 100％でくっきり、下げるほどぼける。</div>
+    </div></div>`;
+  }
+  function textureEditor(L) {
+    const t = L.texture || {};
+    const imgs = P.media.filter((m) => m.type === 'image');
+    return `<div class="sec"><h4>テクスチャ<label style="margin-left:auto;font-weight:400"><input type="checkbox" data-txon${t.on ? ' checked' : ''}> オン</label></h4><div class="in${t.on ? '' : ' dim'}">
+      ${field('種類', `<select data-txkind>${TEXTURES.map(([v, l]) => `<option value="${v}"${t.kind === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`)}
+      ${t.kind === 'image' ? field('画像', `<select data-tximg><option value="">（プロジェクトの画像を選ぶ）</option>${imgs.map((m) => `<option value="${m.id}"${t.mediaId === m.id ? ' selected' : ''}>${escapeHtml(m.name)}</option>`).join('')}</select>`) : ''}
+      ${field('大きさ', scrub('L.texture.scale', t.scale || 100, { step: 1, min: 10, max: 1000, unit: '%' }))}
+      ${field('濃さ', scrub('L.texture.opacity', t.opacity == null ? 60 : t.opacity, { step: 1, min: 0, max: 100, unit: '%' }))}
+      <div class="note">文字の塗りの上に模様や画像を重ねます（縁と影には乗りません）。</div>
+    </div></div>`;
+  }
+  function graphicInspectorHtml(c) {
+    const L = selectedLayer(c);
+    const rows = (c.layers || []).slice().reverse().map((x) => `
+      <div class="lrow${L && L.id === x.id ? ' on' : ''}${x.visible === false ? ' off' : ''}" data-lsel="${x.id}">
+        <button class="lb" data-lvis="${x.id}" title="表示／非表示">${x.visible === false ? '◌' : '👁'}</button>
+        <button class="lb" data-llock="${x.id}" title="ロック（モニターで動かないように）">${x.locked ? '🔒' : '🔓'}</button>
+        <span class="lic">${L_ICON[x.kind]}</span>
+        <span class="lname" title="ダブルクリックで名前を変更">${escapeHtml(x.name || x.kind)}${x.kind === 'text' ? `<span class="unit">　${escapeHtml(String(x.text).replace(/\n/g, ' ').slice(0, 14))}</span>` : ''}</span>
+        ${x.kf && Object.keys(x.kf).length ? '<span class="lkf" title="キーフレームあり">◆</span>' : ''}
+      </div>`).join('');
+    let h = `<div class="sec"><h4>レイヤー<span class="unit" style="margin-left:6px;font-weight:400">上ほど手前</span></h4><div class="in">
+      <div class="layers">${rows || '<div class="note">レイヤーがありません</div>'}</div>
+      <div class="btnrow"><button class="btn sm" data-ladd="text">＋ テキスト</button><button class="btn sm" data-ladd="shape">＋ シェイプ</button><button class="btn sm" data-ladd="image">＋ 画像</button></div>
+      <div class="btnrow"><button class="btn sm" data-lop="up" title="手前へ">↑ 手前</button><button class="btn sm" data-lop="down" title="奥へ">↓ 奥</button><button class="btn sm" data-lop="dup">複製</button><button class="btn sm danger" data-lop="del">削除</button></div>
+      <div class="note">モニター上でレイヤーをクリックして選択・ドラッグで移動、四隅で拡大縮小。何も選ばずにドラッグするとグラフィック全体が動きます。</div>
+    </div></div>`;
+    if (!L) return h + '<div class="sec"><div class="in note">レイヤーを選ぶと、文字・塗り・エッジ・影・テクスチャ・動きを編集できます。</div></div>';
+    const lt = clamp(st.time - c.start, 0, c.dur);
+    const lv = (p) => layerVal(L, p, lt);
+    h += `<div class="sec"><h4><span class="sw" style="background:var(--accent)"></span>レイヤー「${escapeHtml(L.name || '')}」の位置・動き</h4><div class="in">
+      ${field('位置 X', scrub('L.x', lv('x'), { step: 1, unit: 'px' }) + kfBtnL(c, L, 'x'))}
+      ${field('位置 Y', scrub('L.y', lv('y'), { step: 1, unit: 'px' }) + kfBtnL(c, L, 'y'))}
+      ${field('スケール', scrub('L.scale', lv('scale'), { step: 1, min: 1, max: 2000, unit: '%' }) + kfBtnL(c, L, 'scale'))}
+      ${field('回転', scrub('L.rotation', lv('rotation'), { step: 1, min: -3600, max: 3600, unit: '°' }) + kfBtnL(c, L, 'rotation'))}
+      ${field('不透明度', scrub('L.opacity', lv('opacity'), { step: 1, min: 0, max: 100, unit: '%' }) + kfBtnL(c, L, 'opacity'))}
+      <div class="btnrow"><button class="btn sm" data-lalign="center">中央に</button><button class="btn sm" data-lalign="hcenter">左右中央</button><button class="btn sm" data-lalign="vcenter">上下中央</button></div>
+    </div></div>`;
+    if (L.kind === 'text') {
+      const f = L.font || {};
+      const weights = ((D && D.FONTS && D.FONTS[f.family] && D.FONTS[f.family].weights) || ['400', '700', '900']).map(Number);
+      h += `<div class="sec"><h4>テキスト</h4><div class="in">
+        <textarea id="L-text" rows="2">${escapeHtml(L.text || '')}</textarea>
+        ${field('フォント', `<select id="L-family">${FONT_LIST.map((x) => `<option${x === f.family ? ' selected' : ''}>${escapeHtml(x)}</option>`).join('')}</select>`)}
+        ${field('太さ', `<select id="L-weight">${Array.from(new Set(weights.concat([+f.weight || 400]))).sort((a, b) => a - b).map((w) => `<option value="${w}"${+f.weight === w ? ' selected' : ''}>${w}</option>`).join('')}</select>`)}
+        ${field('サイズ', scrub('L.font.size', f.size || 100, { step: 1, min: 4, max: 1000, unit: 'px' }))}
+        ${field('字間', scrub('L.font.letterSpacing', (f.letterSpacing || 0), { step: 0.01, min: -0.5, max: 2, unit: 'em', dec: 2 }))}
+        ${field('行間', scrub('L.font.lineHeight', f.lineHeight || 1.2, { step: 0.02, min: 0.5, max: 4, unit: '倍', dec: 2 }))}
+        ${field('揃え', `<span class="seg">${[['left', '左'], ['center', '中央'], ['right', '右']].map(([v, l]) => `<button class="btn sm${(L.align || 'center') === v ? ' primary' : ''}" data-lal="${v}">${l}</button>`).join('')}</span><label style="margin-left:8px"><input type="checkbox" id="L-italic"${f.italic ? ' checked' : ''}> 斜体</label>`)}
+        <div class="btnrow"><button class="btn sm" id="L-applydesign" title="左の「テロップ」タブで選んだデザインの、フォント・塗り・縁・影をこの文字に適用">テロップのデザインを適用</button></div>
+      </div></div>`;
+    }
+    if (L.kind === 'shape') {
+      h += `<div class="sec"><h4>シェイプ</h4><div class="in">
+        ${field('形', `<select id="L-shape">${SHAPES.map(([v, l]) => `<option value="${v}"${L.shape === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`)}
+        ${field('幅', scrub('L.w', L.w || 200, { step: 2, min: 1, max: 8000, unit: 'px' }))}
+        ${field('高さ', scrub('L.h', L.h || 100, { step: 2, min: 1, max: 8000, unit: 'px' }))}
+        ${field('角の丸み', scrub('L.radius', L.radius || 0, { step: 1, min: 0, max: 4000, unit: 'px' }))}
+        <div class="btnrow"><button class="btn sm" data-lfit="w">横幅いっぱい</button><button class="btn sm" data-lfit="all">画面いっぱい</button></div>
+      </div></div>`;
+    }
+    if (L.kind === 'image') {
+      const imgs = P.media.filter((m) => m.type === 'image');
+      h += `<div class="sec"><h4>画像</h4><div class="in">
+        ${field('画像', `<select id="L-img">${imgs.map((m) => `<option value="${m.id}"${L.mediaId === m.id ? ' selected' : ''}>${escapeHtml(m.name)}</option>`).join('')}</select>`)}
+        ${field('幅', scrub('L.w', L.w || 400, { step: 2, min: 1, max: 8000, unit: 'px' }))}
+      </div></div>`;
+    }
+    if (L.kind === 'text' || L.kind === 'shape') {
+      const fl = L.fill || { on: true, paint: solidPaint('#fff') };
+      h += `<div class="sec"><h4>塗り<label style="margin-left:auto;font-weight:400"><input type="checkbox" data-fillon${fl.on !== false ? ' checked' : ''}> オン</label></h4><div class="in${fl.on !== false ? '' : ' dim'}">
+        ${paintEditor('種類', 'fill.paint', fl.paint)}
+        ${field('不透明度', scrub('L.fill.opacity', fl.opacity == null ? 100 : fl.opacity, { step: 1, min: 0, max: 100, unit: '%' }))}
+      </div></div>`;
+      h += edgesEditor(L) + shadowEditor(L);
+      if (L.kind === 'text') h += textureEditor(L);
+      h += `<div class="sec"><div class="in">${recentRow()}</div></div>`;
+    }
+    return h;
+  }
+
+  function bindGraphicInspector(c) {
+    const L = selectedLayer(c);
+    const touch = () => { if (L) layerCache.delete(L.id); };
+    const redraw = (full) => { touch(); if (full) changed({ props: true }); else { changed({ props: true, light: true }); } };
+    // レイヤーパネル
+    $$('[data-lsel]', insp).forEach((row) => {
+      row.addEventListener('click', (e) => { if (e.target.closest('.lb')) return; st.selLayer = { clipId: c.id, layerId: row.dataset.lsel }; st.kfSel.clear(); changed({ selection: true }); });
+      row.addEventListener('dblclick', () => { const x = c.layers.find((y) => y.id === row.dataset.lsel); const n = prompt('レイヤー名', x.name || ''); if (n != null) { pushUndo(); x.name = n.trim() || x.name; changed({ props: true }); } });
+    });
+    $$('[data-lvis]', insp).forEach((b) => b.addEventListener('click', () => { const x = c.layers.find((y) => y.id === b.dataset.lvis); pushUndo(); x.visible = x.visible === false; changed({ props: true }); }));
+    $$('[data-llock]', insp).forEach((b) => b.addEventListener('click', () => { const x = c.layers.find((y) => y.id === b.dataset.llock); pushUndo(); x.locked = !x.locked; changed({ props: true }); }));
+    $$('[data-ladd]', insp).forEach((b) => b.addEventListener('click', async () => {
+      const kind = b.dataset.ladd;
+      let nl;
+      if (kind === 'text') nl = defaultTextLayer('テキスト');
+      else if (kind === 'shape') nl = defaultShapeLayer('round');
+      else {
+        let imgs = P.media.filter((m) => m.type === 'image' && media.has(m.id));
+        if (!imgs.length) { toast('先に「プロジェクト」に画像を読み込んでください（ロゴ・写真など）'); $('#file-media').click(); return; }
+        nl = defaultImageLayer(imgs[imgs.length - 1].id);
+      }
+      pushUndo();
+      // 選択中のレイヤーのすぐ上に
+      const idx = L ? c.layers.indexOf(L) + 1 : c.layers.length;
+      c.layers.splice(idx, 0, nl);
+      st.selLayer = { clipId: c.id, layerId: nl.id };
+      changed({ props: true });
+    }));
+    $$('[data-lop]', insp).forEach((b) => b.addEventListener('click', () => {
+      if (!L) return toast('レイヤーを選んでください');
+      const i = c.layers.indexOf(L), op = b.dataset.lop;
+      pushUndo();
+      if (op === 'del') { c.layers.splice(i, 1); st.selLayer = c.layers[Math.max(0, i - 1)] ? { clipId: c.id, layerId: c.layers[Math.max(0, i - 1)].id } : null; }
+      if (op === 'dup') { const d = clone(L); d.id = uid('L'); d.name = (L.name || '') + ' のコピー'; d.x = (d.x || 0) + 30; d.y = (d.y || 0) + 30; c.layers.splice(i + 1, 0, d); st.selLayer = { clipId: c.id, layerId: d.id }; }
+      if (op === 'up' && i < c.layers.length - 1) { c.layers.splice(i, 1); c.layers.splice(i + 1, 0, L); }
+      if (op === 'down' && i > 0) { c.layers.splice(i, 1); c.layers.splice(i - 1, 0, L); }
+      changed({ props: true });
+    }));
+    if (!L) return;
+    $$('[data-lalign]', insp).forEach((b) => b.addEventListener('click', () => {
+      pushUndo();
+      const gk = kfValue(c, 'scale', st.time) / 100, gx = kfValue(c, 'x', st.time), gy = kfValue(c, 'y', st.time);
+      if (b.dataset.lalign !== 'vcenter') setLayerProp(c, L, 'x', Math.round(-gx / gk));
+      if (b.dataset.lalign !== 'hcenter') setLayerProp(c, L, 'y', Math.round(-gy / gk));
+      changed({ props: true });
+    }));
+    $$('[data-lkf]', insp).forEach((b) => {
+      const prop = b.dataset.lkf;
+      b.addEventListener('click', () => {
+        pushUndo();
+        const lt = clamp(st.time - c.start, 0, c.dur);
+        const has = L.kf && L.kf[prop] && L.kf[prop].length;
+        if (!has) { setKfObj(L, prop, lt, layerVal(L, prop, lt), c.dur); }
+        else {
+          const k = L.kf[prop], i = k.findIndex((x) => Math.abs(x[0] - lt) < 0.5 / fps());
+          if (i >= 0) { const cur = layerVal(L, prop, lt); k.splice(i, 1); if (!k.length) { L[prop] = cur; delete L.kf[prop]; } }
+          else setKfObj(L, prop, lt, layerVal(L, prop, lt), c.dur);
+        }
+        changed({ props: true });
+      });
+    });
+    const ta = $('#L-text', insp);
+    if (ta) {
+      ta.addEventListener('input', () => { pushUndo('Ltext' + L.id); L.text = ta.value; redraw(false); });
+      ta.addEventListener('keydown', (e) => { if (e.key === 'Escape') ta.blur(); else if (!((e.ctrlKey || e.metaKey) && /^[sSmM]$/.test(e.key))) e.stopPropagation(); });
+    }
+    const on = (sel, ev, fn) => { const el = $(sel, insp); if (el) el.addEventListener(ev, fn); };
+    on('#L-family', 'change', (e) => { pushUndo(); L.font.family = e.target.value; const ws = ((D.FONTS[L.font.family] || {}).weights || []).map(Number); if (ws.length && !ws.includes(+L.font.weight)) L.font.weight = ws[ws.length - 1]; redraw(true); });
+    on('#L-weight', 'change', (e) => { pushUndo(); L.font.weight = +e.target.value; redraw(true); });
+    on('#L-italic', 'change', (e) => { pushUndo(); L.font.italic = e.target.checked; redraw(false); });
+    on('#L-applydesign', 'click', () => { pushUndo(); applyDesignToTextLayer(L); redraw(true); });
+    on('#L-shape', 'change', (e) => { pushUndo(); L.shape = e.target.value; redraw(true); });
+    on('#L-img', 'change', (e) => { pushUndo(); L.mediaId = e.target.value; redraw(true); });
+    $$('[data-lal]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); L.align = b.dataset.lal; redraw(true); }));
+    $$('[data-lfit]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); const gk = kfValue(c, 'scale', st.time) / 100; L.w = Math.round(P.width / gk); L.x = 0; if (b.dataset.lfit === 'all') { L.h = Math.round(P.height / gk); L.y = 0; L.radius = 0; } redraw(true); }));
+    $$('[data-fillon]', insp).forEach((b) => b.addEventListener('change', () => { pushUndo(); L.fill = L.fill || { paint: solidPaint('#fff') }; L.fill.on = b.checked; redraw(true); }));
+    $$('[data-shon]', insp).forEach((b) => b.addEventListener('change', () => { pushUndo(); L.shadow = L.shadow || {}; L.shadow.on = b.checked; if (b.checked && !L.shadow.paint) Object.assign(L.shadow, { paint: solidPaint('#000'), opacity: 55, distance: 8, angle: 135, length: 0, hardness: 70 }); redraw(true); }));
+    $$('[data-txon]', insp).forEach((b) => b.addEventListener('change', () => { pushUndo(); L.texture = L.texture || { kind: 'stripes', scale: 100, opacity: 60 }; L.texture.on = b.checked; redraw(true); }));
+    on('[data-txkind]', 'change', (e) => { pushUndo(); L.texture.kind = e.target.value; redraw(true); });
+    on('[data-tximg]', 'change', (e) => { pushUndo(); L.texture.mediaId = e.target.value; redraw(true); });
+    // エッジ
+    on('[data-sadd]', 'click', () => { pushUndo(); L.strokes = L.strokes || []; const last = L.strokes[L.strokes.length - 1]; L.strokes.push({ on: true, width: last ? Math.max(4, Math.round(last.width * 0.8)) : 10, paint: solidPaint(L.strokes.length % 2 ? '#ffffff' : '#111111'), join: 'round', opacity: 100 }); redraw(true); });
+    $$('[data-son]', insp).forEach((b) => b.addEventListener('change', () => { pushUndo(); L.strokes[+b.dataset.son].on = b.checked; redraw(false); }));
+    $$('[data-sdel]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); L.strokes.splice(+b.dataset.sdel, 1); redraw(true); }));
+    $$('[data-smove]', insp).forEach((b) => b.addEventListener('click', () => { const i = +b.dataset.smove, j = i + +b.dataset.dir; if (j < 0 || j >= L.strokes.length) return; pushUndo(); const [s] = L.strokes.splice(i, 1); L.strokes.splice(j, 0, s); redraw(true); }));
+    $$('[data-sjoin]', insp).forEach((b) => b.addEventListener('change', () => { pushUndo(); L.strokes[+b.dataset.sjoin].join = b.value; redraw(false); }));
+    // 塗りの種類（単色 ⇔ グラデーション）
+    $$('[data-ptype]', insp).forEach((sel) => sel.addEventListener('change', () => {
+      const path = sel.dataset.ptype, cur = getPath(L, path) || solidPaint('#fff');
+      const base = cur.type === 'solid' ? (cur.color || '#ffffff') : ((cur.stops && cur.stops[0] && cur.stops[0][1]) || '#ffffff');
+      pushUndo();
+      if (sel.value === 'solid') setPath(L, path, solidPaint(base));
+      else {
+        const p = parseColor(base) || { r: 255, g: 255, b: 255 };
+        const dark = toHex({ r: p.r * 0.45, g: p.g * 0.45, b: p.b * 0.45 });
+        setPath(L, path, { type: sel.value, angle: cur.angle == null ? 180 : cur.angle, stops: cur.stops && cur.stops.length > 1 ? cur.stops : [[0, base], [1, dark]] });
+      }
+      redraw(true);
+    }));
+    $$('[data-gadd]', insp).forEach((b) => b.addEventListener('click', () => { const pt = getPath(L, b.dataset.gadd); pushUndo(); const last = pt.stops[pt.stops.length - 1]; pt.stops.push([1, last ? last[1] : '#fff']); pt.stops.forEach((s, i) => { s[0] = +(i / (pt.stops.length - 1)).toFixed(3); }); redraw(true); }));
+    $$('[data-gdel]', insp).forEach((b) => b.addEventListener('click', () => { const pt = getPath(L, b.dataset.gdel); pushUndo(); pt.stops.splice(+b.dataset.gi, 1); redraw(true); }));
+    // 色（スポイト付き）
+    bindColorFields(insp, (k) => getPath(L, k), (k, v, final) => { pushUndo('Lcolor' + k + L.id); setPath(L, k, v); touch(); if (final) changed({ props: true, light: true }); else requestDraw(); });
+  }
+  /** レイヤーのプロパティを設定（キーフレームがある／自動キーなら、再生ヘッドの位置のキーに） */
+  function setLayerProp(c, L, path, v) {
+    if (KF_PROPS.includes(path) && ((L.kf && L.kf[path] && L.kf[path].length) || st.autoKey)) setKfObj(L, path, st.time - c.start, v, c.dur);
+    else if (/\.stops\.\d+\.0$/.test(path)) setPath(L, path, clamp(v / 100, 0, 1));
+    else setPath(L, path, v);
+    layerCache.delete(L.id);
+  }
+
+  /* =================================================================
      変更通知
      ================================================================= */
   function changed(what) {
@@ -3078,6 +4182,7 @@
     if (what.structure) { renderBin(); if (st.ltab === 'tx' && !(document.activeElement && document.activeElement.dataset && document.activeElement.dataset.captext)) renderCaptions(); }
     if (!st.playing) syncMedia(st.time, false);
     requestDraw();
+    drawKfStrip();
     if (what.structure || what.props) scheduleSave();
     $('#projname').value = P.name;
   }
@@ -3367,7 +4472,7 @@
     pause();
     const total = duration();
     if (total <= 0) return toast('タイムラインが空です', true);
-    const missing = P.clips.filter((c) => c.type !== 'telop' && c.type !== 'shape' && !media.has(c.mediaId));
+    const missing = P.clips.filter((c) => !['telop', 'shape', 'graphic'].includes(c.type) && !media.has(c.mediaId));
     if (missing.length && !confirm(`${missing.length} 個のクリップの素材が見つかりません（未リンク）。このまま書き出しますか？`)) return;
     const lockedUsed = P.clips.filter((c) => c.type === 'telop' && isLocked(c.designId));
     if (lockedUsed.length) {
@@ -3429,6 +4534,7 @@
       await Promise.all(fontJobs);
       try { await document.fonts.ready; } catch (e) { /* ignore */ }
       telopCache.clear();
+      await ensureGraphicFonts();
 
       const vc = await pickVideoCodec(W, H, opts.mbps * 1e6, fr);
       if (!vc) throw new Error('このブラウザは動画エンコードに対応していません');
@@ -3680,6 +4786,15 @@
     silence: silenceDialog,
     closeGaps,
     addShape: () => addShape('round'),
+    addText: () => { const c = addGraphic([defaultTextLayer('テキスト')], 'テキスト'); setTimeout(() => { const ta = $('#L-text'); if (ta) { ta.focus(); ta.select(); } }, 30); return c; },
+    addGraphicFromDesign: () => {
+      if (!st.libDesign) return toast('左の「テロップ」タブでデザインを選んでください');
+      const d = designById.get(st.libDesign);
+      const layers = layersFromTelop(st.libDesign, st.libVariant, d.sample, d.sampleSub || '', null, 100);
+      if (layers) addGraphic(layers, d.name);
+    },
+    easyEase: () => easyEase('both'), easeIn: () => easyEase('in'), easeOut: () => easyEase('out'), easeCurve: () => easeEditor(),
+    toggleKfPanel: () => $('#kf-toggle').click(), autoKey: () => $('#kf-auto').click(),
     voice: () => toggleVoice(),
     addTelop: () => {
       const sel = P.clips.find((c) => st.sel.has(c.id) && c.type === 'telop');
@@ -3808,6 +4923,13 @@
     ['toggleSnap', 'スナップ切替', 'ツール', ['S']],
     ['addTelop', 'テロップを追加', '編集', ['T']],
     ['addShape', 'シェイプを追加', '編集', ['Shift+T']],
+    ['addText', 'テキスト（レイヤー）を追加', '編集', ['Alt+T']],
+    ['easyEase', 'イージーイーズ（選んだキーフレーム）', 'キーフレーム', ['F9']],
+    ['easeIn', 'イーズイン（入りをゆっくり）', 'キーフレーム', ['Shift+F9']],
+    ['easeOut', 'イーズアウト（出をゆっくり）', 'キーフレーム', ['Ctrl+Shift+F9']],
+    ['easeCurve', 'イージングのカーブ調整', 'キーフレーム', ['Ctrl+F9']],
+    ['toggleKfPanel', 'キーフレームパネルの表示', 'キーフレーム', ['Shift+K']],
+    ['autoKey', '自動キー（動かすとキーフレーム）', 'キーフレーム', ['Alt+K']],
     ['voice', '音声で編集（マイク オン／オフ）', '編集', ['Ctrl+Shift+V']],
     ['undo', '取り消し', '編集', ['Ctrl+Z']],
     ['redo', 'やり直し', '編集', ['Ctrl+Shift+Z', 'Ctrl+Y']],
@@ -4003,7 +5125,8 @@
   // テスト・自動操作用の小さな公開 API
   window.ChainCut = {
     get project() { return P; }, get state() { return st; }, media,
-    voiceCommand, addShape, colorSlots, parseColor, comboOf,
+    voiceCommand, addShape, addGraphic, defaultTextLayer, defaultShapeLayer, layersFromTelop, convertTelopToGraphic, easyEase, kfAt, bezierFn, setKfObj,
+    get selLayer() { return st.selLayer; }, set selLayer(v) { st.selLayer = v; }, colorSlots, parseColor, comboOf,
     transcribe, captionsToTelops, addCaptionRow, splitLongRows, get presets() { return presets; }, applyPresetById,
     importFiles, cmd, seek, drawFrame, openProjectFile, unlockWithCode, registerProjectDesigns, kfValue, animated,
     isLocked: (id) => isLocked(id), detectKeeps, applySilenceCut, parseSrt, runExport, getBuffer,
