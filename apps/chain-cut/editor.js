@@ -57,7 +57,7 @@
      ================================================================= */
   const undoStack = [], redoStack = [];
   let lastCoalesce = { key: null, t: 0 };
-  function snapshot() { return JSON.stringify({ tracks: P.tracks, clips: P.clips, media: P.media, name: P.name, inPoint: P.inPoint, outPoint: P.outPoint }); }
+  function snapshot() { return JSON.stringify({ tracks: P.tracks, clips: P.clips, media: P.media, name: P.name, inPoint: P.inPoint, outPoint: P.outPoint, captions: P.captions || [], designs: P.designs || [] }); }
   function pushUndo(coalesceKey) {
     const now = performance.now();
     if (coalesceKey && lastCoalesce.key === coalesceKey && now - lastCoalesce.t < 900) { lastCoalesce.t = now; return; }
@@ -68,7 +68,7 @@
   }
   function restore(s) {
     const o = JSON.parse(s);
-    P.tracks = o.tracks; P.clips = o.clips; P.media = o.media; P.name = o.name; P.inPoint = o.inPoint; P.outPoint = o.outPoint;
+    P.tracks = o.tracks; P.clips = o.clips; P.media = o.media; P.name = o.name; P.inPoint = o.inPoint; P.outPoint = o.outPoint; P.captions = o.captions || []; P.designs = o.designs || [];
     for (const id of Array.from(st.sel)) if (!clipById(id)) st.sel.delete(id);
     changed({ structure: true });
   }
@@ -191,7 +191,7 @@
   }
 
   function computePeaks(buf, perSec) {
-    perSec = perSec || 50;
+    perSec = perSec || 100;
     const n = Math.ceil(buf.duration * perSec);
     const out = new Array(n).fill(0);
     const chs = []; for (let c = 0; c < Math.min(2, buf.numberOfChannels); c++) chs.push(buf.getChannelData(c));
@@ -353,9 +353,10 @@
     const dur = type === 'image' ? 5 : meta.duration || 5;
     const c = baseClip(type, track, start, dur);
     c.mediaId = meta.id;
-    if (type === 'video' && meta.width && meta.height) {
-      // 縦プロジェクトに横素材などは cover の方が自然なことが多いが、既定は全体表示
-      c.fit = 'contain';
+    if ((type === 'video' || type === 'image') && meta.width && meta.height) {
+      // 向きが違う素材（縦の画面に横の動画など）は、プロジェクトで選んだ表示方法に
+      const mismatch = (meta.width > meta.height) !== (P.width > P.height) && meta.width !== meta.height && P.width !== P.height;
+      c.fit = mismatch ? (P.mismatchFit || 'native') : 'contain';
     }
     return c;
   }
@@ -630,7 +631,8 @@
   }
 
   function visualRect(c, sw, sh, W, H) {
-    const fit = c.fit === 'cover' ? Math.max(W / sw, H / sh) : c.fit === 'stretch' ? null : Math.min(W / sw, H / sh);
+    // native：素材と同じ向きの画面に収めたときの大きさ（横→縦に切り替えても縮まない）
+    const fit = c.fit === 'cover' ? Math.max(W / sw, H / sh) : c.fit === 'stretch' ? null : c.fit === 'native' ? Math.min(Math.max(W, H) / Math.max(sw, sh), Math.min(W, H) / Math.min(sw, sh)) : Math.min(W / sw, H / sh);
     const k = (c.scale || 100) / 100;
     let dw, dh;
     if (fit == null) { dw = W * k; dh = H * k; } else { dw = sw * fit * k; dh = sh * fit * k; }
@@ -1027,6 +1029,7 @@
   function updateTimeUI() {
     const d = duration();
     $('#tc-cur').textContent = tc(st.time);
+    highlightCaption();
     $('#tl-tc').textContent = tc(st.time);
     $('#tc-total').textContent = tc(d);
     $('#scrubbar .fill').style.width = (d > 0 ? clamp(st.time / d, 0, 1) * 100 : 0) + '%';
@@ -1038,7 +1041,9 @@
      ================================================================= */
   const scroller = $('#tl-scroll'), rows = $('#tl-rows'), content = $('#tl-content');
   const ruler = $('#tl-ruler'), rctx = ruler.getContext('2d');
-  const TRACK_H = { video: 62, telop: 38, audio: 50 };
+  const TRACK_H = { video: 70, telop: 38, audio: 64 };
+  try { Object.assign(TRACK_H, JSON.parse(localStorage.getItem('cc-trackh') || '{}')); } catch (e) { /* ignore */ }
+  const TRACK_SIZES = { video: [70, 100, 140], audio: [64, 96, 140], telop: [38, 52] };
   const HEAD_W = 150;
 
   const ICON = {
@@ -1062,8 +1067,9 @@
         ? `<button class="ib ${tr.muted ? 'off' : ''}" data-tmute="${tr.id}" title="ミュート">${tr.muted ? ICON.mute : ICON.spk}</button>`
         : `<button class="ib ${tr.hidden ? 'off' : ''}" data-thide="${tr.id}" title="表示／非表示">${tr.hidden ? ICON.eyeOff : ICON.eye}</button>` +
           (tr.kind === 'video' ? `<button class="ib ${tr.muted ? 'off' : ''}" data-tmute="${tr.id}" title="このトラックの音声をミュート">${tr.muted ? ICON.mute : ICON.spk}</button>` : '');
+      const sizeBtn = tr.kind !== 'telop' ? `<button class="ib" data-theight="${tr.kind}" title="トラックの高さ（波形を大きく）"><svg viewBox="0 0 24 24"><path d="M12 3l4 4h-3v10h3l-4 4-4-4h3V7H8z"/></svg></button>` : '';
       html += `<div class="trow k-${tr.kind}" data-track="${tr.id}" style="height:${h}px">
-        <div class="thead"><span class="tn" style="background:${TRACK_COL[tr.kind]}">${tr.id}</span><span class="tl">${TRACK_LBL[tr.kind]}</span>${vis}<button class="ib tdel" data-tdel="${tr.id}" title="トラックを削除">${ICON.x}</button></div>
+        <div class="thead"><span class="tn" style="background:${TRACK_COL[tr.kind]}">${tr.id}</span><span class="tl">${TRACK_LBL[tr.kind]}</span>${sizeBtn}${vis}<button class="ib tdel" data-tdel="${tr.id}" title="トラックを削除">${ICON.x}</button></div>
         <div class="lane" data-lane="${tr.id}"></div></div>`;
     }
     rows.innerHTML = html;
@@ -1093,7 +1099,7 @@
     el.style.width = Math.max(2, c.dur * st.pps) + 'px';
     if (rt && rt.thumb && (c.type === 'video' || c.type === 'image')) {
       el.style.backgroundImage = `url(${rt.thumb})`;
-      el.style.backgroundSize = 'auto 62%'; el.style.backgroundPosition = '0 16px';
+      el.style.backgroundSize = 'auto ' + Math.max(20, TRACK_H.video - 16 - (rt.peaks ? Math.max(22, Math.round(TRACK_H.video * 0.42)) : 0)) + 'px'; el.style.backgroundPosition = '0 16px';
     }
     let inner = `<div class="cl">${escapeHtml(clipLabel(c))}${c.volume != null && c.volume !== 1 && c.type !== 'telop' && c.type !== 'image' ? ` ・ ${volToDb(c.volume)}dB` : ''}</div>`;
     if (c.fadeIn > 0) inner += `<div class="fade i" style="width:${c.fadeIn * st.pps}px"></div>`;
@@ -1107,27 +1113,44 @@
     if (c.trOut && c.trOut.type) inner += `<i class="trm r" style="width:${c.trOut.dur * st.pps}px"></i>`;
     inner += '<div class="eh l"></div><div class="eh r"></div>';
     el.innerHTML = inner;
-    if (rt && rt.peaks && (c.type === 'audio' || c.type === 'video')) {
-      const cv = document.createElement('canvas'); cv.className = 'wf';
-      const w = Math.min(4000, Math.max(2, Math.round(c.dur * st.pps)));
-      const h = c.type === 'audio' ? TRACK_H.audio - 20 : 18;
-      cv.width = w; cv.height = h; cv.style.height = h + 'px';
-      const g = cv.getContext('2d');
-      g.fillStyle = c.type === 'audio' ? 'rgba(190,255,215,.75)' : 'rgba(200,225,255,.7)';
-      if (c.type === 'video') { g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, w, h); g.fillStyle = 'rgba(160,220,190,.85)'; }
-      const pk = rt.peaks, per = 50, vol = Math.min(2, c.volume == null ? 1 : c.volume);
-      for (let x = 0; x < w; x++) {
-        const ts = (c.in || 0) + (x / w) * c.dur;
-        const te = (c.in || 0) + ((x + 1) / w) * c.dur;
-        let mx = 0;
-        for (let i = Math.floor(ts * per); i <= Math.floor(te * per) && i < pk.length; i++) if (pk[i] > mx) mx = pk[i];
-        const a = Math.min(1, (mx / 255) * vol) * h;
-        if (c.type === 'audio') g.fillRect(x, (h - a) / 2, 1, Math.max(1, a));
-        else g.fillRect(x, h - a, 1, Math.max(1, a));
-      }
-      el.appendChild(cv);
-    }
+    if (rt && rt.peaks && (c.type === 'audio' || c.type === 'video')) el.appendChild(waveCanvas(c, rt));
     return el;
+  }
+
+  /** 波形：素材ごとに最大値で正規化し、小さい声も見えるようにやや持ち上げて描く */
+  function waveCanvas(c, rt) {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const cssW = Math.max(2, Math.round(c.dur * st.pps));
+    const isA = c.type === 'audio';
+    const cssH = isA ? TRACK_H.audio - 22 : Math.max(22, Math.round(TRACK_H.video * 0.42));
+    const w = Math.min(8000, Math.round(cssW * dpr)), h = Math.round(cssH * dpr);
+    const cv = document.createElement('canvas'); cv.className = 'wf';
+    cv.width = w; cv.height = h; cv.style.height = cssH + 'px';
+    const g = cv.getContext('2d');
+    const pk = rt.peaks;
+    const meta = mediaMeta(c.mediaId) || {};
+    const per = meta.duration > 0 ? pk.length / meta.duration : 100;
+    if (!rt.pkMax) { let mx = 1; for (const v of pk) if (v > mx) mx = v; rt.pkMax = mx; }
+    const vol = clamp(c.volume == null ? 1 : c.volume, 0, 2);
+    g.fillStyle = isA ? 'rgba(0,0,0,.28)' : 'rgba(0,0,0,.5)';
+    g.fillRect(0, 0, w, h);
+    const mid = isA ? h / 2 : h / 2;
+    g.fillStyle = isA ? 'rgba(255,255,255,.18)' : 'rgba(255,255,255,.14)';
+    g.fillRect(0, Math.floor(mid), w, Math.max(1, dpr | 0));
+    const col = isA ? '#8ff5bd' : '#a9d6ff';
+    const colHot = '#ffcf5c', colClip = '#ff6b6b';
+    for (let x = 0; x < w; x++) {
+      const ts = (c.in || 0) + (x / w) * c.dur, te = (c.in || 0) + ((x + 1) / w) * c.dur;
+      let mx = 0;
+      const i0 = Math.floor(ts * per), i1 = Math.max(i0, Math.floor(te * per));
+      for (let i = i0; i <= i1 && i < pk.length; i++) if (pk[i] > mx) mx = pk[i];
+      const raw = (mx / 255) * vol;                     // 実際の音量（1 で 0dBFS）
+      const v = Math.pow(Math.min(1, mx / rt.pkMax * vol), 0.65); // 表示用（正規化＋持ち上げ）
+      const a = Math.max(dpr, v * (h - 2 * dpr) / 2);
+      g.fillStyle = raw >= 0.99 ? colClip : raw > 0.7 ? colHot : col;
+      g.fillRect(x, mid - a, 1, a * 2);
+    }
+    return cv;
   }
 
   function drawRuler() {
@@ -1247,6 +1270,12 @@
   rows.addEventListener('pointerdown', (e) => {
     const btn = e.target.closest('button');
     if (btn) {
+      if (btn.dataset.theight) {
+        const k = btn.dataset.theight, sz = TRACK_SIZES[k], i = sz.indexOf(TRACK_H[k]);
+        TRACK_H[k] = sz[(i + 1) % sz.length];
+        try { localStorage.setItem('cc-trackh', JSON.stringify(TRACK_H)); } catch (e2) { /* ignore */ }
+        renderTimeline(); return;
+      }
       const tid = btn.dataset.tmute || btn.dataset.thide || btn.dataset.tdel;
       const tr = trackById(tid); if (!tr) return;
       if (btn.dataset.tdel) { removeTrack(tid); return; }
@@ -1695,6 +1724,13 @@
         ${field('フェードアウト', scrub('fadeOut', c.fadeOut || 0, { step: 0.05, min: 0, max: 5, unit: '秒', dec: 2 }))}
       </div></div>`;
     }
+    if (c.type === 'telop') {
+      h += `<div class="sec"><h4>テロップのプリセット</h4><div class="in">
+        ${presetChips('telop')}
+        <div class="btnrow"><button class="btn sm primary" id="ps-save-telop">＋ このテロップの見た目を保存</button></div>
+        ${c.captionId ? '<div class="note">字幕から作ったテロップです。文字は「文字起こし」タブでも直せます（両方に反映）。</div>' : ''}
+      </div></div>`;
+    }
     if (c.type !== 'audio') {
       const kv = (pr) => kfValue(c, pr, clamp(st.time, c.start, clipEnd(c)));
       h += `<div class="sec"><h4>モーション<span class="unit" style="margin-left:auto;font-weight:400">◆＝キーフレーム</span></h4><div class="in">
@@ -1703,15 +1739,16 @@
         ${field('スケール', scrub('scale', kv('scale'), { step: 1, min: 5, max: 800, unit: '%' }) + kfBtn(c, 'scale'))}
         ${field('回転', scrub('rotation', kv('rotation'), { step: 1, min: -3600, max: 3600, unit: '°' }) + kfBtn(c, 'rotation'))}
         ${field('不透明度', scrub('opacity', kv('opacity'), { step: 1, min: 0, max: 100, unit: '%' }) + kfBtn(c, 'opacity'))}
-        ${c.type !== 'telop' ? field('フィット', `<select id="c-fit"><option value="contain"${c.fit === 'contain' ? ' selected' : ''}>全体を表示（余白あり）</option><option value="cover"${c.fit === 'cover' ? ' selected' : ''}>画面を埋める（はみ出しカット）</option><option value="stretch"${c.fit === 'stretch' ? ' selected' : ''}>引き伸ばす</option></select>`) : ''}
+        ${c.type !== 'telop' ? field('フィット', `<select id="c-fit"><option value="native"${c.fit === 'native' ? ' selected' : ''}>原寸（横のときと同じ大きさ）</option><option value="contain"${c.fit === 'contain' ? ' selected' : ''}>全体を表示（余白あり）</option><option value="cover"${c.fit === 'cover' ? ' selected' : ''}>画面を埋める（はみ出しカット）</option><option value="stretch"${c.fit === 'stretch' ? ' selected' : ''}>引き伸ばす</option></select>`) : ''}
         <div class="btnrow"><button class="btn sm" id="c-reset">モーションをリセット</button></div>
         <div class="note">プログラムモニター上でドラッグして移動、四隅をドラッグで拡大縮小。◆ を押すと再生ヘッドの位置にキーフレームを打ち、以降の変更はその時刻の値になります。</div>
       </div></div>`;
       const fx = c.fx || {};
-      h += `<div class="sec"><h4>演出プリセット</h4><div class="in">
-        <div class="btnrow"><button class="btn sm" data-preset="zoomIn">じわっとズーム</button><button class="btn sm" data-preset="kenburns">ケンバーンズ</button></div>
-        <div class="btnrow"><button class="btn sm" data-preset="punch">パンチイン（再生ヘッド）</button><button class="btn sm" data-preset="shake">揺れ</button></div>
-        <div class="btnrow"><button class="btn sm" data-preset="pop">ポンと出る</button><button class="btn sm danger" data-preset="clear">演出をすべて解除</button></div>
+      h += `<div class="sec"><h4>演出プリセット<button class="btn sm" id="ps-reset" style="margin-left:auto;padding:1px 6px" title="初期のプリセットに戻す">初期化</button></h4><div class="in">
+        ${presetChips('effect')}
+        <div class="btnrow"><button class="btn sm" data-preset="punch">パンチイン（再生ヘッド）</button><button class="btn sm danger" data-preset="clear">演出を解除</button></div>
+        <div class="btnrow"><button class="btn sm primary" id="ps-save-effect">＋ 今の設定をプリセットに保存</button></div>
+        <div class="note">「⋯」で名前の変更・上書き・削除ができます。</div>
       </div></div>`;
       h += `<div class="sec"><h4>トランジション</h4><div class="in">
         ${field('入り', `<select id="tr-in">${TRANSITIONS.map(([v, l]) => `<option value="${v}"${((c.trIn || {}).type || '') === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`)}
@@ -1812,10 +1849,27 @@
   function bindInspector(sel) {
     // プロジェクト設定
     const asp = $('#p-aspect', insp);
-    if (asp) asp.addEventListener('change', () => {
+    if (asp) asp.addEventListener('change', async () => {
       pushUndo();
       const a = ASPECTS[asp.value]; P.aspect = asp.value; P.width = a.w; P.height = a.h;
       telopCache.clear(); layoutMonitor(); changed({ props: true });
+      // 向きの違う素材があれば、表示方法を聞く
+      const mism = P.clips.filter((c) => (c.type === 'video' || c.type === 'image')).filter((c) => { const m = mediaMeta(c.mediaId); return m && m.width && m.height && m.width !== m.height && P.width !== P.height && (m.width > m.height) !== (P.width > P.height); });
+      if (!mism.length) return;
+      const m = openModal('向きの違う素材の表示', `
+        <p>${P.width < P.height ? '縦の画面に横の素材' : '横の画面に縦の素材'}が ${mism.length} 個あります。どう表示しますか？（あとからクリップごとに「フィット」で変えられます）</p>
+        <div class="aspects" style="grid-template-columns:1fr">
+          <button data-fitopt="native" class="on"><b>原寸（おすすめ）</b><small>元の大きさのまま。はみ出した左右（上下）は切れます。位置はモニターでドラッグして調整</small></button>
+          <button data-fitopt="cover"><b>画面を埋める</b><small>すき間なく拡大。切れる範囲が一番大きい</small></button>
+          <button data-fitopt="contain"><b>全体を表示</b><small>全部見えるように縮小。上下（左右）に黒い帯</small></button>
+        </div>`, [['そのまま', null], ['適用', 'go', true]]);
+      let pick = 'native';
+      $$('[data-fitopt]', m.el).forEach((b) => b.addEventListener('click', () => { pick = b.dataset.fitopt; $$('[data-fitopt]', m.el).forEach((x) => x.classList.toggle('on', x === b)); }));
+      if (await m.result !== 'go') return;
+      pushUndo();
+      for (const c of mism) { c.fit = pick; c.x = 0; c.y = 0; }
+      P.mismatchFit = pick;
+      changed({ props: true });
     });
     const fpsSel = $('#p-fps', insp);
     if (fpsSel) fpsSel.addEventListener('change', () => { pushUndo(); P.fps = +fpsSel.value; changed({ structure: true }); });
@@ -1867,7 +1921,11 @@
 
     const txt = $('#t-text', insp);
     if (txt) {
-      txt.addEventListener('input', () => { pushUndo('text-' + c.id); c.text = txt.value; changed({ props: true, light: true }); });
+      txt.addEventListener('input', () => {
+        pushUndo('text-' + c.id); c.text = txt.value;
+        if (c.captionId) { const r = captions().find((x) => x.id === c.captionId); if (r) { r.text = txt.value.replace(/\n/g, ''); for (const o of P.clips) if (o !== c && o.captionId === r.id) { o.text = txt.value; telopCache.delete(o.id); } } }
+        changed({ props: true, light: true });
+      });
       txt.addEventListener('keydown', (e) => { if (e.key === 'Escape') txt.blur(); else if (!((e.ctrlKey || e.metaKey) && /^[sSmM]$/.test(e.key))) e.stopPropagation(); });
     }
     const sub = $('#t-sub', insp);
@@ -1890,6 +1948,10 @@
       });
       b.addEventListener('contextmenu', (e) => { e.preventDefault(); if (!hasKf(c, prop)) return; pushUndo(); c[prop] = kfValue(c, prop, st.time); delete c.kf[prop]; changed({ props: true }); });
     });
+    $$('[data-papply]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); applyPresetById(c, b.dataset.papply); telopCache.delete(c.id); changed({ props: true }); }));
+    $$('[data-pmenu]', insp).forEach((b) => b.addEventListener('click', () => presetMenu(b.dataset.pmenu)));
+    for (const k of ['effect', 'telop']) { const b = $('#ps-save-' + k, insp); if (b) b.addEventListener('click', () => savePresetDialog(c, k)); }
+    { const b = $('#ps-reset', insp); if (b) b.addEventListener('click', resetPresets); }
     $$('[data-preset]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); applyPreset(c, b.dataset.preset); telopCache.delete(c.id); changed({ props: true }); }));
     $$('[data-look]', insp).forEach((b) => b.addEventListener('click', () => { pushUndo(); c.fx = Object.assign(c.fx || {}, LOOKS[b.dataset.look]); changed({ props: true }); }));
     for (const k of ['in', 'out']) {
@@ -2084,13 +2146,508 @@
   }
 
   /* =================================================================
+     文字起こし（ブラウザ内の Whisper）と字幕の編集
+     P.captions = [{ id, mediaId, start, end, text }]
+       mediaId あり → start/end は「素材の秒」（カットしても自動で追従）
+       mediaId なし → start/end は「タイムラインの秒」（手入力した行など）
+     ================================================================= */
+  const ASR_MODELS = [
+    ['Xenova/whisper-small', '高精度（初回 約250MB）'],
+    ['Xenova/whisper-base', '速い（初回 約80MB・精度は控えめ）'],
+  ];
+  let asrWorker = null, asrBusy = false;
+  const capPrefs = (() => { try { return Object.assign({ model: ASR_MODELS[0][0], maxChars: 16, auto: true }, JSON.parse(localStorage.getItem('cc-cap') || '{}')); } catch (e) { return { model: ASR_MODELS[0][0], maxChars: 16, auto: true }; } })();
+  function saveCapPrefs() { try { localStorage.setItem('cc-cap', JSON.stringify(capPrefs)); } catch (e) { /* ignore */ } }
+  function captions() { if (!Array.isArray(P.captions)) P.captions = []; return P.captions; }
+
+  /** 字幕の行 → タイムライン上の出現位置（素材のどこを使っているかで決まる） */
+  function captionSpans(row) {
+    if (!row.mediaId) return [[row.start, row.end, null]];
+    const out = [];
+    for (const c of P.clips) {
+      if (c.mediaId !== row.mediaId || (c.type !== 'video' && c.type !== 'audio')) continue;
+      const a = Math.max(row.start, c.in || 0), b = Math.min(row.end, (c.in || 0) + c.dur);
+      if (b - a < 0.15) continue;
+      out.push([c.start + (a - (c.in || 0)), c.start + (b - (c.in || 0)), c]);
+    }
+    return out.sort((x, y) => x[0] - y[0]);
+  }
+  function sortedCaptions() {
+    return captions().map((r) => ({ r, s: captionSpans(r) })).sort((a, b) => (a.s.length ? a.s[0][0] : 1e9 + a.r.start) - (b.s.length ? b.s[0][0] : 1e9 + b.r.start));
+  }
+
+  function renderCaptions() {
+    const box = $('#cap-list'); if (!box) return;
+    $('#cap-model').value = capPrefs.model;
+    $('#cap-max').value = capPrefs.maxChars;
+    $('#cap-auto').checked = capPrefs.auto;
+    const rows = sortedCaptions();
+    $('#cap-count').textContent = rows.length ? `${rows.length} 行` : '';
+    if (!rows.length) {
+      box.innerHTML = `<div class="empty-bin" style="margin:8px">まだ字幕がありません。<br><b>「文字起こし」</b>で声から自動で作るか、<br><b>「＋ 行を追加」</b>で自分で打ち込めます。</div>`;
+      return;
+    }
+    const now = st.time;
+    box.innerHTML = rows.map(({ r, s }) => {
+      const t = s.length ? s[0][0] : null;
+      const on = s.some(([a, b]) => now >= a && now < b);
+      return `<div class="cap-row${on ? ' on' : ''}${t == null ? ' gone' : ''}" data-cap="${r.id}">
+        <div class="cap-t"><button class="cap-tc" data-capgo="${r.id}" title="ここへ移動">${t == null ? 'カット済み' : tc(t).slice(3)}</button>
+          <span class="cap-tools"><button data-capin="${r.id}" title="開始を再生ヘッドに">⇤</button><button data-capout="${r.id}" title="終了を再生ヘッドに">⇥</button><button data-capdel="${r.id}" title="この行を削除">×</button></span></div>
+        <textarea class="cap-text" data-captext="${r.id}" rows="1" spellcheck="false">${escapeHtml(r.text)}</textarea></div>`;
+    }).join('');
+    $$('.cap-text', box).forEach(autoGrow);
+  }
+  function autoGrow(ta) { ta.style.height = 'auto'; ta.style.height = Math.min(120, ta.scrollHeight + 2) + 'px'; }
+  function highlightCaption() {
+    if (st.ltab !== 'tx') return;
+    const now = st.time;
+    for (const el of $$('.cap-row', $('#cap-list'))) {
+      const r = captions().find((x) => x.id === el.dataset.cap); if (!r) continue;
+      const on = captionSpans(r).some(([a, b]) => now >= a && now < b);
+      if (on !== el.classList.contains('on')) { el.classList.toggle('on', on); if (on && st.playing) el.scrollIntoView({ block: 'nearest' }); }
+    }
+  }
+
+  /** 字幕テロップ（captionId 付き）の文字を行と同期 */
+  function syncCaptionTelops(row) {
+    for (const c of P.clips) if (c.captionId === row.id) { c.text = wrapCaption(row.text); telopCache.delete(c.id); }
+  }
+  function wrapCaption(text) {
+    const max = capPrefs.maxChars || 16;
+    const t = String(text).replace(/\s*\n\s*/g, '');
+    if (t.length <= max || /\n/.test(text)) return String(text);
+    // 真ん中に近い「自然な切れ目」で 2 行に（句読点 > 助詞の後 > ひらがな→漢字/カタカナ。語の途中は避ける）
+    const arr = Array.from(t), mid = arr.length / 2;
+    let best = Math.round(mid), bestScore = -1e9;
+    for (let k = 2; k < arr.length - 1; k++) {
+      const x = arr[k - 1], y = arr[k];
+      let sc = -1e9;
+      if (/[、。,.!?！？\s]/.test(x)) sc = 30;
+      else if (/[はがをにでともへやの]/.test(x) && !/[ぁ-ん]/.test(y)) sc = 20;
+      else if (/[ぁ-ん]/.test(x) && /[一-龥ァ-ヶ]/.test(y)) sc = 12;
+      else if (/[一-龥]/.test(x) && /[ァ-ヶ]/.test(y)) sc = 6;
+      if (sc < 0) continue;
+      sc -= Math.abs(k - mid) * 2.2;
+      if (sc > bestScore) { bestScore = sc; best = k; }
+    }
+    return arr.slice(0, best).join('').trim() + '\n' + arr.slice(best).join('').trim();
+  }
+
+  /** 長すぎる行を、句読点・文字数で分ける（時間は文字数で按分） */
+  function splitLongRows() {
+    const max = capPrefs.maxChars || 16, out = [];
+    let n = 0;
+    for (const r of captions()) {
+      const t = r.text.replace(/\s+/g, ' ').trim();
+      if (t.length <= max * 2) { out.push(r); continue; }
+      const parts = [];
+      let cur = '';
+      const chars = Array.from(t);
+      for (let i = 0; i < chars.length; i++) {
+        const ch = chars[i];
+        cur += ch;
+        if ((/[。！？!?]/.test(ch) && cur.length >= max * 0.5) || (/[、,\s]/.test(ch) && cur.length >= max)) { parts.push(cur.trim()); cur = ''; continue; }
+        if (cur.length >= max * 1.6) {
+          // 句読点がないときは、助詞の後ろなど自然な所で切る（カタカナ語・漢字語の途中では切らない）
+          const arr = Array.from(cur);
+          let cut = -1;
+          for (let k = arr.length - 1; k >= Math.max(3, arr.length - 10); k--) {
+            const a = arr[k - 1], b = arr[k];
+            if (/[はがをにでともへやの]/.test(a) && !/[ぁ-ん]/.test(b)) { cut = k; break; }
+            if (/[ぁ-ん]/.test(a) && /[一-龥ァ-ヶー]/.test(b)) { cut = k; break; }
+          }
+          if (cut < 0 && cur.length < max * 2) continue;
+          if (cut < 0) cut = arr.length - 1;
+          parts.push(arr.slice(0, cut).join('').trim()); cur = arr.slice(cut).join('');
+        }
+      }
+      if (cur.trim()) { if (parts.length && cur.trim().length < 4) parts[parts.length - 1] += cur.trim(); else parts.push(cur.trim()); }
+      const total = parts.reduce((s, p) => s + p.length, 0) || 1;
+      let a = r.start;
+      parts.forEach((p, i) => {
+        const b = i === parts.length - 1 ? r.end : a + (r.end - r.start) * p.length / total;
+        out.push({ id: uid('cap'), mediaId: r.mediaId, start: a, end: b, text: p });
+        a = b;
+      });
+      n++;
+    }
+    P.captions = out;
+    return n;
+  }
+
+  /** 字幕 → テロップ（以前に作った字幕テロップは作り直す） */
+  function captionsToTelops(silent) {
+    const rows = captions();
+    if (!rows.length) return toast('字幕がありません');
+    const designId = (st.libDesign && designById.has(st.libDesign)) ? st.libDesign : (P.captionDesign && designById.has(P.captionDesign) ? P.captionDesign : null);
+    pushUndo();
+    // 使うトラック：前回の字幕テロップがあればそこ、なければ空いているテロップトラック、なければ新規
+    const prev = P.clips.find((c) => c.captionId);
+    let tid = prev ? prev.track : null;
+    P.clips = P.clips.filter((c) => !c.captionId);
+    if (!tid || !trackById(tid)) {
+      const free = P.tracks.filter((t) => t.kind === 'telop').find((t) => !P.clips.some((c) => c.track === t.id));
+      if (free) tid = free.id; else { const before = new Set(P.tracks.map((t) => t.id)); addTrack('telop'); undoStack.pop(); tid = P.tracks.find((t) => !before.has(t.id)).id; }
+    }
+    const savedDesign = st.libDesign, savedVariant = st.libVariant;
+    if (designId) { st.libDesign = designId; P.captionDesign = designId; }
+    let n = 0;
+    for (const { r, s } of sortedCaptions()) {
+      if (!r.text.trim()) continue; // 空の行はテロップにしない
+      for (const [a, b] of s) {
+        const c = makeTelopClip(tid, a, wrapCaption(r.text), Math.max(0.3, b - a));
+        c.captionId = r.id; c.fadeIn = 0.05; c.fadeOut = 0.05;
+        if (P.captionPreset) applyTelopPresetData(c, P.captionPreset);
+        P.clips.push(c); n++;
+      }
+    }
+    st.libDesign = savedDesign; st.libVariant = savedVariant;
+    // 重なる字幕テロップは、前のものを次の開始で終わらせる
+    const caps = P.clips.filter((c) => c.captionId && c.track === tid).sort((x, y) => x.start - y.start);
+    for (let i = 0; i < caps.length - 1; i++) if (clipEnd(caps[i]) > caps[i + 1].start) caps[i].dur = Math.max(0.2, snapFrame(caps[i + 1].start - caps[i].start));
+    changed({ structure: true });
+    if (!silent) toast(`字幕 ${n} 枚をテロップにしました（${tid}）。文字を直すと、テロップにもそのまま反映されます`);
+  }
+
+  /** 16kHz モノラルに */
+  async function toMono16k(buf, a, b) {
+    const len = Math.max(1, Math.ceil((b - a) * 16000));
+    const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    const oc = new OAC(1, len, 16000);
+    const src = oc.createBufferSource(); src.buffer = buf; src.connect(oc.destination);
+    src.start(0, a, b - a);
+    const r = await oc.startRendering();
+    return r.getChannelData(0).slice();
+  }
+  /** 25 秒前後で、静かな所を選んで区切る */
+  function chunkPoints(x, maxLen) {
+    const sr = 16000, out = [0], win = sr * 0.05;
+    let pos = 0;
+    while (x.length - pos > maxLen * sr) {
+      const from = pos + Math.floor(maxLen * 0.7 * sr), to = pos + maxLen * sr;
+      let best = to, bestE = Infinity;
+      for (let i = from; i + win < to; i += win) {
+        let e = 0; for (let j = i; j < i + win; j += 4) e += x[j] * x[j];
+        if (e < bestE) { bestE = e; best = i + win / 2; }
+      }
+      pos = Math.floor(best); out.push(pos);
+    }
+    out.push(x.length);
+    return out;
+  }
+  function runAsr(audio, model, device) {
+    return new Promise((resolve, reject) => {
+      const id = uid('asr');
+      const on = (e) => {
+        const m = e.data;
+        if (m.type === 'progress') { onAsrProgress(m); return; }
+        if (m.id !== id) return;
+        asrWorker.removeEventListener('message', on);
+        if (m.type === 'result') resolve(m.chunks); else reject(new Error(m.message));
+      };
+      asrWorker.addEventListener('message', on);
+      asrWorker.postMessage({ type: 'run', id, audio, model, lang: 'japanese', device }, [audio.buffer]);
+    });
+  }
+  const dlProgress = {};
+  function onAsrProgress(m) {
+    const s = $('#cap-status'); if (!s) return;
+    if (m.stage === 'load' && m.file && m.total) {
+      dlProgress[m.file] = [m.loaded || 0, m.total];
+      const tot = Object.values(dlProgress).reduce((a, [l, t]) => [a[0] + l, a[1] + t], [0, 0]);
+      s.textContent = `音声認識モデルを準備中… ${(tot[0] / 1048576).toFixed(0)} / ${(tot[1] / 1048576).toFixed(0)} MB（初回だけ）`;
+      setCapBar(tot[0] / tot[1] * 0.3);
+    } else if (m.stage === 'fallback') s.textContent = 'GPU が使えないため CPU で処理します（少し時間がかかります）';
+  }
+  function setCapBar(p) { const b = $('#cap-bar'); if (b) { b.parentElement.style.display = 'block'; b.style.width = (clamp(p, 0, 1) * 100).toFixed(1) + '%'; } }
+
+  async function transcribe() {
+    if (asrBusy) return;
+    // 対象：選択中の動画・音声クリップ、なければ V1 の動画（なければ音声のあるクリップ全部）
+    let targets = P.clips.filter((c) => st.sel.has(c.id) && (c.type === 'video' || c.type === 'audio') && (mediaMeta(c.mediaId) || {}).hasAudio);
+    if (!targets.length) targets = P.clips.filter((c) => c.track === 'V1' && c.type === 'video' && (mediaMeta(c.mediaId) || {}).hasAudio);
+    if (!targets.length) targets = P.clips.filter((c) => (c.type === 'video' || c.type === 'audio') && (mediaMeta(c.mediaId) || {}).hasAudio && !/^SE_/.test((mediaMeta(c.mediaId) || {}).name || ''));
+    if (!targets.length) return toast('声の入った動画・音声クリップがありません。先にタイムラインに置いてください', true);
+    // 素材ごとに、使っている範囲をまとめる
+    const ranges = {};
+    for (const c of targets) (ranges[c.mediaId] = ranges[c.mediaId] || []).push([Math.max(0, (c.in || 0) - 0.3), (c.in || 0) + c.dur + 0.3]);
+    for (const k of Object.keys(ranges)) {
+      const r = ranges[k].sort((a, b) => a[0] - b[0]), m = [];
+      for (const x of r) { if (m.length && x[0] <= m[m.length - 1][1] + 1) m[m.length - 1][1] = Math.max(m[m.length - 1][1], x[1]); else m.push(x.slice()); }
+      ranges[k] = m;
+    }
+    const totalSec = Object.values(ranges).flat().reduce((s, [a, b]) => s + b - a, 0);
+    asrBusy = true;
+    const btn = $('#cap-run'); btn.disabled = true; btn.textContent = '文字起こし中…';
+    const status = $('#cap-status');
+    status.textContent = '準備中…'; setCapBar(0.02);
+    const t0 = performance.now();
+    try {
+      if (!asrWorker) asrWorker = new Worker('asr-worker.js', { type: 'module' });
+      let device = 'wasm';
+      try { if (navigator.gpu && await navigator.gpu.requestAdapter()) device = 'webgpu'; } catch (e) { device = 'wasm'; }
+      const rows = [];
+      let done = 0;
+      for (const [mediaId, list] of Object.entries(ranges)) {
+        const buf = await getBuffer(mediaId);
+        if (!buf) continue;
+        for (const [a0, b0] of list) {
+          const a = Math.max(0, a0), b = Math.min(buf.duration, b0);
+          const x = await toMono16k(buf, a, b);
+          const pts = chunkPoints(x, 28);
+          for (let i = 0; i < pts.length - 1; i++) {
+            const piece = x.slice(pts[i], pts[i + 1]);
+            const off = a + pts[i] / 16000;
+            status.textContent = `文字起こし中… ${Math.round(done)} / ${Math.round(totalSec)} 秒`;
+            const chunks = await runAsr(piece, capPrefs.model, device);
+            for (const ch of chunks) {
+              const text = String(ch.text || '').trim();
+              if (!text || /^[\s.。、…♪]*$/.test(text)) continue;
+              const ts = ch.timestamp || [0, piece.length / 16000];
+              const s = off + (ts[0] || 0), e = off + (ts[1] != null ? ts[1] : piece.length / 16000);
+              rows.push({ id: uid('cap'), mediaId, start: s, end: Math.max(s + 0.3, e), text });
+            }
+            done += piece.length / 16000;
+            setCapBar(0.3 + 0.7 * done / Math.max(1, totalSec));
+          }
+        }
+      }
+      pushUndo();
+      // 同じ範囲の古い字幕は置き換える
+      P.captions = captions().filter((r) => !(r.mediaId && ranges[r.mediaId] && ranges[r.mediaId].some(([a, b]) => r.start >= a - 0.01 && r.end <= b + 0.01)));
+      P.captions.push(...rows);
+      const split = splitLongRows();
+      const secs = ((performance.now() - t0) / 1000).toFixed(0);
+      status.textContent = `完了：${rows.length} 行（${secs} 秒）${split ? `・長い行を ${split} か所分割` : ''}。文字はそのまま直せます`;
+      setCapBar(1);
+      if (capPrefs.auto) captionsToTelops(true);
+      changed({ structure: true });
+      renderCaptions();
+    } catch (e) {
+      console.error(e);
+      status.textContent = '文字起こしに失敗しました：' + (e.message || e);
+      toast('文字起こしに失敗しました。ネット接続（初回はモデルのダウンロードが必要）を確認してください', true);
+    } finally {
+      asrBusy = false; btn.disabled = false; btn.textContent = '文字起こし';
+      setTimeout(() => { const b = $('#cap-bar'); if (b && !asrBusy) b.parentElement.style.display = 'none'; }, 4000);
+    }
+  }
+
+  function addCaptionRow() {
+    // 再生ヘッドの位置にある音声つきクリップに結びつける（カットしても追従するように）
+    const t = st.time;
+    const c = P.clips.filter((x) => (x.type === 'video' || x.type === 'audio') && isActive(x, t) && (mediaMeta(x.mediaId) || {}).hasAudio)
+      .sort((a, b) => (a.track === 'V1' ? -1 : 0) - (b.track === 'V1' ? -1 : 0))[0];
+    pushUndo();
+    const row = c ? { id: uid('cap'), mediaId: c.mediaId, start: (c.in || 0) + (t - c.start), end: (c.in || 0) + Math.min(c.dur, t - c.start + 2), text: '' }
+      : { id: uid('cap'), mediaId: null, start: t, end: t + 2, text: '' };
+    captions().push(row);
+    scheduleSave();
+    renderCaptions();
+    setTimeout(() => { const ta = $(`[data-captext="${row.id}"]`); if (ta) { ta.focus(); ta.scrollIntoView({ block: 'nearest' }); } }, 20);
+  }
+  function setRowEdge(id, which) {
+    const r = captions().find((x) => x.id === id); if (!r) return;
+    pushUndo();
+    let v = st.time;
+    if (r.mediaId) {
+      const c = P.clips.find((x) => x.mediaId === r.mediaId && isActive(x, st.time));
+      if (!c) return toast('再生ヘッドがこの素材の上にありません');
+      v = (c.in || 0) + (st.time - c.start);
+    }
+    if (which === 'in') r.start = Math.min(v, r.end - 0.2); else r.end = Math.max(v, r.start + 0.2);
+    // 字幕テロップの位置も合わせる
+    if (P.clips.some((c) => c.captionId === r.id)) { const keep = P.clips.filter((c) => c.captionId === r.id)[0]; const sp = captionSpans(r); P.clips.filter((c) => c.captionId === r.id).forEach((c, i) => { if (sp[i]) { c.start = snapFrame(sp[i][0]); c.dur = snapFrame(Math.max(0.3, sp[i][1] - sp[i][0])); } }); void keep; }
+    changed({ structure: true }); renderCaptions();
+  }
+
+  // パネルの操作
+  $('#cap-run').addEventListener('click', transcribe);
+  $('#cap-add').addEventListener('click', addCaptionRow);
+  $('#cap-telop').addEventListener('click', () => captionsToTelops());
+  $('#cap-split').addEventListener('click', () => { pushUndo(); const n = splitLongRows(); scheduleSave(); renderCaptions(); toast(n ? `${n} 行を分割しました` : '分割が必要な長い行はありません'); });
+  $('#cap-clear').addEventListener('click', () => {
+    if (!captions().length) return;
+    if (!confirm('字幕をすべて削除しますか？（字幕から作ったテロップも消えます）')) return;
+    pushUndo(); P.captions = []; P.clips = P.clips.filter((c) => !c.captionId); changed({ structure: true }); renderCaptions();
+  });
+  $('#cap-srt').addEventListener('click', () => {
+    const rows = sortedCaptions().filter((x) => x.s.length);
+    if (!rows.length) return toast('書き出せる字幕がありません');
+    const f = (t) => { const ms = Math.round(t * 1000); const h = Math.floor(ms / 3600000), m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60; return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')},${String(ms % 1000).padStart(3, '0')}`; };
+    let n = 0;
+    const srt = rows.flatMap(({ r, s }) => s.map(([a, b]) => `${++n}\n${f(a)} --> ${f(b)}\n${wrapCaption(r.text)}\n`)).join('\n');
+    downloadBlob(new Blob(['﻿' + srt], { type: 'text/plain' }), safeName(P.name || 'captions') + '.srt');
+  });
+  $('#cap-model').innerHTML = ASR_MODELS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  $('#cap-model').addEventListener('change', (e) => { capPrefs.model = e.target.value; saveCapPrefs(); });
+  $('#cap-max').addEventListener('change', (e) => { capPrefs.maxChars = clamp(+e.target.value || 16, 6, 40); saveCapPrefs(); });
+  $('#cap-auto').addEventListener('change', (e) => { capPrefs.auto = e.target.checked; saveCapPrefs(); });
+  $('#cap-list').addEventListener('input', (e) => {
+    const ta = e.target.closest('[data-captext]'); if (!ta) return;
+    const r = captions().find((x) => x.id === ta.dataset.captext); if (!r) return;
+    pushUndo('cap-' + r.id);
+    r.text = ta.value; autoGrow(ta);
+    syncCaptionTelops(r);
+    scheduleSave(); requestDraw(); renderTimelineSoon();
+  });
+  $('#cap-list').addEventListener('keydown', (e) => {
+    const ta = e.target.closest('[data-captext]'); if (!ta) return;
+    e.stopPropagation();
+    if (e.key === 'Escape') ta.blur();
+    if (e.key === 'Enter' && !e.shiftKey) { // Enter で次の行へ（Shift+Enter で改行）
+      e.preventDefault();
+      const all = $$('[data-captext]', $('#cap-list')); const i = all.indexOf(ta);
+      if (all[i + 1]) all[i + 1].focus(); else addCaptionRow();
+    }
+  });
+  $('#cap-list').addEventListener('focusin', (e) => {
+    const ta = e.target.closest('[data-captext]'); if (!ta) return;
+    const r = captions().find((x) => x.id === ta.dataset.captext); if (!r) return;
+    const sp = captionSpans(r); if (sp.length && !st.playing) seek(sp[0][0] + 0.01);
+  });
+  $('#cap-list').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.capgo) { const r = captions().find((x) => x.id === b.dataset.capgo); const sp = r && captionSpans(r); if (sp && sp.length) { seek(sp[0][0] + 0.01); followPlayhead(); } }
+    if (b.dataset.capin) setRowEdge(b.dataset.capin, 'in');
+    if (b.dataset.capout) setRowEdge(b.dataset.capout, 'out');
+    if (b.dataset.capdel) { pushUndo(); const id = b.dataset.capdel; P.captions = captions().filter((x) => x.id !== id); P.clips = P.clips.filter((c) => c.captionId !== id); changed({ structure: true }); renderCaptions(); }
+  });
+  let tlSoon = 0;
+  function renderTimelineSoon() { clearTimeout(tlSoon); tlSoon = setTimeout(renderTimeline, 250); }
+
+  /* =================================================================
+     プリセット（演出・テロップ）— 追加・名前変更・上書き・削除ができる
+     このブラウザに保存（localStorage）。キーフレームの時刻はクリップの長さに対する割合で持つ
+     ================================================================= */
+  const PRESET_LS = 'cc-presets';
+  const rel = (kf, dur) => (kf ? Object.fromEntries(Object.entries(kf).map(([k, arr]) => [k, arr.map(([t, v, e]) => [+(t / Math.max(dur, 1e-3)).toFixed(4), v, e])])) : undefined);
+  const DEFAULT_PRESETS = [
+    { id: 'p-zoomin', kind: 'effect', name: 'じわっとズーム', data: { kfRel: { scale: [[0, 100, 'easeInOut'], [1, 115, 'easeInOut']] } } },
+    { id: 'p-kenburns', kind: 'effect', name: 'ケンバーンズ', data: { kfRel: { scale: [[0, 108, 'linear'], [1, 120, 'linear']], x: [[0, -40, 'linear'], [1, 40, 'linear']] } } },
+    { id: 'p-zoomout', kind: 'effect', name: 'ゆっくり引く', data: { kfRel: { scale: [[0, 118, 'easeOut'], [1, 100, 'easeOut']] } } },
+    { id: 'p-shake', kind: 'effect', name: '揺れ', data: { fx: { shake: 14 } } },
+    { id: 'p-pop', kind: 'effect', name: 'ポンと出る', data: { kfAbs: { scale: [[0, 40, 'back'], [0.3, 100, 'easeInOut']] } } },
+    { id: 'p-flashin', kind: 'effect', name: 'フラッシュで入る', data: { trIn: { type: 'flash', dur: 0.25 } } },
+    { id: 'p-whip', kind: 'effect', name: 'ホイップで入る', data: { trIn: { type: 'whip', dur: 0.3 } } },
+    { id: 'p-cinema', kind: 'effect', name: 'シネマ風', data: { fx: { contrast: 115, saturate: 85, brightness: 95, vignette: 45 } } },
+    { id: 'pt-pop', kind: 'telop', name: 'ポップに出る', data: { anim: 'pop', fadeIn: 0.05, fadeOut: 0.1 } },
+    { id: 'pt-slide', kind: 'telop', name: '下からスライド', data: { anim: 'slideUp', fadeIn: 0.1, fadeOut: 0.15 } },
+    { id: 'pt-type', kind: 'telop', name: 'タイプライター', data: { anim: 'type', fadeIn: 0, fadeOut: 0.1 } },
+  ];
+  function loadPresets() {
+    try { const v = JSON.parse(localStorage.getItem(PRESET_LS) || 'null'); if (Array.isArray(v)) return v; } catch (e) { /* ignore */ }
+    return JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+  }
+  let presets = loadPresets();
+  function savePresets() { try { localStorage.setItem(PRESET_LS, JSON.stringify(presets)); } catch (e) { /* ignore */ } }
+
+  /** 今のクリップの設定 → プリセットのデータ */
+  function captureClip(c, kind) {
+    const d = {};
+    if (c.kf && Object.keys(c.kf).length) d.kfRel = rel(c.kf, c.dur);
+    if (c.fx && Object.keys(c.fx).length) d.fx = clone(c.fx);
+    if (c.trIn && c.trIn.type) d.trIn = clone(c.trIn);
+    if (c.trOut && c.trOut.type) d.trOut = clone(c.trOut);
+    for (const k of ['scale', 'x', 'y', 'rotation', 'opacity']) if (c[k] != null && c[k] !== KF_DEFAULT[k]) d[k] = c[k];
+    if (kind === 'telop') {
+      Object.assign(d, { designId: c.designId, variant: c.variant || 0, anim: c.anim || 'none', fadeIn: c.fadeIn, fadeOut: c.fadeOut });
+      const pd = projectDesigns().find((x) => x.id === c.designId);
+      if (pd) d.design = clone(pd); // 独自デザインは中身ごと持ち運ぶ
+    } else if (c.type !== 'audio') { d.fit = c.fit; }
+    return d;
+  }
+  function applyEffectPresetData(c, d) {
+    if (d.kfRel) { c.kf = c.kf || {}; for (const [k, arr] of Object.entries(d.kfRel)) c.kf[k] = arr.map(([t, v, e]) => [Math.round(t * c.dur * fps()) / fps(), k === 'scale' ? v * (c.scale || 100) / 100 : v, e]); }
+    if (d.kfAbs) { c.kf = c.kf || {}; for (const [k, arr] of Object.entries(d.kfAbs)) c.kf[k] = arr.map(([t, v, e]) => [Math.min(c.dur, t), k === 'scale' ? v * (c.scale || 100) / 100 : v, e]); }
+    if (d.fx) c.fx = Object.assign(c.fx || {}, clone(d.fx));
+    if (d.trIn) c.trIn = clone(d.trIn);
+    if (d.trOut) c.trOut = clone(d.trOut);
+    for (const k of ['scale', 'x', 'y', 'rotation', 'opacity', 'fit']) if (d[k] != null && !(d.kfRel && d.kfRel[k])) c[k] = d[k];
+  }
+  function applyTelopPresetData(c, d) {
+    if (d.design && !designById.has(d.design.id)) { P.designs = projectDesigns().concat([clone(d.design)]); registerProjectDesigns(); }
+    if (d.designId && designById.has(d.designId)) c.designId = d.designId;
+    for (const k of ['variant', 'anim', 'fadeIn', 'fadeOut']) if (d[k] != null) c[k] = d[k];
+    applyEffectPresetData(c, d);
+    telopCache.delete(c.id);
+  }
+  function applyPresetById(c, id) {
+    const p = presets.find((x) => x.id === id); if (!p) return;
+    if (p.kind === 'telop') { if (c.type === 'telop') applyTelopPresetData(c, p.data); }
+    else applyEffectPresetData(c, p.data);
+  }
+  function presetChips(kind) {
+    const list = presets.filter((p) => p.kind === kind);
+    return `<div class="pchips">${list.map((p) => `<span class="pchip"><button class="pc-apply" data-papply="${p.id}" title="適用">${escapeHtml(p.name)}</button><button class="pc-menu" data-pmenu="${p.id}" title="名前変更・上書き・削除">⋯</button></span>`).join('') || '<span class="unit">まだありません</span>'}</div>`;
+  }
+  async function savePresetDialog(c, kind) {
+    const same = presets.filter((p) => p.kind === kind);
+    const m = openModal(kind === 'telop' ? 'テロップのプリセットとして保存' : '演出のプリセットとして保存', `
+      <p>今のクリップの${kind === 'telop' ? 'デザイン・色・アニメーション・位置・大きさ' : '動き（キーフレーム）・エフェクト・トランジション・位置・大きさ'}を保存します。保存したプリセットは、どのプロジェクトでもボタン一つで使えます。</p>
+      ${field('保存先', `<select id="ps-target"><option value="">新しいプリセット</option>${same.map((p) => `<option value="${p.id}">上書き：${escapeHtml(p.name)}</option>`).join('')}</select>`)}
+      ${field('名前', '<input type="text" id="ps-name" placeholder="例：強調ドン、商品紹介ズーム">')}
+    `, [['キャンセル', null], ['保存', 'go', true]]);
+    const tgt = $('#ps-target', m.el), nm = $('#ps-name', m.el);
+    tgt.addEventListener('change', () => { const p = presets.find((x) => x.id === tgt.value); nm.value = p ? p.name : ''; });
+    setTimeout(() => nm.focus(), 30);
+    if (await m.result !== 'go') return;
+    const name = nm.value.trim() || (kind === 'telop' ? 'マイテロップ' : 'マイ演出');
+    const data = captureClip(c, kind);
+    const ex = presets.find((x) => x.id === tgt.value);
+    if (ex) { ex.name = name; ex.data = data; } else presets.push({ id: uid('pr'), kind, name, data });
+    savePresets(); renderInspector(); renderLibPresets();
+    toast(`プリセット「${name}」を保存しました`);
+  }
+  async function presetMenu(id) {
+    const p = presets.find((x) => x.id === id); if (!p) return;
+    const c = P.clips.find((x) => st.sel.has(x.id));
+    const m = openModal(`プリセット「${escapeHtml(p.name)}」`, `
+      ${field('名前', `<input type="text" id="pm-name" value="${escapeHtml(p.name)}">`)}
+      <p class="note" style="font-size:11px;color:var(--muted)">中身を変えたいときは、クリップに適用 → インスペクターで調整 → 「上書き」で保存し直します。</p>
+    `, [['削除', 'del'], ...(c ? [['選択中のクリップの設定で上書き', 'over']] : []), ['キャンセル', null], ['名前を保存', 'name', true]]);
+    const r = await m.result;
+    if (r === 'del') { if (!confirm(`「${p.name}」を削除しますか？`)) return; presets = presets.filter((x) => x.id !== id); }
+    else if (r === 'name') { p.name = $('#pm-name', m.el).value.trim() || p.name; }
+    else if (r === 'over' && c) { p.data = captureClip(c, p.kind); p.name = $('#pm-name', m.el).value.trim() || p.name; toast(`「${p.name}」を上書きしました`); }
+    else return;
+    savePresets(); renderInspector(); renderLibPresets();
+  }
+  function resetPresets() {
+    if (!confirm('プリセットを初期状態に戻しますか？（自分で作ったものは消えます）')) return;
+    presets = JSON.parse(JSON.stringify(DEFAULT_PRESETS)); savePresets(); renderInspector(); renderLibPresets();
+  }
+  /** テロップタブの「マイプリセット」：押すと再生ヘッドにそのテロップを追加 */
+  function renderLibPresets() {
+    const box = $('#lib-presets'); if (!box) return;
+    const list = presets.filter((p) => p.kind === 'telop' && p.data.designId);
+    box.innerHTML = list.length ? `<div class="unit" style="margin-bottom:3px">マイプリセット（押すと再生ヘッドに追加）</div>` + list.map((p) => `<button class="chip" data-libpreset="${p.id}">${escapeHtml(p.name)}</button>`).join(' ') : '';
+  }
+  $('#lib-presets').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-libpreset]'); if (!b) return;
+    const p = presets.find((x) => x.id === b.dataset.libpreset); if (!p) return;
+    const tr = firstTrack('telop'); if (!tr) return;
+    pushUndo();
+    let start = st.time;
+    const over = P.clips.find((c) => c.track === tr.id && isActive(c, start));
+    if (over) start = clipEnd(over);
+    const c = makeTelopClip(tr.id, start);
+    applyTelopPresetData(c, p.data);
+    const d = designById.get(c.designId); if (d && d.sample) c.text = d.sample;
+    P.clips.push(c); st.sel = new Set([c.id]);
+    changed({ structure: true });
+    setTimeout(() => { const ta = $('#t-text'); if (ta) { ta.focus(); ta.select(); } }, 30);
+  });
+
+  /* =================================================================
      変更通知
      ================================================================= */
   function changed(what) {
     what = what || {};
     if (what.structure || what.selection) { renderTimeline(); renderInspector(); }
     else if (what.props) { if (!what.light) renderInspector(); renderTimeline(); }
-    if (what.structure) renderBin();
+    if (what.structure) { renderBin(); if (st.ltab === 'tx' && !(document.activeElement && document.activeElement.dataset && document.activeElement.dataset.captext)) renderCaptions(); }
     if (!st.playing) syncMedia(st.time, false);
     requestDraw();
     if (what.structure || what.props) scheduleSave();
@@ -2769,7 +3326,9 @@
   $$('[data-ltab]').forEach((b) => b.addEventListener('click', () => {
     st.ltab = b.dataset.ltab;
     $$('[data-ltab]').forEach((x) => x.classList.toggle('on', x === b));
-    for (const k of ['bin', 'lib', 'se']) $('#tab-' + k).classList.toggle('hidden', st.ltab !== k);
+    for (const k of ['bin', 'lib', 'se', 'tx']) $('#tab-' + k).classList.toggle('hidden', st.ltab !== k);
+    if (st.ltab === 'tx') renderCaptions();
+    if (st.ltab === 'lib') renderLibPresets();
     $('#btn-import').classList.toggle('hidden', st.ltab !== 'bin');
     if (st.ltab === 'lib' && !libGrid.children.length) renderLib();
     if (st.ltab === 'se') renderSe();
@@ -2985,6 +3544,7 @@
       }
     } catch (e) { console.warn('restore failed', e); }
     registerProjectDesigns();
+    renderLibPresets();
     document.title = `${P.name} — Chain Cut`;
     layoutMonitor();
     changed({ structure: true });
@@ -2997,6 +3557,7 @@
   // テスト・自動操作用の小さな公開 API
   window.ChainCut = {
     get project() { return P; }, get state() { return st; }, media,
+    transcribe, captionsToTelops, addCaptionRow, splitLongRows, get presets() { return presets; }, applyPresetById,
     importFiles, cmd, seek, drawFrame, openProjectFile, unlockWithCode, registerProjectDesigns, kfValue, animated,
     isLocked: (id) => isLocked(id), detectKeeps, applySilenceCut, parseSrt, runExport, getBuffer,
     select: (ids) => { st.sel = new Set(ids); changed({ selection: true }); },
