@@ -1,5 +1,15 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-19 向け（翌朝の自分への引き継ぎ）
+- 実装済み: re2（10/19 Release 予定）、sports2（10/20）、nursery（10/21）、nail（10/22）、funeral（10/23）。`node factory/calendar.mjs next-design` は `moving-vol1`（10/24・不用品回収・引越し）を返すはずなので、それを20デザイン実装する。brief は calendar.json の moving-vol1 を参照。id 接頭辞は mv- を確認して使う
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → `node factory/gen_howto_caps.mjs` → 報告
+- **10/19 は月曜なのでアプリ枠あり**: 新作アプリではなく **note No.27 の下書き**（テーマ「1 パック 20 分の工場 — 型と自動化で毎朝 1 商品」。記事の型 v2、■ 見出し 3〜5、ヘッダーは factory/note_header.mjs、挿絵は 1280×640 フラット、CTA は相談窓口、9/28 勉強会の話は入れない）。content/note/2026-10-19-factory20min/ に article.md・body.txt・header・挿絵 2〜3 枚・ledger.json。Drive 投入は本文 Doc＋台帳＋キャラ挿絵プロンプトの 3 点（No.26 と同じ手順、content/note/2026-10-08-30packs/guide.md 参照）
+- 株シミュ: 10/19 9:00 の再計算後の report を確認。案 B は「B で」の指示があるまで実装しない
+- calendar は community-vol1（11/10）まで。11/11 以降のテーマを2件追加（候補: 士業（税理士・社労士）、工務店 Vol.2（施工事例・完成見学会）、保険代理店は money と被るので避ける、ペット Vol.3 は早い）
+
 ## 2026-10-18 向け（翌朝の自分への引き継ぎ）
 - 実装済み: pet2（10/18 Release 予定）、re2（10/19）、sports2（10/20）、nursery（10/21）、nail（10/22）。`node factory/calendar.mjs next-design` は `funeral-vol1`（10/23・葬儀・終活）を返すはずなので、それを20デザイン実装する。brief は calendar.json の funeral-vol1 を参照。id 接頭辞は fn- を確認して使う。**赤・派手色は使わない**（落ち着いた配色・明朝中心）
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
