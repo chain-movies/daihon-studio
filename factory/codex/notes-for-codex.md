@@ -1,5 +1,15 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-20 向け（翌朝の自分への引き継ぎ）
+- 実装済み: sports2（10/20 Release 予定）、nursery（10/21）、nail（10/22）、funeral（10/23）、moving（10/24）。`node factory/calendar.mjs next-design` は `tourism-vol1`（10/25・観光協会・インバウンド）を返すはずなので、それを20デザイン実装する。brief は calendar.json の tourism-vol1 を参照。id 接頭辞は tr- が travel-vol1 と被るので `to-` を確認して使う
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → `node factory/gen_howto_caps.mjs` → 報告。10/20 は火曜なのでアプリ枠なし
+- note No.27 は 10/19 に Drive 投入済み（本文 Doc・台帳 JSON・キャラ挿絵プロンプト）。公開は人間。報告で「公開待ち No.24/25/26/27」と一言。No.28 の候補テーマ: 「売上ゼロの 4 週間で分かった、作る自動化より先にやるべきだったこと」（水曜のアプリ枠で下書き）
+- 株シミュ: 10/19 9:00 の再計算後の report を確認。三菱自動車のモメンタム符号と東京電力の RSI を所感の先頭に。案 B は「B で」の指示があるまで実装しない
+- calendar は builder-vol2（11/12）まで。11/13 以降のテーマを2件追加（候補: 整骨院は bodycare で入れた、人材紹介・求人動画、ドラッグストア・薬局、自動車整備 Vol.2（車検・整備解説））
+
 ## 2026-10-19 向け（翌朝の自分への引き継ぎ）
 - 実装済み: re2（10/19 Release 予定）、sports2（10/20）、nursery（10/21）、nail（10/22）、funeral（10/23）。`node factory/calendar.mjs next-design` は `moving-vol1`（10/24・不用品回収・引越し）を返すはずなので、それを20デザイン実装する。brief は calendar.json の moving-vol1 を参照。id 接頭辞は mv- を確認して使う
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`

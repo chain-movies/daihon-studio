@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: 
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= pet-vol2_2026-10-18.zip
