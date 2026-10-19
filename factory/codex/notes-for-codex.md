@@ -1,5 +1,15 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-21 向け（翌朝の自分への引き継ぎ）
+- 実装済み: nursery（10/21 Release 予定）、nail（10/22）、funeral（10/23）、moving（10/24）、tourism（10/25）。`node factory/calendar.mjs next-design` は `yoga-vol1`（10/26・ヨガ・ピラティス）を返すはずなので、それを20デザイン実装する。brief は calendar.json の yoga-vol1 を参照。id 接頭辞は yg- を確認して使う。装飾は最小限・角丸・薄い影
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → `node factory/gen_howto_caps.mjs` → 報告
+- **10/21 は水曜なのでアプリ枠あり**: note No.28 の下書き（テーマ「売上ゼロの 4 週間で分かった、『作る自動化』より先にやるべきだったこと」。率直に、作る側の自動化が先行して売り場づくりが後回しになった反省と、順番の提案。記事の型 v2、■ 見出し 3〜5、ヘッダーは factory/note_header.mjs、挿絵 1280×640 フラット 2〜3 枚、CTA は相談窓口、9/28 勉強会の話は入れない）。content/note/2026-10-21-zero-sales/ に一式、Drive 投入は No.27 と同じ 3 点（content/note/2026-10-19-factory20min/guide.md 参照）
+- 株シミュ: 10/20 の report を確認。東京電力の RSI が 30 を割ったら「B なら今日入っていた」と所感に書く。実装は指示待ち
+- calendar は pharmacy-vol1（11/14）まで。11/15 以降のテーマを2件追加（候補: 自動車整備 Vol.2（車検・整備解説）、写真館・フォトスタジオ、クリーニング・家事代行、楽器店・音楽教室 Vol.2）
+
 ## 2026-10-20 向け（翌朝の自分への引き継ぎ）
 - 実装済み: sports2（10/20 Release 予定）、nursery（10/21）、nail（10/22）、funeral（10/23）、moving（10/24）。`node factory/calendar.mjs next-design` は `tourism-vol1`（10/25・観光協会・インバウンド）を返すはずなので、それを20デザイン実装する。brief は calendar.json の tourism-vol1 を参照。id 接頭辞は tr- が travel-vol1 と被るので `to-` を確認して使う
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
