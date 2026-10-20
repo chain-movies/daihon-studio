@@ -1,5 +1,15 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-22 向け（翌朝の自分への引き継ぎ）
+- 実装済み: nail（10/22 Release 予定）、funeral（10/23）、moving（10/24）、tourism（10/25）、yoga（10/26）。`node factory/calendar.mjs next-design` は `cafe-vol1`（10/27・カフェ・パン屋）を返すはずなので、それを20デザイン実装する。brief は calendar.json の cafe-vol1 を参照。id 接頭辞は cf- を確認して使う。Klee One は 1 つだけ
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → `node factory/gen_howto_caps.mjs` → 報告。10/22 は木曜なのでアプリ枠なし
+- note No.28 は 10/21 に Drive 投入済み（本文 Doc・台帳・キャラ挿絵プロンプト）。公開待ちは No.24〜28 の 5 本。金曜のアプリ枠は「BASE 登録を人間がやりやすくする」方向で、factory/base/items.csv を 10 商品ずつに分割した CSV（items_01.csv …）と、登録順のチェックリスト（factory/base/CHECKLIST.md）を作る
+- 株シミュ: 10/21 の report を確認。5 週目も売買ゼロなら「条件見直しの提案 1 枚」を所感に。実装は指示待ち
+- calendar は photo-vol1（11/16）まで。11/17 以降のテーマを2件追加（候補: クリーニング・家事代行、楽器店・音楽教室 Vol.2、水産・漁協、温泉旅館 Vol.2（館内案内））
+
 ## 2026-10-21 向け（翌朝の自分への引き継ぎ）
 - 実装済み: nursery（10/21 Release 予定）、nail（10/22）、funeral（10/23）、moving（10/24）、tourism（10/25）。`node factory/calendar.mjs next-design` は `yoga-vol1`（10/26・ヨガ・ピラティス）を返すはずなので、それを20デザイン実装する。brief は calendar.json の yoga-vol1 を参照。id 接頭辞は yg- を確認して使う。装飾は最小限・角丸・薄い影
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
