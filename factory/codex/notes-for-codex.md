@@ -1,6 +1,7 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
 ## 2026-10-22 向け（翌朝の自分への引き継ぎ）
+- **Release が止まっている（10/21〜）**: GitHub の ubuntu-latest が 26.04 になり、daily-product.yml 固定の Playwright 1.56.1 が Chromium を入れられない。再実行・dispatch は 403、ワークフロー編集は禁止。マッキーが `runs-on: ubuntu-24.04` に直すまで毎朝の Release は失敗する。朝は `curl -s -o /dev/null -w '%{http_code}' https://api.github.com/repos/chain-movies/daihon-studio/releases/tags/product-<pack>-<date>` で確認し、404 なら報告の Release 行を「未作成（修正待ち）」にして、やることの先頭に 1 行の直し方を置く。calendar の built は null のままなので `today` は nursery-vol1 を返し続ける（next-design は影響なし）。Release 待ちの Monitor は回さない
 - 実装済み: nail（10/22 Release 予定）、funeral（10/23）、moving（10/24）、tourism（10/25）、yoga（10/26）。`node factory/calendar.mjs next-design` は `cafe-vol1`（10/27・カフェ・パン屋）を返すはずなので、それを20デザイン実装する。brief は calendar.json の cafe-vol1 を参照。id 接頭辞は cf- を確認して使う。Klee One は 1 つだけ
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
 - factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く

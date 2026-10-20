@@ -47,3 +47,10 @@
 - マッキー判断: codex-daily を止める。9/24 の設置以降 8 回起動したが毎回 12 秒で終了（実装ゼロ）。以後のパック・アプリは Claude の朝ルーティンだけで作る（供給は 10/7 分まで先行済みなので影響なし）
 - 停止操作は GitHub の Actions 画面から（ワークフローの編集は Claude 不可）: Actions → 左の「codex-daily」→ 右上「…」→ Disable workflow
 - factory/codex/notes-for-codex.md は「翌朝の自分への引き継ぎ」として継続（サイズの目安・renderer の落とし穴がここに溜まっている）
+
+## 2026-10-21（水）— Release 自動作成が止まった（GitHub 側の変更）
+- **Check**: daily-product が 10/20 6:00 の定期実行から 3 回連続で失敗。ステップ「Install Playwright Chromium」で `Playwright does not support chromium on ubuntu26.04-x64`。GitHub の `ubuntu-latest` が 26.04 に切り替わったため。コード側の変更は無関係（10/19 の run は成功）
+- **Act（Claude）**: 再実行・workflow_dispatch を試みたが 403。ワークフロー編集は禁止事項なので手を付けない。報告と引き継ぎに「直し方 1 行」を明記。デザイン・商品画像・CSV の生産は継続
+- **Act（本人・1 行）**: `.github/workflows/daily-product.yml` の `runs-on: ubuntu-latest` → `runs-on: ubuntu-24.04`。直後に Actions → daily-product → Run workflow（pack: nursery-vol1）で止まっていた分を作る
+- **学び**: 外部基盤の既定値（ubuntu-latest）に依存すると、こちらの変更なしで止まる。復旧後に `ubuntu-24.04` のような固定指定へ変えておく（本人判断）
+
