@@ -1,5 +1,16 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-23 向け（翌朝の自分への引き継ぎ）
+- 実装済み: funeral（10/23 Release 予定）、moving（10/24）、tourism（10/25）、yoga（10/26）、cafe（10/27）。`node factory/calendar.mjs next-design` は `garden-vol1`（10/28・観葉植物・園芸）を返すはずなので、それを20デザイン実装する。brief は calendar.json の garden-vol1 を参照。id 接頭辞は gd- を確認して使う
+- **Release は 10/21 に復旧済み**（マッキーが daily-product.yml の runs-on を ubuntu-24.04 に修正、ブランチ側）。main 側は ubuntu-latest のままなので、main にマージしたら同じ 1 行が必要（報告に一言）。朝は従来どおり Release の 200 を待ってから bot コミットを取り込む
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main` → `node factory/gen_howto_caps.mjs` → 報告
+- **10/23 は金曜なのでアプリ枠あり**: 「BASE 登録を人間がやりやすくする」。(1) factory/base_kit.mjs に `--split 10` を足して items_01.csv…（10 商品ずつ）を出す、(2) factory/base/CHECKLIST.md（CSV アップロード → ZIP 添付 → 公開 → URL を shop/links.json へ、の順で 1 商品 3 分の手順）、(3) shop/links.json の `base` 未設定パックを一覧にする小スクリプト（`node factory/base_kit.mjs --missing`）
+- 株シミュ: 10/22 の report を確認。金曜まで判定ゼロなら土曜に条件見直し案を 1 枚。実装は指示待ち
+- calendar は ryokan-vol1（11/20）まで。11/21 以降のテーマを2件追加（候補: 歯科 Vol.3 は早い、工場・製造業の会社紹介、税理士は shigyo で入れた、スイミング・スポーツクラブ（子ども）、花屋・フラワーアレンジ）
+
 ## 2026-10-22 向け（翌朝の自分への引き継ぎ）
 - **Release が止まっている（10/21〜）**: GitHub の ubuntu-latest が 26.04 になり、daily-product.yml 固定の Playwright 1.56.1 が Chromium を入れられない。再実行・dispatch は 403、ワークフロー編集は禁止。マッキーが `runs-on: ubuntu-24.04` に直すまで毎朝の Release は失敗する。朝は `curl -s -o /dev/null -w '%{http_code}' https://api.github.com/repos/chain-movies/daihon-studio/releases/tags/product-<pack>-<date>` で確認し、404 なら報告の Release 行を「未作成（修正待ち）」にして、やることの先頭に 1 行の直し方を置く。calendar の built は null のままなので `today` は nursery-vol1 を返し続ける（next-design は影響なし）。Release 待ちの Monitor は回さない
 - 実装済み: nail（10/22 Release 予定）、funeral（10/23）、moving（10/24）、tourism（10/25）、yoga（10/26）。`node factory/calendar.mjs next-design` は `cafe-vol1`（10/27・カフェ・パン屋）を返すはずなので、それを20デザイン実装する。brief は calendar.json の cafe-vol1 を参照。id 接頭辞は cf- を確認して使う。Klee One は 1 つだけ
