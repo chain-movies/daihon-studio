@@ -318,12 +318,108 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#333;border:1px solid #4a4a4a;color:#fff;padding:8px 16px;border-radius:8px;z-index:300;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:12.5px;max-width:90vw}
 .toast.err{border-color:var(--danger)}
 
-@media (max-width:900px){
-  #app{grid-template-columns:1fr;grid-template-rows:34px 40vh auto 1fr;height:auto;min-height:100vh}
-  html,body{overflow:auto}
-  .splitter{display:none}
-  #panel-left,#panel-right{min-height:260px}
+
+/* ---------- トラック追加行・リンク・かんたんモーション ---------- */
+.addrow{display:flex;height:34px;border-bottom:1px solid #111}
+.addrow .thead{gap:4px;padding:0 4px}
+.addrow .thead .btn{padding:2px 6px;font-size:11px;flex:1}
+.addrow .lane{display:flex;align-items:center;padding-left:10px;color:#555;font-size:11px;background:repeating-linear-gradient(90deg,#171717 0 12px,#1a1a1a 12px 24px)}
+.addrow.dropok .lane{background:rgba(45,140,235,.16);color:var(--ink2)}
+.clip .cl .lk{font-style:normal;font-size:9px;margin-right:3px;opacity:.85}
+.clip.aoff.t-video::after{content:"映像のみ";position:absolute;right:4px;bottom:2px;font-size:9px;color:rgba(255,255,255,.55);pointer-events:none}
+.mcard .mact{display:flex;gap:2px;padding:0 4px 5px}
+.mcard .mact button{flex:1;min-width:0;border:1px solid var(--line2);background:var(--panel3);border-radius:4px;font-size:10px;padding:2px 0;color:var(--ink2);white-space:nowrap;overflow:hidden}
+.mcard .mact button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+#insp .sec.motion{background:#1f1d18}
+#insp .mlabel{font-size:11px;font-weight:700;color:#ffcf66;margin-top:3px}
+#insp .mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+#insp .mbtn{border:1px solid var(--line2);background:var(--panel3);border-radius:6px;padding:6px 2px;font-size:11px;white-space:nowrap;color:var(--ink)}
+#insp .mbtn:hover{background:#ffb020;border-color:#ffb020;color:#111}
+#insp .addshape{display:inline-flex;gap:2px;flex:1}
+#insp .addshape .btn{flex:1}
+#insp .addshape select{width:64px}
+#rec-banner{position:absolute;left:8px;right:8px;top:8px;z-index:20;display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:rgba(40,10,10,.92);border:1px solid #e5484d;border-radius:8px;padding:6px 10px;font-size:12px}
+#rec-banner .dot{width:10px;height:10px;border-radius:50%;background:#e5484d;animation:vpulse 1.2s infinite}
+#rec-banner .tx{flex:1;min-width:160px}
+.sheet-x,#mtabs{display:none}
+
+@media (max-width:820px){
+  :root{--tl-head:62px}
+  html,body{overflow:hidden;height:100%}
+  #app{display:flex;flex-direction:column;height:calc(100dvh - 58px);min-height:0}
+  .splitter,#split-l,#split-r,#split-h,#meter{display:none!important}
+  #menubar{flex:none;height:42px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+  #menubar::-webkit-scrollbar{display:none}
+  #menubar .logo{font-size:0;margin-right:4px}
+  #menubar .logo .mark{font-size:10px}
+  #projname,#savestate{display:none}
+  #menubar>*{flex:none}
+  #menubar .sp{flex:1 0 4px}
+  .menu>button,#lic-badge,#menubar .btn{white-space:nowrap}
+  #btn-voice{margin-right:4px!important}
+  .menu>button{padding:8px 8px}
+  .menu .dd{position:fixed;top:42px;left:6px;right:6px;min-width:0;max-height:70dvh;overflow:auto}
+  .dd button{padding:10px 12px;font-size:14px}
+  #monitor{flex:none;height:38dvh;min-height:220px}
+  #monitor>.ptabs{display:none}
+  #mon-stage{touch-action:none}
+  #overlay,#tl-ruler,#scrubbar{touch-action:none}
+  #scrubbar{height:14px;margin:4px 10px 0}
+  .transport{grid-template-columns:auto 1fr auto;padding:2px 6px 4px;gap:4px}
+  .transport .tc{font-size:12px}
+  .tbtns{justify-content:center}
+  .tbtns .ib{width:38px;height:40px}
+  .tbtns .ib.play{width:52px}
+  .tbtns [data-cmd="prevEdit"],.tbtns [data-cmd="nextEdit"],.tbtns [data-cmd="toggleLoop"]{display:none}
+  .mon-right .tc.total,.mon-right [data-cmd="snapshot"],.mon-right [data-cmd="toggleSafe"]{display:none}
+  .mon-right .ib{width:40px;height:40px}
+  #timeline{flex:1;min-height:0}
+  #tools{width:40px}
+  #tools .ib{width:36px;height:38px}
+  #tl-bar{height:46px;overflow-x:auto;overflow-y:hidden;gap:6px;scrollbar-width:none}
+  #tl-bar::-webkit-scrollbar{display:none}
+  #tl-bar .btn{padding:8px 12px;font-size:13px;flex:none}
+  #tl-bar .tc,#tl-bar .unit,#tl-bar #zoom{display:none}
+  #tl-bar .sp{display:none}
+  .thead{padding:0 3px;gap:1px}
+  .thead .tn{width:24px}
+  .thead [data-theight],.thead [data-tmute]{display:none}
+  .trow.k-audio .thead [data-tmute]{display:grid}
+  .thead .ib{width:26px;height:26px}
+  .addrow{height:44px}
+  .addrow .thead{flex-direction:column;gap:2px;padding:2px}
+  .addrow .thead .btn{padding:1px 2px;font-size:10px;width:100%}
+  .clip .eh{width:16px}
+  .clip .eh.l{left:-2px}.clip .eh.r{right:-2px}
+  .clip.sel .eh{background:rgba(255,255,255,.28)}
+  .clip.sel,.clip .eh{touch-action:none}
+  .clip .cl{font-size:11px}
+  #kfstrip .kf-head{overflow-x:auto;scrollbar-width:none}
+  #kfstrip .kf-head .btn{flex:none}
+  /* 左右のパネルは下から出てくるシート */
+  #panel-left,#panel-right{position:fixed;left:0;right:0;bottom:58px;height:min(66dvh,560px);z-index:150;border-radius:14px 14px 0 0;border-top:1px solid #444;box-shadow:0 -14px 40px rgba(0,0,0,.6);transform:translateY(calc(100% + 70px));transition:transform .22s ease;min-height:0}
+  #panel-left.sheet-open,#panel-right.sheet-open{transform:none}
+  #panel-left .ptabs,#panel-right .ptabs{height:44px;overflow-x:auto;scrollbar-width:none}
+  #panel-left .ptabs button,#panel-right .ptabs button{font-size:13px;padding:0 10px}
+  .sheet-x{display:grid;place-items:center;width:44px;height:44px;flex:none;font-size:18px;background:none;border:0;color:var(--ink2)}
+  #bin{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .mcard .mact button{font-size:12px;padding:6px 0}
+  #insp .sec .in{gap:8px}
+  #insp .field{min-height:34px}
+  #insp .btn{padding:8px 10px}
+  #insp .mbtn{padding:10px 2px;font-size:12.5px}
+  #insp select,#insp input[type=text],#insp textarea{font-size:16px}
+  #mtabs{display:flex;position:fixed;left:0;right:0;bottom:0;height:58px;z-index:160;background:#181818;border-top:1px solid #333;padding-bottom:env(safe-area-inset-bottom)}
+  #mtabs button{flex:1;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:11px;position:relative}
+  #mtabs button i{font-style:normal;font-size:19px;line-height:1.1}
+  #mtabs button.on{color:var(--accent2);background:#202833}
+  #mtabs button.dot::after{content:"";position:absolute;top:8px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#ffb020}
+  .toast{bottom:72px}
+  #rec-banner{font-size:11px;padding:5px 6px}
+  #rec-banner .btn{padding:6px 8px}
+  .modal{width:96vw}
 }
+
 </style>
 </head>
 <body>
@@ -374,9 +470,9 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
       <button data-cmd="addTelop">テロップを追加<span class="k">T</span></button>
       <button data-cmd="addShape">シェイプを追加</button>
       <button data-cmd="addText">テキスト（レイヤー）を追加<span class="k">Alt+T</span></button>
-      <button data-cmd="addTrackVideo">ビデオトラックを追加</button>
-      <button data-cmd="addTrackTelop">テロップトラックを追加</button>
-      <button data-cmd="addTrackAudio">オーディオトラックを追加</button>
+      <button data-cmd="addTrackVideo">映像トラックを追加</button>
+      <button data-cmd="addTrackAudio">音声トラックを追加</button>
+      <button data-cmd="linkToggle">映像と音声のリンク／解除<span class="k">Ctrl+L</span></button>
     </div></div>
     <div class="menu"><button>表示</button><div class="dd">
       <button data-cmd="zoomIn">タイムライン拡大<span class="k">=</span></button>
@@ -410,6 +506,7 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
       <button data-ltab="tx">文字起こし</button>
       <div class="sp"></div>
       <button class="btn sm tool" data-cmd="import" id="btn-import" title="素材を読み込み (Ctrl+I)">＋</button>
+      <button class="sheet-x" data-closesheet title="閉じる">✕</button>
     </div>
     <div class="pbody" id="tab-bin"><div id="bin"></div></div>
     <div class="pbody hidden" id="tab-tx">
@@ -489,7 +586,7 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
 
   <!-- 右：インスペクター -->
   <section class="panel" id="panel-right">
-    <div class="ptabs"><button class="on">インスペクター</button></div>
+    <div class="ptabs"><button class="on">インスペクター（調整）</button><div class="sp"></div><button class="sheet-x" data-closesheet title="閉じる">✕</button></div>
     <div class="pbody" id="insp"></div>
   </section>
 
@@ -512,6 +609,8 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
         <button class="btn sm" data-cmd="addTelop" title="T">＋テロップ</button>
         <button class="btn sm" data-cmd="addShape" title="Shift+T">＋シェイプ</button>
         <button class="btn sm" data-cmd="addText" title="Alt+T：文字・塗り・エッジ・影・テクスチャを細かく作れるレイヤー">＋テキスト</button>
+        <button class="btn sm" data-cmd="addTrackVideo" title="映像トラックを追加">＋映像段</button>
+        <button class="btn sm" data-cmd="addTrackAudio" title="音声トラックを追加">＋音声段</button>
         <div class="sp"></div>
         <span class="unit">ズーム</span>
         <input type="range" id="zoom" min="0" max="100" value="40">
@@ -537,6 +636,14 @@ kbd{display:inline-block;background:#333;border:1px solid #474747;border-bottom-
     <div id="meter"><canvas id="meter-c"></canvas><span>dB</span></div>
   </section>
 </div>
+
+<nav id="mtabs">
+  <button data-mtab="bin"><i>🎞</i>素材</button>
+  <button data-mtab="lib"><i>Ｔ</i>テロップ</button>
+  <button data-mtab="se"><i>♪</i>効果音</button>
+  <button data-mtab="tx"><i>字</i>文字起こし</button>
+  <button data-mtab="insp"><i>⚙</i>調整・動き</button>
+</nav>
 
 <input type="file" id="file-media" multiple accept="video/*,audio/*,image/*" hidden>
 <input type="file" id="file-srt" accept=".srt,.vtt,text/plain" hidden>
