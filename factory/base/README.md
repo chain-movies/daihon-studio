@@ -47,3 +47,9 @@ node factory/base_kit.mjs                       # built 済み（Release 済み�
 node factory/base_kit.mjs --pack cooking-vol1   # 1 パックだけ（items.csv もその 1 件で上書き）
 node factory/base_kit.mjs --ref <branch>        # 画像 URL の参照ブランチ
 ```
+
+## 登録作業を小分けにする（10/23 追加）
+
+- `node factory/base_kit.mjs --split 10` → `items_01.csv`〜 が 10 商品ずつ出る。1 回の登録作業を 10 商品（約 30 分）で区切れる
+- `node factory/base_kit.mjs --missing` → Release 済みで BASE 未登録（shop/links.json の base が空）のパック一覧
+- 手順は `CHECKLIST.md`（CSV アップロード → ZIP 添付 → 公開 → URL 共有）

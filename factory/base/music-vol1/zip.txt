@@ -1,2 +1,2 @@
-販売用ZIPの取得元（Release）: 
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-music-vol1-2026-10-02
 Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= music-vol1_2026-10-02.zip

@@ -1,2 +1,2 @@
-販売用ZIPの取得元（Release）: 
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-money-vol1-2026-10-17
 Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= money-vol1_2026-10-17.zip

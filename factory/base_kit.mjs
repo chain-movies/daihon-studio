@@ -4,6 +4,8 @@
 //   node factory/base_kit.mjs --pack stream-vol1
 //   node factory/base_kit.mjs --ref main      # 画像URLの参照ブランチ（既定 main）
 //   node factory/base_kit.mjs --no-faq        # 説明文末尾の「よくある質問」（factory/bundle/faq.md）を付けない
+//   node factory/base_kit.mjs --split 10      # items.csv に加えて 10 商品ずつの items_01.csv, items_02.csv … も出す（登録作業を小分けにする）
+//   node factory/base_kit.mjs --missing       # shop/links.json の base URL が未設定のパック（= BASE 未登録）だけ一覧して終了
 // 出力: factory/base/items.csv（CSV商品管理 App 用）と factory/base/<pack>/{title,description,tags,images,price}.txt
 // BASE には公開APIがあるが「デジタルコンテンツ販売 App」のZIP登録はAPI非対応のため、
 // 商品情報は CSV で一括、ZIP だけ手で付ける前提。
@@ -21,6 +23,14 @@ const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] :
 const onlyPack = opt('--pack', null);
 const ref = opt('--ref', 'main');
 const withFaq = !args.includes('--no-faq');
+const split = Number(opt('--split', 0)) || 0;
+if (args.includes('--missing')) {
+  const built = calendar.queue.filter((it) => it.built && PACKS[it.pack]);
+  const missing = built.filter((it) => !(links.packs[it.pack] && links.packs[it.pack].base));
+  console.log(`Release 済み ${built.length} パック / BASE 未登録 ${missing.length} パック`);
+  for (const it of missing) console.log(`- ${it.pack}\t${PACKS[it.pack].name}\t${(links.packs[it.pack] && links.packs[it.pack].release) || `https://github.com/chain-movies/daihon-studio/releases/tag/product-${it.pack}-${it.built}`}`);
+  process.exit(0);
+}
 function faqShort() {
   try {
     const t = fs.readFileSync(path.join(root, 'factory/bundle/faq.md'), 'utf8');
@@ -103,10 +113,19 @@ for (const it of targets) {
   fs.writeFileSync(path.join(dir, 'tags.txt'), tags + '\n');
   fs.writeFileSync(path.join(dir, 'price.txt'), `${pack.price}\n`);
   fs.writeFileSync(path.join(dir, 'images.txt'), images.filter(Boolean).join('\n') + '\n');
-  const rel = (links.packs[it.pack] && links.packs[it.pack].release) || '';
+  const rel = (links.packs[it.pack] && links.packs[it.pack].release) || (it.built ? `https://github.com/chain-movies/daihon-studio/releases/tag/product-${it.pack}-${it.built}` : '');
   fs.writeFileSync(path.join(dir, 'zip.txt'), `販売用ZIPの取得元（Release）: ${rel}\nAssets の「販売用ZIP（BASE/BOOTHにアップロード）」= ${it.pack}_${it.built || it.date}.zip\n`);
   rows.push([title, desc, pack.price, 10, 9999, it.built ? 1 : 0, order++, ...images].map(esc).join(','));
   console.log(`✔ ${it.pack}  ${images.filter(Boolean).length} 画像  ¥${pack.price}`);
 }
 fs.writeFileSync(path.join(outRoot, 'items.csv'), '﻿' + rows.join('\r\n') + '\r\n');
 console.log(`→ ${path.relative(root, outRoot)}/items.csv（${rows.length - 1} 商品）`);
+if (split > 0) {
+  for (const f of fs.readdirSync(outRoot)) if (/^items_\d+\.csv$/.test(f)) fs.unlinkSync(path.join(outRoot, f));
+  const body = rows.slice(1);
+  for (let i = 0; i < body.length; i += split) {
+    const n = String(i / split + 1).padStart(2, '0');
+    fs.writeFileSync(path.join(outRoot, `items_${n}.csv`), '﻿' + [rows[0], ...body.slice(i, i + split)].join('\r\n') + '\r\n');
+    console.log(`→ ${path.relative(root, outRoot)}/items_${n}.csv（${Math.min(split, body.length - i)} 商品: 表示順 ${i + 1}〜${Math.min(i + split, body.length)}）`);
+  }
+}

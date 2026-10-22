@@ -1,2 +1,2 @@
-販売用ZIPの取得元（Release）: 
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-bousai-vol1-2026-10-07
 Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= bousai-vol1_2026-10-07.zip

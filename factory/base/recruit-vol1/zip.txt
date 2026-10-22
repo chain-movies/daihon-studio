@@ -1,2 +1,2 @@
-販売用ZIPの取得元（Release）: 
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-recruit-vol1-2026-09-27
 Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= recruit-vol1_2026-09-27.zip
