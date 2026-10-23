@@ -1,5 +1,15 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-25 向け（翌朝の自分への引き継ぎ）
+- 実装済み: tourism（10/25 Release 予定）、yoga（10/26）、cafe（10/27）、garden（10/28）、bodycare（10/29）。`node factory/calendar.mjs next-design` は `camp-vol1`（10/30・キャンプ・アウトドア）を返すはずなので、それを20デザイン実装する。brief は calendar.json の camp-vol1 を参照。id 接頭辞は cp- を確認して使う。Yusei Magic は 1 つだけ
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告。10/25 は日曜なのでアプリ枠なし
+- 株シミュ: 10/23 に「昼と夜で RSI が別物」の異常を記録済み（commentary 10/24）。日曜は休場なので所感は「週のまとめ＋異常の再掲」を短く。月曜に「直して」があれば、stocks/engine.mjs の report 出力に「RSI 計算に使った系列の最終日付・本数」を 1 行足す（state.json は触らない）
+- 月曜（10/26）のアプリ枠: 使い方動画の収録手順を人間向けに 1 枚に束ねる（factory/bundle/howto-storyboard.md ＋ factory/howto/<pack>/ のキャプチャ ＋ ナレーション台本 → factory/bundle/howto-record-sheet.md。「机に置いて読める 1 枚」）
+- calendar は seminar-vol1（11/24）まで。11/25 以降のテーマを2件追加（候補: 着物・和装、BAR・居酒屋、リサイクルショップ・古着、動物園・水族館）
+
 ## 2026-10-24 向け（翌朝の自分への引き継ぎ）
 - 実装済み: moving（10/24 Release 予定）、tourism（10/25）、yoga（10/26）、cafe（10/27）、garden（10/28）。`node factory/calendar.mjs next-design` は `bodycare-vol1`（10/29・整体・接骨院・鍼灸）を返すはずなので、それを20デザイン実装する。brief は calendar.json の bodycare-vol1 を参照。id 接頭辞は bc- を確認して使う。**効果の断定は不可**（「〜かも」「目安」で書く）、赤は使わない
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
