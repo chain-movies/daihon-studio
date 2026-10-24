@@ -1,5 +1,15 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-26 向け（翌朝の自分への引き継ぎ）
+- 実装済み: yoga（10/26 Release 予定）、cafe（10/27）、garden（10/28）、bodycare（10/29）、camp（10/30）。`node factory/calendar.mjs next-design` は `handmade-vol1`（10/31・ハンドメイド・雑貨づくり）を返すはずなので、それを20デザイン実装する。brief は calendar.json の handmade-vol1 を参照。id 接頭辞は hm- を確認して使う。Klee One は 1 つだけ
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告
+- **10/26 は月曜なのでアプリ枠あり**: 使い方動画の収録手順を人間向けに 1 枚に束ねる → factory/bundle/howto-record-sheet.md（howto-storyboard.md の 6 カット＋howto-script.md のナレーション＋factory/howto/<pack>/ のキャプチャ 3 枚の参照＋「収録前チェック 5 項目」。机に置いて読める 1 枚、A4 1 枚相当）。あわせて PDF 化（factory/bundle/howto-record-sheet.pdf、Playwright で HTML → PDF）
+- 株シミュ: 10/26 9:00 の再計算で金曜夜の低 RSI が昼の値に戻るかを確認して所感の先頭に。「直して」があれば stocks/engine.mjs の report 出力に RSI 系列の最終日付・本数を 1 行足す（state.json は触らない）
+- calendar は bar-vol1（11/26）まで。11/27 以降のテーマを2件追加（候補: リサイクルショップ・古着、動物園・水族館、英会話 Vol.2（ビジネス）、眼鏡・コンタクト）
+
 ## 2026-10-25 向け（翌朝の自分への引き継ぎ）
 - 実装済み: tourism（10/25 Release 予定）、yoga（10/26）、cafe（10/27）、garden（10/28）、bodycare（10/29）。`node factory/calendar.mjs next-design` は `camp-vol1`（10/30・キャンプ・アウトドア）を返すはずなので、それを20デザイン実装する。brief は calendar.json の camp-vol1 を参照。id 接頭辞は cp- を確認して使う。Yusei Magic は 1 つだけ
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
