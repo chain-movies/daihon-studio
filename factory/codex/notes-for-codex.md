@@ -1,5 +1,15 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-28 向け（翌朝の自分への引き継ぎ）
+- 実装済み: garden（10/28 Release 予定）、bodycare（10/29）、camp（10/30）、handmade（10/31）、juku2（11/1）。`node factory/calendar.mjs next-design` は `newyear-vol1`（11/2・年末年始・新年のご挨拶）を返すはずなので、それを20デザイン実装する。brief は calendar.json の newyear-vol1 を参照。id 接頭辞は ny- を確認して使う。Yuji Syuku は 1 つだけ
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告
+- **10/28 は水曜なのでアプリ枠あり**: note No.29 の下書き（テーマ「売り場づくりを人間の 30 分に縮めた話 — CSV 分割・チェックリスト・収録シート」。No.28 の反省の続きとして「残った人間の仕事を 30 分単位に切った方法」。記事の型 v2、■ 3〜5、ヘッダーは factory/note_header.mjs、挿絵 1280×640 フラット 2〜3 枚、CTA は相談窓口、9/28 勉強会には触れない）。content/note/2026-10-28-thirty-minutes/ に一式、Drive 投入は 3 点（content/note/2026-10-21-zero-sales/guide.md 参照）
+- 株シミュ: 10/27 の report を確認。「昼の RSI は前夜の値の使い回し」が 10/26 で確定（commentary 10/27）。「直して」があれば stocks/engine.mjs の report 出力に RSI 期間・系列の最終日付・本数を 1 行足す（state.json は触らない）
+- calendar は optical-vol1（11/30）まで。12/1 以降のテーマを2件追加（候補: 便利屋・何でも屋、司会・イベント MC、年賀状・印刷、スキー場・冬レジャー）
+
 ## 2026-10-27 向け（翌朝の自分への引き継ぎ）
 - 実装済み: cafe（10/27 Release 予定）、garden（10/28）、bodycare（10/29）、camp（10/30）、handmade（10/31）。`node factory/calendar.mjs next-design` は `juku-vol2`（11/1・学習塾 Vol.2 受験・合格実績）を返すはずなので、それを20デザイン実装する。brief は calendar.json の juku-vol2 を参照。id 接頭辞は jk- を確認して使う。**合格を保証する文言は不可**、実在の学校名・試験名は「〇〇高校」まで
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
