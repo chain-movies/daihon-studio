@@ -1,5 +1,15 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-29 向け（翌朝の自分への引き継ぎ）
+- 実装済み: bodycare（10/29 Release 予定）、camp（10/30）、handmade（10/31）、juku2（11/1）、newyear（11/2）。`node factory/calendar.mjs next-design` は `editor-vol2`（11/3・動画編集者向け汎用 Vol.2 解説・ノウハウ）を返すはずなので、それを20デザイン実装する。brief は calendar.json の editor-vol2 を参照。id 接頭辞は ed2- を確認して使う（ed- は editor-vol1 が使っている可能性あり。`grep -c "id: 'ed2-"` で 0 を確認）。variants は「ネイビー／黒／白地」の 3 つで統一。筆文字・手書きは使わない（汎用パックなので）
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告。10/29 は木曜なのでアプリ枠なし
+- 10/28 に note No.29（content/note/2026-10-28-thirty-minutes/）を Drive に 3 点投入済み（Doc 1mNA5U2BsAb528cMsviAPLouWT--EsCXvIEIXWznu0sU・prompt 1bO1RN06RsER5o3xbKIUps3pzbPm5it8f・ledger 1O9P78UD7_ZU30DSQ32yb1PUqnthJjti1）。金曜（10/30）のアプリ枠は「11 月の運用提案 1 枚」（毎朝 1 本＋週 1 本の売り場仕事、の具体案を factory/plan-2026-11.md に）
+- 株シミュ: 10/28 の report を確認。LINEヤフー RSI 3・三菱自動車 19 が夜の値。「直して」があれば stocks/engine.mjs の report 出力に RSI 期間・系列の最終日付・本数を 1 行足す（state.json は触らない）
+- calendar は mc-vol1（12/2）まで。12/3 以降のテーマを2件追加（候補: 年賀状・印刷、スキー場・冬レジャー、整骨院 Vol.2（スポーツ外傷）、保険代理店）
+
 ## 2026-10-28 向け（翌朝の自分への引き継ぎ）
 - 実装済み: garden（10/28 Release 予定）、bodycare（10/29）、camp（10/30）、handmade（10/31）、juku2（11/1）。`node factory/calendar.mjs next-design` は `newyear-vol1`（11/2・年末年始・新年のご挨拶）を返すはずなので、それを20デザイン実装する。brief は calendar.json の newyear-vol1 を参照。id 接頭辞は ny- を確認して使う。Yuji Syuku は 1 つだけ
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
