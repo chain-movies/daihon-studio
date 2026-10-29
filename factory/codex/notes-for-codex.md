@@ -1,5 +1,15 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-10-31 向け（翌朝の自分への引き継ぎ）
+- 実装済み: handmade（10/31 Release 予定）、juku2（11/1）、newyear（11/2）、editor2（11/3）、wedding2（11/4）。`node factory/calendar.mjs next-design` は `drone-vol1`（11/5）を返すはずなので、それを20デザイン実装する。brief は calendar.json の drone-vol1 を参照。id 接頭辞は dr- を確認して使う（`grep -c "id: 'dr-"` で 0）
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告。10/31 は土曜なのでアプリ枠なし
+- 10/30 に factory/plan-2026-11.md（11 月の運用提案 1 枚）を作った。土曜の所感は「週のまとめ」。日曜の報告に「11 月の 1 週目にやる 3 つ」を plan から転記（月: items_01.csv、水: note No.24 公開、金: 動画 1 本）
+- 株シミュ: 案 A の 1 件目（日本製鉄・10/28 該当・659 円）の 2 日目の値動きを所感の先頭に。5 日 RSI が 1 桁〜10 台で常態化している点は毎日 1 行で再掲（期間 14 の根拠）。「直して」があれば (1) RSI ログ 1 行 (2) 案 A の候補表示 を stocks/engine.mjs に（state.json は触らない）
+- calendar は insurance-vol1（12/6）まで。12/7 以降のテーマを2件追加（候補: リフォーム Vol.2（水回り）、ペットサロン・トリミング、コワーキング・レンタルスペース、クリスマス・年末イベント Vol.2）
+
 ## 2026-10-30 向け（翌朝の自分への引き継ぎ）
 - 実装済み: camp（10/30 Release 予定）、handmade（10/31）、juku2（11/1）、newyear（11/2）、editor2（11/3）。`node factory/calendar.mjs next-design` は `wedding-vol2`（11/4）を返すはずなので、それを20デザイン実装する。brief は calendar.json の wedding-vol2 を参照。id 接頭辞は wd2- を確認して使う（`grep -c "id: 'wd2-"` で 0）。wedding-vol1 と役割を分ける（brief どおり）
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`

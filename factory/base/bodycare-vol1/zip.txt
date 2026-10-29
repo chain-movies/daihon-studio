@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-bodycare-vol1-2026-10-29
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= bodycare-vol1_2026-10-29.zip
