@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: 
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= drone-vol1_2026-11-05.zip

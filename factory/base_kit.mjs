@@ -49,7 +49,10 @@ if (!targets.length) { console.error('対象パックなし'); process.exit(1); 
 const outRoot = path.join(root, 'factory/base');
 fs.mkdirSync(outRoot, { recursive: true });
 
-function plain(pack, designs, count) {
+// パック固有の一言（factory/base/pitch.json: { "<packId>": "..." }）。あれば冒頭の段落の直後に 1 行入れる
+const PITCH = (() => { try { return JSON.parse(fs.readFileSync(path.join(root, 'factory/base/pitch.json'), 'utf8')); } catch (e) { return {}; } })();
+function plain(pack, designs, count, packId) {
+  const pitch = PITCH[packId] ? `${PITCH[packId]}\n\n` : '';
   const cats = [...new Set(designs.map((d) => d.category))];
   const names = designs.map((d, i) => `${String(i + 1).padStart(2, '0')}. ${d.name}（${(d.variants || []).map((v) => v.name).join('・')}）`).join('\n');
   return `${pack.name}｜${designs.length}デザイン×色違い ${count}点の透過PNG＋テロップメーカー付き
@@ -57,7 +60,7 @@ function plain(pack, designs, count) {
 貼るだけでテレビ番組のような「あのテロップ」になる、${cats.join('・')} ${designs.length}デザインのセットです。
 文字を変えたい人のために、ブラウザで動く「テロップメーカー」を同梱。台本を貼れば全行分を一括でPNG書き出しできます。
 
-■ こんな人に
+${pitch}■ こんな人に
 ・YouTube / ショート動画のテロップに「テレビっぽさ」が欲しい
 ・Premiere Pro の文字装飾を毎回ゼロから作るのが面倒
 ・CapCut・DaVinci・iMovie でも使える素材が欲しい（画像を置くだけ）
@@ -104,7 +107,7 @@ for (const it of targets) {
     return fs.existsSync(path.join(galleryDir, f)) ? `${RAW}/factory/gallery/${it.pack}/${f}` : '';
   });
   const title = `${pack.name}｜${designs.length}デザイン×色違い ${count}点 透過PNG＋テロップメーカー付き`;
-  const desc = plain(pack, designs, count);
+  const desc = plain(pack, designs, count, it.pack);
   const tags = ['テロップ', 'テロップ素材', 'Premiere Pro', 'CapCut', '動画編集', '透過PNG', 'YouTube', pack.short.replace(/ Vol\.\d+$/, '')].join(', ');
   const dir = path.join(outRoot, it.pack);
   fs.mkdirSync(dir, { recursive: true });
