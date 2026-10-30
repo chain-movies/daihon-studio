@@ -9,7 +9,8 @@
 - 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告。11/1 は日曜なのでアプリ枠なし
 - 日曜の報告に「11 月 1 週目にやる 3 つ」を factory/plan-2026-11.md から転記（月 11/2: items_01.csv、水 11/4: note No.24 公開、金 11/6: 動画 1 本）。10 月の月次まとめ（Release 48・CSV 47・売り場 1・note 公開 0・動画 0）を 3 行で
 - 株シミュ: 日曜は休場。所感は「6 週間のまとめ＋11 月 1 週目に入れる 3 つ（RSI ログ・案 A 候補表示・期間 14 並記）」を短く。「直して」があれば stocks/engine.mjs に入れる（state.json は触らない）
-- calendar は petsalon-vol1（12/8）まで。12/9 以降のテーマを2件追加（候補: コワーキング・レンタルスペース、クリスマス・年末イベント Vol.2、税理士・会計事務所、整体 Vol.3 は不要）
+- calendar は cowork-vol1（12/9）まで。12/10 以降のテーマを2件追加（候補: クリスマス・年末イベント Vol.2、税理士・会計事務所、ネイル Vol.2、靴・修理）
+- **教訓（10/31）**: 朝の push の後、Actions の `calendar: built` コミットが届く前に追加 push すると bot の push が rejected になる（Release は成功、built が null のまま）。直すには designs.js か calendar.json に触れる push をもう 1 回（workflow が Release を delete→create し直して built を書く）。**朝は 1 回 push したら bot コミットを取り込むまで push しない**
 
 ## 2026-10-31 向け（翌朝の自分への引き継ぎ）
 - 実装済み: handmade（10/31 Release 予定）、juku2（11/1）、newyear（11/2）、editor2（11/3）、wedding2（11/4）。`node factory/calendar.mjs next-design` は `drone-vol1`（11/5）を返すはずなので、それを20デザイン実装する。brief は calendar.json の drone-vol1 を参照。id 接頭辞は dr- を確認して使う（`grep -c "id: 'dr-"` で 0）
