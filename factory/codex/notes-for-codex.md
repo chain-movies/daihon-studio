@@ -1,5 +1,16 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-01 向け（翌朝の自分への引き継ぎ）
+- 実装済み: juku2（11/1 Release 予定）、newyear（11/2）、editor2（11/3）、wedding2（11/4）、drone（11/5）。`node factory/calendar.mjs next-design` は `sweets-vol1`（11/6）を返すはずなので、それを20デザイン実装する。brief は calendar.json の sweets-vol1 を参照。id 接頭辞は sw- を確認して使う（`grep -c "id: 'sw-"` で 0）
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- 10/31 に FONTS の Noto Sans JP に weights 300/500 を足した（drone-vol1 の細字用。既存デザインの見た目は変わらない。テロップメーカーの Google Fonts 読み込みにも 300;500 が入る）
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告。11/1 は日曜なのでアプリ枠なし
+- 日曜の報告に「11 月 1 週目にやる 3 つ」を factory/plan-2026-11.md から転記（月 11/2: items_01.csv、水 11/4: note No.24 公開、金 11/6: 動画 1 本）。10 月の月次まとめ（Release 48・CSV 47・売り場 1・note 公開 0・動画 0）を 3 行で
+- 株シミュ: 日曜は休場。所感は「6 週間のまとめ＋11 月 1 週目に入れる 3 つ（RSI ログ・案 A 候補表示・期間 14 並記）」を短く。「直して」があれば stocks/engine.mjs に入れる（state.json は触らない）
+- calendar は petsalon-vol1（12/8）まで。12/9 以降のテーマを2件追加（候補: コワーキング・レンタルスペース、クリスマス・年末イベント Vol.2、税理士・会計事務所、整体 Vol.3 は不要）
+
 ## 2026-10-31 向け（翌朝の自分への引き継ぎ）
 - 実装済み: handmade（10/31 Release 予定）、juku2（11/1）、newyear（11/2）、editor2（11/3）、wedding2（11/4）。`node factory/calendar.mjs next-design` は `drone-vol1`（11/5）を返すはずなので、それを20デザイン実装する。brief は calendar.json の drone-vol1 を参照。id 接頭辞は dr- を確認して使う（`grep -c "id: 'dr-"` で 0）
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
