@@ -1,5 +1,17 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-02 向け（翌朝の自分への引き継ぎ）
+- 実装済み: newyear（11/2 Release 予定）、editor2（11/3）、wedding2（11/4）、drone（11/5）、sweets（11/6）。`node factory/calendar.mjs next-design` は `dental-vol2`（11/7）を返すはずなので、それを20デザイン実装する。brief は calendar.json の dental-vol2 を参照。id 接頭辞は dn2- を確認して使う（`grep -c "id: 'dn2-"` で 0）。医療系なので **効果の断定は不可**、赤は避ける（dental-vol1 の配色と役割を分ける）
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- **push は朝 1 回だけ**。bot の `calendar: built` コミットを取り込むまで追加 push しない（10/31 の教訓）。直したいものが出たら bot コミット後に
+- factory/base/pitch.json にパック固有の一言を書くと商品説明の冒頭に入る（10/31 追加）。新パックを実装したら 1 件足す
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告
+- **11/2 は月曜なのでアプリ枠あり**: plan-2026-11.md の「月曜 = BASE 登録 30 分」の初回。人間が items_01.csv を登録したら URL を貼ってくる前提で、**shop/links.json に BASE の URL を一括で流し込む小スクリプト** `factory/links_add.mjs`（標準入力に URL を 10 行貼ると、商品名→pack を items.csv から逆引きして links.json を更新し、未対応の URL を表示）を作る。貼られなかった場合も動作確認（ダミー URL で）だけして報告
+- 株シミュ: 月曜 9:00 が 7 週目の初回。「直して」があれば (1) RSI ログ 1 行 (2) 案 A 候補表示 (3) 期間 14 並記 を stocks/engine.mjs に（state.json は触らない）。report の 10/30 夜の値（NTT・日本製鉄が案 A 該当）が月曜の昼にどうなるかを所感の先頭に
+- calendar は tax-vol1（12/11）まで。12/12 以降のテーマを2件追加（候補: ネイル Vol.2、靴・修理・リペア、学童 Vol.2 は不要、引越し Vol.2（繁忙期）、花屋 Vol.2（年末年始）は flower と被るので不可）
+
 ## 2026-11-01 向け（翌朝の自分への引き継ぎ）
 - 実装済み: juku2（11/1 Release 予定）、newyear（11/2）、editor2（11/3）、wedding2（11/4）、drone（11/5）。`node factory/calendar.mjs next-design` は `sweets-vol1`（11/6）を返すはずなので、それを20デザイン実装する。brief は calendar.json の sweets-vol1 を参照。id 接頭辞は sw- を確認して使う（`grep -c "id: 'sw-"` で 0）
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
