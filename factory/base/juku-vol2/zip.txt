@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-juku-vol2-2026-11-01
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= juku-vol2_2026-11-01.zip

@@ -1,5 +1,17 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-03 向け（翌朝の自分への引き継ぎ）
+- 実装済み: editor2（11/3 Release 予定）、wedding2（11/4）、drone（11/5）、sweets（11/6）、dental2（11/7）。`node factory/calendar.mjs next-design` は `gym-vol2`（11/8）を返すはずなので、それを20デザイン実装する。brief は calendar.json の gym-vol2 を参照。id 接頭辞は gy2- を確認して使う（`grep -c "id: 'gy2-"` で 0）。gym-vol1 と役割を分ける
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- **push は朝 1 回だけ**。bot の `calendar: built` コミットを取り込むまで追加 push しない
+- 新パックを実装したら factory/base/pitch.json に一言を 1 件足す（商品説明の冒頭に入る）
+- **月曜に URL が貼られていたら**（マッキーのメッセージか、factory/base/urls_*.txt）: `node factory/links_add.mjs --csv factory/base/items_01.csv < urls.txt` で shop/links.json に反映 → `node factory/base_kit.mjs --missing` で確認 → 報告に「BASE 掲載 N 商品」。貼られていなければ報告の「やること」の先頭に残す
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告。11/3 は火曜（祝日・文化の日）なのでアプリ枠なし。株は休場
+- 株シミュ: 11/3 は祝日で休場。report は 11/2 夜の値になっているはず。NTT・日本製鉄（案 A の 10/30 該当）の 11/2 の騰落を所感の先頭に。「直して」があれば 3 点を stocks/engine.mjs に（state.json は触らない）
+- calendar は repair-vol1（12/13）まで。12/14 以降のテーマを2件追加（候補: 引越し Vol.2（繁忙期）、学習塾 Vol.3 は不要、ドラッグストア、パン屋 Vol.2 は cafe と被るので不可、写真館 Vol.2（七五三・成人式）、自動車学校）
+
 ## 2026-11-02 向け（翌朝の自分への引き継ぎ）
 - 実装済み: newyear（11/2 Release 予定）、editor2（11/3）、wedding2（11/4）、drone（11/5）、sweets（11/6）。`node factory/calendar.mjs next-design` は `dental-vol2`（11/7）を返すはずなので、それを20デザイン実装する。brief は calendar.json の dental-vol2 を参照。id 接頭辞は dn2- を確認して使う（`grep -c "id: 'dn2-"` で 0）。医療系なので **効果の断定は不可**、赤は避ける（dental-vol1 の配色と役割を分ける）
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`

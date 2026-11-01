@@ -21,6 +21,7 @@
 ## 3. 公開して URL を送る（10 商品 3 分）
 - [ ] 商品ページを開き、画像 7 枚・価格 ¥1,980・説明文の「よくある質問」まで表示されているか 1 つだけ確認
 - [ ] 10 商品の URL（`https://chaincreate.base.shop/items/…`）をまとめて Claude に貼る → `shop/links.json` に反映され、shop ページの「BASE で購入」が有効になる
+  - Claude 側の処理: 貼られた URL を `urls.txt` に保存して `node factory/links_add.mjs --csv factory/base/items_01.csv < urls.txt`（CSV の表示順どおりに割り当て。順番が違うときは行頭に pack 名を付ける）
 
 ## 4. 次の 10 商品へ
 - [ ] `items_02.csv` で 1〜3 を繰り返す。`node factory/base_kit.mjs --missing` で未登録パックが減っているか確認できる
