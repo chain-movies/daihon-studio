@@ -1,5 +1,18 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-04 向け（翌朝の自分への引き継ぎ）
+- 実装済み: wedding2（11/4 Release 予定）、drone（11/5）、sweets（11/6）、dental2（11/7）、gym2（11/8）。`node factory/calendar.mjs next-design` は `afterschool-vol1`（11/9）を返すはずなので、それを20デザイン実装する。brief は calendar.json の afterschool-vol1 を参照。id 接頭辞は as- を確認して使う（`grep -c "id: 'as-"` で 0）。子ども向けなので手書き・丸文字は 1 つまで
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- **push は朝 1 回だけ**。bot の `calendar: built` コミットを取り込むまで追加 push しない
+- 新パックを実装したら factory/base/pitch.json に一言を 1 件足す
+- **URL が貼られていたら**: `node factory/links_add.mjs --csv factory/base/items_01.csv < urls.txt` → `node factory/base_kit.mjs --missing` → 報告に「BASE 掲載 N 商品」。11/2（月）は貼られなかったので、報告の「やること」の先頭に残す
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告
+- **11/4 は水曜なのでアプリ枠あり**: plan-2026-11.md の「水曜 = note 公開」の初回。人間が No.24 を公開したら URL を貼ってくる前提で、**note の公開 URL を台帳と次の記事の冒頭に反映する小スクリプト** `factory/note_published.mjs`（引数: No と URL → content/note/<dir>/ledger.json の status を「公開済み」・url を追加、factory/note_ledger.md（無ければ作る）に 1 行追記、次の No の body.txt の冒頭「前回の記事」リンクを差し込む）。公開されなくても動作確認（ダミー URL・--dry）だけして報告
+- 株シミュ: 11/4 の report で 11/3 が祝日休場だったことを確認。案 A の答え合わせは延べ 5 件（+0.15／-0.15／+1.2／±0）。「直して」があれば 3 点を stocks/engine.mjs に（state.json は触らない）
+- calendar は driving-vol1（12/15）まで。12/16 以降のテーマを2件追加（候補: 引越し Vol.2（繁忙期）、ドラッグストア、工務店 Vol.3 は不要、ホテル・ビジネスホテル、書店・文具店）
+
 ## 2026-11-03 向け（翌朝の自分への引き継ぎ）
 - 実装済み: editor2（11/3 Release 予定）、wedding2（11/4）、drone（11/5）、sweets（11/6）、dental2（11/7）。`node factory/calendar.mjs next-design` は `gym-vol2`（11/8）を返すはずなので、それを20デザイン実装する。brief は calendar.json の gym-vol2 を参照。id 接頭辞は gy2- を確認して使う（`grep -c "id: 'gy2-"` で 0）。gym-vol1 と役割を分ける
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
