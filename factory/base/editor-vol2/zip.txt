@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-editor-vol2-2026-11-03
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= editor-vol2_2026-11-03.zip

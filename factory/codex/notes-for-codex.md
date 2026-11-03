@@ -1,5 +1,18 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-05 向け（翌朝の自分への引き継ぎ）
+- 実装済み: drone（11/5 Release 予定）、sweets（11/6）、dental2（11/7）、gym2（11/8）、afterschool（11/9）。`node factory/calendar.mjs next-design` は `community-vol1`（11/10）を返すはずなので、それを20デザイン実装する。brief は calendar.json の community-vol1 を参照。id 接頭辞は cm- を確認して使う（`grep -c "id: 'cm-"` で 0）
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- **push は朝 1 回だけ**。bot の `calendar: built` コミットを取り込むまで追加 push しない
+- 新パックを実装したら factory/base/pitch.json に一言を 1 件足す
+- **URL が貼られていたら**: BASE → `node factory/links_add.mjs --csv factory/base/items_01.csv < urls.txt`、note → `node factory/note_published.mjs <No> <URL>`。どちらも --dry で確認してから。貼られていなければ報告の「やること」の先頭に残す（11/2 月・11/4 水とも未着）
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告。11/5 は木曜なのでアプリ枠なし
+- 金曜（11/6）のアプリ枠: plan の「金曜 = 動画 1 本」の受け皿。人間が収録した動画ファイル（factory/howto/raw/ に置く想定）から **字幕 SRT を自動生成する下準備** として、howto-script.md のナレーション 6 本を SRT（秒数はカット表の 0–6／6–16／…）に変換する `factory/howto_srt.mjs` を作る（動画が無くても SRT は作れる。Premiere に読み込める形）
+- 株シミュ: 11/4 夜の値で、祝日明けの NTT・日本製鉄が案 A に戻ったかを所感の先頭に。「直して」があれば 3 点を stocks/engine.mjs に（state.json は触らない）
+- calendar は bookstore-vol1（12/17）まで。12/18 以降のテーマを2件追加（候補: 引越し Vol.2（繁忙期）、ドラッグストア、クリーニング Vol.2 は不要、葬儀 Vol.2（家族葬プラン）、農業 Vol.2（直売所））
+
 ## 2026-11-04 向け（翌朝の自分への引き継ぎ）
 - 実装済み: wedding2（11/4 Release 予定）、drone（11/5）、sweets（11/6）、dental2（11/7）、gym2（11/8）。`node factory/calendar.mjs next-design` は `afterschool-vol1`（11/9）を返すはずなので、それを20デザイン実装する。brief は calendar.json の afterschool-vol1 を参照。id 接頭辞は as- を確認して使う（`grep -c "id: 'as-"` で 0）。子ども向けなので手書き・丸文字は 1 つまで
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
