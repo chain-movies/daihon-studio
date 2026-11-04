@@ -1,5 +1,18 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-06 向け（翌朝の自分への引き継ぎ）
+- 実装済み: sweets（11/6 Release 予定）、dental2（11/7）、gym2（11/8）、afterschool（11/9）、community（11/10）。`node factory/calendar.mjs next-design` は `shigyo-vol1`（11/11）を返すはずなので、それを20デザイン実装する。brief は calendar.json の shigyo-vol1 を参照。id 接頭辞は sg- を確認して使う（`grep -c "id: 'sg-"` で 0）。士業なので断定を避け「一例」「要件あり」を添える
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- **push は朝 1 回だけ**。bot の `calendar: built` コミットを取り込むまで追加 push しない
+- 新パックを実装したら factory/base/pitch.json に一言を 1 件足す
+- **URL が貼られていたら**: BASE → `node factory/links_add.mjs --csv factory/base/items_01.csv < urls.txt`、note → `node factory/note_published.mjs <No> <URL>`。--dry で確認してから。未着なら報告の「やること」の先頭に残す
+- **株シミュが最優先の確認**: 11/4 夜に日本製鉄が初の「✅候補」。11/5 9:00 の実行で買いが入ったかを `git show origin/main:stocks/data/report.md` の「保有」「直近の売買」で確認し、所感と報告の先頭に。買っていれば「100 株・約 66,000 円・損切り -5%・利確 +10%・トレーリング 6%・最長 30 日」を書く。買っていなければ理由（昼の系列／出来高／SMA）を report の reasons から拾う。「直して」があれば 3 点を stocks/engine.mjs に（state.json は触らない）
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告
+- **11/6 は金曜なのでアプリ枠あり**: `factory/howto_srt.mjs` — factory/bundle/howto-script.md のナレーション 6 本をカット表の秒数（0–6／6–16／16–30／30–45／45–54／54–60）で SRT にする。出力は factory/bundle/howto-subtitles.srt（Premiere・CapCut に読み込める形）。`--pack <id>` でカット 6 の文言をパック名に差し替え。動画が無くても作れるので、人間が収録したらそのまま字幕に使える
+- calendar は drugstore-vol1（12/19）まで。12/20 以降のテーマを2件追加（候補: 葬儀 Vol.2（家族葬プラン）、農業 Vol.2（直売所）、神社・寺（初詣・祈祷）、ガソリンスタンド・カー用品）
+
 ## 2026-11-05 向け（翌朝の自分への引き継ぎ）
 - 実装済み: drone（11/5 Release 予定）、sweets（11/6）、dental2（11/7）、gym2（11/8）、afterschool（11/9）。`node factory/calendar.mjs next-design` は `community-vol1`（11/10）を返すはずなので、それを20デザイン実装する。brief は calendar.json の community-vol1 を参照。id 接頭辞は cm- を確認して使う（`grep -c "id: 'cm-"` で 0）
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
