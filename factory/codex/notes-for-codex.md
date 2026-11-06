@@ -1,5 +1,18 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-08 向け（翌朝の自分への引き継ぎ）
+- 実装済み: gym2（11/8 Release 予定）、afterschool（11/9）、community（11/10）、shigyo（11/11）、builder2（11/12）。`node factory/calendar.mjs next-design` は `recruit-vol2`（11/13・採用 Vol.2 求人情報）を返すはずなので、それを20デザイン実装する。brief は calendar.json の recruit-vol2 を参照。id 接頭辞は rc2- を確認して使う（rc- は recruit-vol1 が使用中）。**11/7 に calendar の重複（11/13 が recruit-vol1 のままだった）を recruit-vol2 に直した**。新テーマを足すときは `node -e` で pack id の重複と PACKS との衝突を確認する
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- **push は朝 1 回だけ**。bot の `calendar: built` コミットを取り込むまで追加 push しない
+- 新パックを実装したら factory/base/pitch.json に一言を 1 件足す
+- **URL が貼られていたら**: BASE → `node factory/links_add.mjs --csv factory/base/items_01.csv < urls.txt`、note → `node factory/note_published.mjs <No> <URL>`。--dry で確認してから。未着なら報告の「やること」の先頭に残す
+- 日曜なのでアプリ枠なし。報告に「11 月 1 週目の結果（人間の 30 分 0／3 回）と 2 週目にやる 3 つ」を plan-2026-11.md から転記（月 11/9: items_01.csv、水 11/11: note No.24、金 11/13: 動画 1 本）
+- 株シミュ: 日曜は休場。所感は「7 週間のまとめ（34 営業日ゼロ・原因は昼の実行の休場日判定）＋ 直し方 3 点」を短く。「直して」があれば stocks/engine.mjs の canTrade 判定を直す（market_date が前日でも平日 9:00〜15:30 で今日の quotes があれば取引時間中）＋ report に「データ元の日付／今日」1 行（state.json は触らない）
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告
+- calendar は gasstation-vol1（12/23）まで。12/24 以降のテーマを2件追加（候補: 美容室 Vol.2（メンズ）、整体 Vol.3 は不要、カフェ Vol.2（テイクアウト・デリバリー）、クリスマス後の「年末大掃除・ハウスクリーニング Vol.2」は cleaning と被るので不可、楽器店・音楽教室 Vol.2 は music2 と被るので不可、ペット Vol.3 は不要、介護施設・デイサービス）
+
 ## 2026-11-07 向け（翌朝の自分への引き継ぎ）
 - 実装済み: dental2（11/7 Release 予定）、gym2（11/8）、afterschool（11/9）、community（11/10）、shigyo（11/11）。`node factory/calendar.mjs next-design` は `builder-vol2`（11/12）を返すはずなので、それを20デザイン実装する。brief は calendar.json の builder-vol2 を参照。id 接頭辞は bd2- を確認して使う（`grep -c "id: 'bd2-"` で 0）。builder-vol1 と役割を分ける
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
