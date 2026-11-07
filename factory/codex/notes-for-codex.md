@@ -1,5 +1,18 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-09 向け（翌朝の自分への引き継ぎ）
+- 実装済み: afterschool（11/9 Release 予定）、community（11/10）、shigyo（11/11）、builder2（11/12）、recruit2（11/13）。`node factory/calendar.mjs next-design` は `pharmacy-vol1`（11/14・薬局）を返すはずなので、それを20デザイン実装する。brief は calendar.json の pharmacy-vol1 を参照。id 接頭辞は ph- を確認して使う（`grep -c "id: 'ph-"` で 0）。医療系なので効果の断定は不可・赤は避ける。12/19 の drugstore-vol1 と役割が近いので「調剤・処方・お薬相談」に寄せる
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- **push は朝 1 回だけ**。bot の `calendar: built` コミットを取り込むまで追加 push しない
+- 新パックを実装したら factory/base/pitch.json に一言を 1 件足す。calendar にテーマを足すときは pack id の重複と PACKS との衝突を `node -e` で確認（11/7 の教訓）
+- **URL が貼られていたら**: BASE → `node factory/links_add.mjs --csv factory/base/items_01.csv < urls.txt`、note → `node factory/note_published.mjs <No> <URL>`。--dry で確認してから。未着なら報告の「やること」の先頭に残す（1 週目は 0／3）
+- **11/9 は月曜なのでアプリ枠あり**: `factory/status.mjs` — 報告の先頭「売る側の数字」を自動で出す。BASE 掲載数（shop/links.json の base が入っている pack 数）、Release 済みパック数（calendar の built）、CSV 商品数（items.csv）、先行在庫（実装済みで未 Release の pack と日付）、note 公開数（content/note/*/ledger.json の status）、動画数（factory/howto/raw/ のファイル数・無ければ 0）、未実装テーマ数。`--md` で報告に貼れる Markdown を出す。以後の報告はこの出力を貼る
+- 株シミュ: 月曜 9:00 が 8 週目初回。14:2x の昼の実行が「休場日（評価のみ）」のままかを `git log origin/main --since=24.hours -- stocks/data/report.md` で確認して所感の先頭に。「直して」があれば stocks/engine.mjs の canTrade 判定（market_date が前日でも平日 9:00〜15:30 で今日の quotes があれば取引時間中）＋ report に「データ元の日付／今日」1 行（state.json は触らない）
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告
+- calendar は daycare-vol1（12/25）まで。12/26 以降のテーマを2件追加（候補: カフェ Vol.2（テイクアウト・デリバリー）、年末大掃除は cleaning と被るので不可、英会話 Vol.3 は不要、スーパー・食品スーパー、整骨院 Vol.3 は不要、観光 Vol.2（インバウンド英語表記）、ブライダル Vol.3 は不要）
+
 ## 2026-11-08 向け（翌朝の自分への引き継ぎ）
 - 実装済み: gym2（11/8 Release 予定）、afterschool（11/9）、community（11/10）、shigyo（11/11）、builder2（11/12）。`node factory/calendar.mjs next-design` は `recruit-vol2`（11/13・採用 Vol.2 求人情報）を返すはずなので、それを20デザイン実装する。brief は calendar.json の recruit-vol2 を参照。id 接頭辞は rc2- を確認して使う（rc- は recruit-vol1 が使用中）。**11/7 に calendar の重複（11/13 が recruit-vol1 のままだった）を recruit-vol2 に直した**。新テーマを足すときは `node -e` で pack id の重複と PACKS との衝突を確認する
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
