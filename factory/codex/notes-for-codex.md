@@ -1,5 +1,18 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-10 向け（翌朝の自分への引き継ぎ）
+- 実装済み: community（11/10 Release 予定）、shigyo（11/11）、builder2（11/12）、recruit2（11/13）、pharmacy（11/14）。`node factory/calendar.mjs next-design` は `carservice-vol2`（11/15・自動車整備 Vol.2 車検・整備解説）を返すはずなので、それを20デザイン実装する。brief は calendar.json の carservice-vol2 を参照。id 接頭辞は cs2- を確認して使う（`grep -c "id: 'cs2-"` で 0）。carservice-vol1 と役割を分ける
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- **push は朝 1 回だけ**。bot の `calendar: built` コミットを取り込むまで追加 push しない
+- 新パックを実装したら factory/base/pitch.json に一言を 1 件足す。calendar にテーマを足すときは pack id の重複と PACKS との衝突を確認
+- **報告の先頭は `node factory/status.mjs --md` の出力を貼る**（11/9 に作った。BASE 掲載・Release 数・CSV・先行在庫・note・動画を自動で数える）。手で数えない
+- **URL が貼られていたら**: BASE → `node factory/links_add.mjs --csv factory/base/items_01.csv < urls.txt`、note → `node factory/note_published.mjs <No> <URL>`。--dry で確認してから。未着なら報告の「やること」の先頭に残す
+- 株シミュ: 11/9 の昼の実行（14:2x）が「休場日（評価のみ）」だったかを `git log origin/main --since=24.hours -- stocks/data/report.md` と各コミットの 1 行目で確認して所感の先頭に。「直して」があれば stocks/engine.mjs の canTrade 判定＋ report に「データ元の日付／今日」1 行（state.json は触らない）
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告。11/10 は火曜なのでアプリ枠なし
+- calendar は tourism-vol2（12/27）まで。12/28 以降のテーマを2件追加（候補: カフェ Vol.2（テイクアウト・デリバリー）、年末年始 Vol.2 は newyear と被るので不可、不動産 Vol.3 は不要、スイミング Vol.2 は kidsport と被るので不可、楽器店は music2 と被るので不可、まつげ・眉サロン、ランドリー・コインランドリー）
+
 ## 2026-11-09 向け（翌朝の自分への引き継ぎ）
 - 実装済み: afterschool（11/9 Release 予定）、community（11/10）、shigyo（11/11）、builder2（11/12）、recruit2（11/13）。`node factory/calendar.mjs next-design` は `pharmacy-vol1`（11/14・薬局）を返すはずなので、それを20デザイン実装する。brief は calendar.json の pharmacy-vol1 を参照。id 接頭辞は ph- を確認して使う（`grep -c "id: 'ph-"` で 0）。医療系なので効果の断定は不可・赤は避ける。12/19 の drugstore-vol1 と役割が近いので「調剤・処方・お薬相談」に寄せる
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
