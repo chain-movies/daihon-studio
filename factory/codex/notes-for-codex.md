@@ -1,5 +1,19 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-11 向け（翌朝の自分への引き継ぎ）
+- 実装済み: shigyo（11/11 Release 予定）、builder2（11/12）、recruit2（11/13）、pharmacy（11/14）、carservice2（11/15）。`node factory/calendar.mjs next-design` は `photo-vol1`（11/16・写真館・フォトスタジオ）を返すはずなので、それを20デザイン実装する。brief は calendar.json の photo-vol1 を参照。id 接頭辞は pho- を使う（pt- は別パックが使用中。`grep -c "id: 'pho-"` で 0 を確認）。12/14 の photo-vol2（七五三・成人式）と役割を分ける（vol1 は brief どおり撮影テクニック・カメラ解説寄り）
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- **push は朝 1 回だけ**。bot の `calendar: built` コミットを取り込むまで追加 push しない
+- 新パックを実装したら factory/base/pitch.json に一言を 1 件足す。calendar にテーマを足すときは pack id の重複と PACKS との衝突を確認
+- **報告の先頭は `node factory/status.mjs --md` の出力を貼る**
+- **URL が貼られていたら**: BASE → `node factory/links_add.mjs --csv factory/base/items_01.csv < urls.txt`、note → `node factory/note_published.mjs <No> <URL>`。--dry で確認してから。未着なら報告の「やること」の先頭に残す（11/9 月も未着）
+- **11/11 は水曜なのでアプリ枠あり**: plan の「水曜 = note 公開」の 2 回目（1 回目は未実施）。工場側の次の一手として **note の「公開手順カード」1 枚**: content/note/2026-09-18-srt-tool/（No.24）の guide.md を元に、「公開ボタンまでの 8 手順（Doc を開く → コピー → note 新規 → 貼る → 見出し画像 → 図解 3 枚の挿入位置 → タグ → 公開）」を factory/note_publish_card.md に。各手順に「どのファイルを開くか」のパスと Drive の Doc URL を書く。A4 1 枚相当・PDF 化（howto-record-sheet と同じ Playwright の手順）
+- 株シミュ: 11/10 の昼の実行（14:2x）の mode と market_date を確認して所感の先頭に（8 週目 2 日目）。「直して」があれば stocks/engine.mjs の canTrade 判定＋ report に「データ元の日付／今日」1 行（state.json は触らない）
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告
+- calendar は laundry-vol1（12/29）まで。12/30 以降のテーマを2件追加（候補: カフェ Vol.2（テイクアウト・デリバリー）、年末年始の営業案内は newyear と被るので不可、ホームセンター・DIY、アパレル・古着は recycle と被るので不可、靴屋は repair と被るので不可、楽器は不可、歯科 Vol.3 は不要、スポーツ用品店）
+
 ## 2026-11-10 向け（翌朝の自分への引き継ぎ）
 - 実装済み: community（11/10 Release 予定）、shigyo（11/11）、builder2（11/12）、recruit2（11/13）、pharmacy（11/14）。`node factory/calendar.mjs next-design` は `carservice-vol2`（11/15・自動車整備 Vol.2 車検・整備解説）を返すはずなので、それを20デザイン実装する。brief は calendar.json の carservice-vol2 を参照。id 接頭辞は cs2- を確認して使う（`grep -c "id: 'cs2-"` で 0）。carservice-vol1 と役割を分ける
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
