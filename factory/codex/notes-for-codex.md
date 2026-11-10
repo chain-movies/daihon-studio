@@ -1,5 +1,19 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-12 向け（翌朝の自分への引き継ぎ）
+- 実装済み: builder2（11/12 Release 予定）、recruit2（11/13）、pharmacy（11/14）、carservice2（11/15）、photo（11/16）。`node factory/calendar.mjs next-design` は `cleaning-vol1`（11/17・クリーニング・家事代行）を返すはずなので、それを20デザイン実装する。brief は calendar.json の cleaning-vol1 を参照。id 接頭辞は **cln-** を使う（cl- は別パックが使用中。`grep -c "id: 'cln-"` で 0 を確認）
+- 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
+- **push は朝 1 回だけ**。bot の `calendar: built` コミットを取り込むまで追加 push しない
+- 新パックを実装したら factory/base/pitch.json に一言を 1 件足す。calendar にテーマを足すときは pack id の重複と PACKS との衝突を確認
+- **報告の先頭は `node factory/status.mjs --md` の出力を貼る**
+- **URL が貼られていたら**: BASE → `node factory/links_add.mjs --csv factory/base/items_01.csv < urls.txt`、note → `node factory/note_published.mjs <No> <URL>`。--dry で確認してから。未着なら報告の「やること」の先頭に残す（11/9 月・11/11 水とも未着なら 2 週目 0／2）
+- 11/11 に factory/note_publish_card.md（＋ .pdf）を作った。報告の「やること」の note 公開には `factory/note_publish_card.pdf を印刷` を添える
+- 株シミュ: 11/11 の昼の実行の mode と market_date を確認して所感の先頭に。夜に LINEヤフーが候補だったので、昼が休場判定なら「3 回目の取りこぼし」と書く。「直して」があれば stocks/engine.mjs の canTrade 判定＋ report に「データ元の日付／今日」1 行（state.json は触らない）
+- factory/design_template.md の 20 枠に当てはめてから書く。anchor x 'right' の sub は主文より短く
+- 文字サイズは主文 66〜84・tag 44〜52・sub 36〜40。tag 'above' は anchor y 'bottom' か 'middle'、bar は align 'center'、deco triangleLeft は size 56・gap 72、accent.side は left/top/bottom のみ、sub の align は 'left' か 'center' のみ。入れた後に count=20 を確認
+- 毎朝の定型: デザイン → quick → 目視 → full → `node factory/gen_gallery.mjs` → `node factory/base_kit.mjs --ref main --split 10` → `node factory/gen_howto_caps.mjs` → 報告。11/12 は木曜なのでアプリ枠なし
+- calendar は sportsshop-vol1（12/31）まで。2027/1/1 以降のテーマを2件追加（候補: カフェ Vol.2（テイクアウト・デリバリー）、成人式（写真館 Vol.2 と被るので不可）、確定申告は shigyo と被るので不可、スキー Vol.2 は不要、バレンタイン・チョコ（sweets Vol.2）、受験応援（juku と被るので不可）、保育園 Vol.2（入園説明会）、引越し Vol.2 は追加済み）
+
 ## 2026-11-11 向け（翌朝の自分への引き継ぎ）
 - 実装済み: shigyo（11/11 Release 予定）、builder2（11/12）、recruit2（11/13）、pharmacy（11/14）、carservice2（11/15）。`node factory/calendar.mjs next-design` は `photo-vol1`（11/16・写真館・フォトスタジオ）を返すはずなので、それを20デザイン実装する。brief は calendar.json の photo-vol1 を参照。id 接頭辞は pho- を使う（pt- は別パックが使用中。`grep -c "id: 'pho-"` で 0 を確認）。12/14 の photo-vol2（七五三・成人式）と役割を分ける（vol1 は brief どおり撮影テクニック・カメラ解説寄り）
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
