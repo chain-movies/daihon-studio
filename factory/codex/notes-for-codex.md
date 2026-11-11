@@ -1,5 +1,18 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-13 向け（金）
+
+- 次の実装 = `music-vol2`（11/18 Release）。prefix は **mu2-**（`mu-` は music-vol1 が使用中。`grep -c "id: 'mu2-" telop/designs.js` が 0 なのを確認してから）。calendar の brief に沿って 20 デザイン
+- PACKS の挿入位置は `'cleaning-vol1'` の行の直後
+- push は朝 1 回だけ（bot の `calendar: built` が入る前に 2 回目を push すると bot 側が reject される。10/31 の件）
+- `factory/base/pitch.json` に music-vol2 の「■ このパックの特徴」を追加（base_kit が商品説明に差し込む）
+- calendar にテーマを足す時は pack id の重複（queue 内／PACKS 内）を必ず確認。11/12 時点で 2027-01-02 sweets-vol2 まで埋まっている → 2027/1/3 以降に 2 本（候補: 保育園 Vol.2 入園説明会、成人式・振袖レンタル、確定申告 税理士 Vol.2 は tax-vol1 と重複注意）
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- 金曜はアプリ枠あり。roadmap は空なので売る側の道具を 1 本。候補: `factory/base/items_01.csv` の 10 商品分の「BASE 商品ページ用サムネ（1200×1200）」を一括生成するスクリプト（contact_sheet から切り出し）。すでにあれば `factory/release_private.mjs`（Release を draft 化する手順書）でも可
+- 株シミュ: 11/12 の昼実行（13:5x JST）の mode と market_date を確認。候補が出ていたのに「休場日（評価のみ）」なら 3 回目の取りこぼし。「直して」が来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+- 「やること」の最後に note_publish_card.pdf と金曜の動画 1 本を入れる
+
 ## 2026-11-12 向け（翌朝の自分への引き継ぎ）
 - 実装済み: builder2（11/12 Release 予定）、recruit2（11/13）、pharmacy（11/14）、carservice2（11/15）、photo（11/16）。`node factory/calendar.mjs next-design` は `cleaning-vol1`（11/17・クリーニング・家事代行）を返すはずなので、それを20デザイン実装する。brief は calendar.json の cleaning-vol1 を参照。id 接頭辞は **cln-** を使う（cl- は別パックが使用中。`grep -c "id: 'cln-"` で 0 を確認）
 - 朝イチで `ls telop/fontcache/files | wc -l`（27 なら OK）。無ければ `node factory/fetch_fonts.mjs`
