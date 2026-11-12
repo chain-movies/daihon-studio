@@ -1,5 +1,18 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-14 向け（土）
+
+- 次の実装 = `fishery-vol1`（11/19 Release）。prefix は **fs-**（未使用を確認済み。念のため `grep -c "id: 'fs-" telop/designs.js` が 0 か見る）。calendar の brief に沿って 20 デザイン
+- PACKS の挿入位置は `'music-vol2'` の行の直後
+- push は朝 1 回だけ（bot の `calendar: built` が入る前に 2 回目を push すると bot 側が reject される）
+- `factory/base/pitch.json` に fishery-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-04 seijin-vol1 まで埋まっている → 2027/1/5 以降に 2 本（候補: 確定申告 税理士 Vol.2 は tax-vol1 と重複注意 → 「年末調整・確定申告 期限」寄りに、ガーデニング・園芸店、バレエ・ダンス教室）。pack id の重複（queue／PACKS）を必ず確認
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- 土曜はアプリ枠なし
+- 株シミュ: 11/13（金）の昼実行の mode と market_date を確認。候補が出ていたのに「休場日（評価のみ）」なら 3 回目の取りこぼし。土曜は休場なので夜の run は「休場日」で正しい
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+- 11/13 に作った `apps/safe-zone/` は無料ツール（導線）。listing.md はあるので BASE 登録は不要。shop/ に載せるなら gen_gallery が拾う形になっているか確認
+
 ## 2026-11-13 向け（金）
 
 - 次の実装 = `music-vol2`（11/18 Release）。prefix は **mu2-**（`mu-` は music-vol1 が使用中。`grep -c "id: 'mu2-" telop/designs.js` が 0 なのを確認してから）。calendar の brief に沿って 20 デザイン

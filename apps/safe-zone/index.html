@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>縦動画セーフゾーンチェッカー｜ショート・リール・TikTok の UI にテロップが隠れないか確認</title>
+<meta name="description" content="縦動画（9:16）の画像・動画を置くだけで、各プラットフォームのボタンや説明文に隠れる範囲を重ねて表示。テロップ・顔・ロゴの安全な位置が一目で分かる。透過ガイド PNG（1080×1920）を書き出して編集ソフトに重ねられます。">
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--surface3:#2b2b29;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#e5484d;--warn:#fab219;--ok:#3fb950;--blue:#3987e5;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:13.5px;line-height:1.6}
+#app{display:grid;grid-template-columns:1fr 340px;grid-template-rows:56px 1fr;height:100%}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+header .logo{display:flex;align-items:center;gap:9px;font-weight:700}
+header .logo .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#3987e5,#9085e9);display:flex;align-items:center;justify-content:center;font-size:14px}
+header .sp{flex:1}
+header a{font-size:11px;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 8px;text-decoration:none}
+main{display:flex;align-items:center;justify-content:center;padding:16px;overflow:hidden;position:relative}
+.stage{position:relative;height:100%;max-height:calc(100vh - 90px);aspect-ratio:9/16;background:#111;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%}
+.drop{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);text-align:center;padding:24px;cursor:pointer}
+.drop b{color:var(--ink2);font-size:15px}
+.drop.hide{display:none}
+.stage.over{outline:2px dashed var(--blue)}
+aside{background:var(--surface);border-left:1px solid var(--line);overflow:auto;padding:12px}
+h3{font-size:12px;color:var(--muted);font-weight:600;margin:14px 0 6px;letter-spacing:.04em}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--surface2);color:var(--ink2);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:12.5px}
+.tab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.chk{display:flex;align-items:center;gap:7px;font-size:12.5px;margin:6px 0}
+.chk input{margin:0}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;width:100%;margin-top:8px}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+input[type=range]{width:100%}
+label{display:block;font-size:12px;color:var(--ink2);margin:8px 0 2px}
+.note{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+.kpi{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px;font-size:12px}
+.kpi b{font-size:16px;display:block}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--line);padding:8px 14px;border-radius:8px;font-size:12px;display:none}
+@media (max-width:900px){#app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr}header{grid-column:1}aside{border-left:0;border-bottom:1px solid var(--line);max-height:45vh}main{min-height:50vh}.stage{max-height:none;height:100%}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo"><span class="mark">▯</span><span>縦動画セーフゾーンチェッカー</span><span style="color:var(--muted);font-weight:400;font-size:11.5px">9:16・UI に隠れない位置を確認</span></div>
+    <div class="sp"></div>
+    <a href="../../shop/">素材集・製品版 →</a>
+  </header>
+  <main>
+    <div class="stage" id="stage">
+      <canvas id="cv" width="1080" height="1920"></canvas>
+      <div class="drop" id="drop"><b>画像か動画をここにドロップ</b><span>またはクリックして選択（PNG / JPG / MP4 / MOV）。ファイルは外部に送信されません</span><span style="font-size:11px">何も置かなくてもガイドだけ書き出せます</span></div>
+      <input type="file" id="file" accept="image/*,video/*" hidden>
+    </div>
+  </main>
+  <aside>
+    <h3>プラットフォーム（複数可）</h3>
+    <div class="tabs" id="plats"></div>
+    <h3>表示</h3>
+    <label class="chk"><input type="checkbox" id="optTitle" checked> テロップ安全域（全部に共通で隠れない範囲）を枠で表示</label>
+    <label class="chk"><input type="checkbox" id="optGrid"> 3 分割グリッド</label>
+    <label class="chk"><input type="checkbox" id="optCenter"> 中央 4:5・1:1 のトリミング枠（フィード用）</label>
+    <label class="chk"><input type="checkbox" id="optLabel" checked> ゾーン名を表示</label>
+    <label>塗りの濃さ <span id="opV" style="color:var(--muted)">45%</span></label>
+    <input type="range" id="opacity" min="10" max="90" value="45">
+    <h3>動画</h3>
+    <div class="row"><button class="btn" id="play">再生 / 停止</button><button class="btn" id="snap">この瞬間で止める</button></div>
+    <input type="range" id="seek" min="0" max="1000" value="0" disabled>
+    <h3>安全域の数字（1080×1920 基準）</h3>
+    <div class="kpi" id="kpi">—</div>
+    <h3>書き出し</h3>
+    <button class="btn primary" id="dlFrame">確認用 PNG（映像＋ゾーン）</button>
+    <button class="btn" id="dlGuide">透過ガイド PNG（1080×1920）</button>
+    <button class="btn" id="dlCsv">安全域の数値を CSV</button>
+    <div class="note">ゾーンは 2026 年時点の一般的なスマホ表示をもとにした目安です。端末・アプリの更新・字幕やキャプションの長さで前後します。迷ったら「テロップ安全域」の枠の中に収めてください。透過ガイドは編集ソフトの最上位トラックに置き、書き出し前に非表示にします。</div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const W=1080,H=1920;
+// ゾーンは 1080×1920 の座標。概算。
+const PLATS={
+  shorts:{name:'ショート',color:'#e5484d',zones:[
+    {n:'上部 UI',x:0,y:0,w:W,h:200},{n:'右ボタン列',x:W-170,y:860,w:170,h:760},{n:'下部 タイトル・チャンネル',x:0,y:1500,w:W-170,h:420}]},
+  reels:{name:'リール',color:'#9085e9',zones:[
+    {n:'上部 UI',x:0,y:0,w:W,h:220},{n:'右ボタン列',x:W-180,y:1000,w:180,h:620},{n:'下部 キャプション・音源',x:0,y:1480,w:W-180,h:440}]},
+  tiktok:{name:'TikTok風',color:'#3fb950',zones:[
+    {n:'上部 タブ',x:0,y:0,w:W,h:240},{n:'右ボタン列',x:W-190,y:900,w:190,h:720},{n:'下部 説明・音源',x:0,y:1440,w:W-190,h:480}]},
+  stories:{name:'ストーリーズ',color:'#fab219',zones:[
+    {n:'上部 プロフィール',x:0,y:0,w:W,h:260},{n:'下部 返信欄',x:0,y:1660,w:W,h:260}]},
+};
+const S={plats:new Set(['shorts','reels','tiktok']),media:null,video:null,fit:'cover'};
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+// タブ
+const platsEl=$('plats');
+for(const [k,p] of Object.entries(PLATS)){const b=document.createElement('button');b.className='tab'+(S.plats.has(k)?' on':'');b.innerHTML=`<span class="sw" style="background:${p.color}"></span>${p.name}`;b.onclick=()=>{S.plats.has(k)?S.plats.delete(k):S.plats.add(k);b.classList.toggle('on');draw();};platsEl.appendChild(b);}
+['optTitle','optGrid','optCenter','optLabel'].forEach(id=>$(id).onchange=draw);
+$('opacity').oninput=e=>{$('opV').textContent=e.target.value+'%';draw();};
+// 安全域 = 選択プラットフォームのゾーンをすべて除いた中央の最大矩形（上下は最大、左右は右列の最大幅）
+function safeRect(){
+  let top=0,bottom=H,right=W;
+  for(const k of S.plats){for(const z of PLATS[k].zones){
+    if(z.y===0&&z.w===W) top=Math.max(top,z.h);
+    else if(z.y+z.h>=H&&z.x===0) bottom=Math.min(bottom,z.y);
+    else if(z.x+z.w>=W) right=Math.min(right,z.x);
+  }}
+  // 右ボタン列は下部に重なる帯の右端なので、ボタン列の上端より上はフル幅で使える。簡便化のため左右は 0〜right に統一
+  return {x:60,y:top+40,w:right-120,h:bottom-top-80};
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#111';ctx.fillRect(0,0,W,H);
+  drawMedia(ctx);
+  drawOverlay(ctx,false);
+  const r=safeRect();
+  $('kpi').innerHTML=`テロップ安全域 <b>${r.w}×${r.h}px</b>左 ${r.x} / 上 ${r.y} / 右 ${W-r.x-r.w} / 下 ${H-r.y-r.h}<br>（16:9 の映像を中央に置くと高さ ${Math.round(W*9/16)}px → 上下 ${Math.round((H-W*9/16)/2)}px が余白）`;
+}
+function drawMedia(c){
+  const m=S.video||S.media; if(!m) return;
+  const mw=S.video?m.videoWidth:m.naturalWidth, mh=S.video?m.videoHeight:m.naturalHeight; if(!mw) return;
+  const s=Math.max(W/mw,H/mh), dw=mw*s, dh=mh*s;
+  c.drawImage(m,(W-dw)/2,(H-dh)/2,dw,dh);
+}
+function drawOverlay(c,guideOnly){
+  const a=(+$('opacity').value)/100;
+  let pi=0;
+  for(const k of S.plats){const p=PLATS[k];const off=pi++*46;
+    for(const z of p.zones){
+      c.fillStyle=hexA(p.color,guideOnly?Math.min(a,.5):a*0.55);c.fillRect(z.x,z.y,z.w,z.h);
+      c.strokeStyle=hexA(p.color,.95);c.lineWidth=4;c.strokeRect(z.x+2,z.y+2,z.w-4,z.h-4);
+      if($('optLabel').checked){c.fillStyle='#fff';c.font='700 30px system-ui,sans-serif';c.textBaseline='top';
+        const t=`${p.name}: ${z.n}`; const tw=c.measureText(t).width+24; const ty=(z.y+z.h>=H?z.y+12+off:z.y+12), tx=z.x+12;
+        c.fillStyle=hexA(p.color,.9);c.fillRect(tx,ty,Math.min(tw,z.w-24),42);c.fillStyle='#fff';c.fillText(t,tx+12,ty+6,z.w-48);}
+    }}
+  if($('optTitle').checked){const r=safeRect();c.setLineDash([24,14]);c.strokeStyle='#fff';c.lineWidth=5;c.strokeRect(r.x,r.y,r.w,r.h);c.setLineDash([]);
+    c.fillStyle='rgba(255,255,255,.92)';c.font='700 34px system-ui,sans-serif';c.textBaseline='top';c.fillText('テロップ安全域',r.x+16,r.y+14);}
+  if($('optGrid').checked){c.strokeStyle='rgba(255,255,255,.45)';c.lineWidth=2;for(let i=1;i<3;i++){c.beginPath();c.moveTo(W*i/3,0);c.lineTo(W*i/3,H);c.stroke();c.beginPath();c.moveTo(0,H*i/3);c.lineTo(W,H*i/3);c.stroke();}}
+  if($('optCenter').checked){c.setLineDash([10,10]);c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=3;
+    const h45=W*5/4;c.strokeRect(0,(H-h45)/2,W,h45);c.strokeRect(0,(H-W)/2,W,W);c.setLineDash([]);
+    c.fillStyle='rgba(255,255,255,.8)';c.font='28px system-ui,sans-serif';c.fillText('4:5',12,(H-h45)/2+8);c.fillText('1:1',12,(H-W)/2+8);}
+}
+function hexA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`;}
+// ファイル
+const stage=$('stage'),drop=$('drop'),file=$('file');
+drop.onclick=()=>file.click();
+stage.ondragover=e=>{e.preventDefault();stage.classList.add('over');};
+stage.ondragleave=()=>stage.classList.remove('over');
+stage.ondrop=e=>{e.preventDefault();stage.classList.remove('over');if(e.dataTransfer.files[0])load(e.dataTransfer.files[0]);};
+file.onchange=()=>file.files[0]&&load(file.files[0]);
+let raf=0;
+function load(f){
+  stopVideo();S.media=null;S.video=null;
+  const url=URL.createObjectURL(f);
+  if(f.type.startsWith('video/')){const v=document.createElement('video');v.src=url;v.muted=true;v.loop=true;v.playsInline=true;
+    v.onloadeddata=()=>{S.video=v;$('seek').disabled=false;drop.classList.add('hide');draw();toast(`${v.videoWidth}×${v.videoHeight}・${v.duration.toFixed(1)} 秒`);};}
+  else{const im=new Image();im.onload=()=>{S.media=im;drop.classList.add('hide');$('seek').disabled=true;draw();toast(`${im.naturalWidth}×${im.naturalHeight}`);};im.src=url;}
+}
+function loop(){if(S.video&&!S.video.paused){draw();$('seek').value=Math.round(S.video.currentTime/S.video.duration*1000);raf=requestAnimationFrame(loop);}}
+function stopVideo(){if(S.video){S.video.pause();}cancelAnimationFrame(raf);}
+$('play').onclick=()=>{if(!S.video)return toast('動画を置いてください');if(S.video.paused){S.video.play();loop();}else{S.video.pause();}};
+$('snap').onclick=()=>{if(S.video){S.video.pause();draw();}};
+$('seek').oninput=e=>{if(S.video){S.video.currentTime=e.target.value/1000*S.video.duration;S.video.onseeked=draw;}};
+// 書き出し
+function dl(canvas,name){canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();toast(name+' を保存');},'image/png');}
+$('dlFrame').onclick=()=>{draw();dl(cv,`safezone_check_${stamp()}.png`);};
+$('dlGuide').onclick=()=>{const g=document.createElement('canvas');g.width=W;g.height=H;const c=g.getContext('2d');drawOverlay(c,true);dl(g,`safezone_guide_${[...S.plats].join('-')||'none'}.png`);};
+$('dlCsv').onclick=()=>{const rows=[['platform','zone','x','y','w','h']];for(const k of S.plats){for(const z of PLATS[k].zones)rows.push([PLATS[k].name,z.n,z.x,z.y,z.w,z.h]);}const r=safeRect();rows.push(['共通','テロップ安全域',r.x,r.y,r.w,r.h]);
+  const csv='﻿'+rows.map(r=>r.join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='safezone.csv';a.click();toast('CSV を保存');};
+function stamp(){const d=new Date();return d.toISOString().slice(0,19).replace(/[-:T]/g,'');}
+let tt;function toast(s){const t=$('toast');t.textContent=s;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',2200);}
+draw();
+</script>
+</body>
+</html>
