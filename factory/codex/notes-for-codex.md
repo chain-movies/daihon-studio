@@ -1,5 +1,18 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-15 向け（日）
+
+- 次の実装 = `ryokan-vol1`（11/20 Release・温泉旅館・ホテル 館内案内）。prefix は **ry-**（未使用を確認済み。念のため `grep -c "id: 'ry-" telop/designs.js` が 0 か見る）
+- PACKS の挿入位置は `'fishery-vol1'` の行の直後
+- push は朝 1 回だけ（bot の `calendar: built` が入る前に 2 回目を push すると bot 側が reject される）。修正 push が必要なら bot のコミットを fetch してから
+- `factory/base/pitch.json` に ryokan-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-06 dance-vol1 まで。2027/1/7 以降に 2 本。**テーマを足す前に queue と PACKS の両方で id を確認**（11/14 に garden-vol1 を足そうとして既存とぶつかった。観葉植物・園芸は 10/28 に Release 済み）。候補: 外構・エクステリア（exterior-vol1）、学習塾 Vol.1（juku-vol1 は free。juku-vol2 だけ存在する変な状態なので名前は「個別指導塾」など別系統に）、鍼灸・整骨院 Vol.2
+- 右寄せ（anchor x 'right'）＋ tag 'above' や sub が主文より長いデザインは右にはみ出す。11/14 も fs-howtoeat で 1 件出た → `{ x: 'left', y: 'middle', margin: 120 }` に
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- 日曜はアプリ枠なし
+- 株シミュ: 土日は休場なので「休場日」で正しい。**11/13 昼に 3 回目の取りこぼし（LINEヤフー 533 円 候補）が確定**。夜の判定で楽天 637 円が候補 → 月曜 11/16 の昼実行で買えるかどうかが次の確認点。「直して」が来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-14 向け（土）
 
 - 次の実装 = `fishery-vol1`（11/19 Release）。prefix は **fs-**（未使用を確認済み。念のため `grep -c "id: 'fs-" telop/designs.js` が 0 か見る）。calendar の brief に沿って 20 デザイン
