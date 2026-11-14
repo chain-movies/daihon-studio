@@ -1,5 +1,18 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-16 向け（月）
+
+- 次の実装 = `factory-vol1`（11/21 Release）。prefix は **fc-** か **fac-**（`grep -c "id: 'fc-" telop/designs.js` が 0 なら fc-）。calendar の brief に沿って 20 デザイン
+- PACKS の挿入位置は `'ryokan-vol1'` の行の直後
+- push は朝 1 回だけ（bot の `calendar: built` が入る前に 2 回目を push すると bot 側が reject される）。修正 push が必要なら bot のコミットを fetch してから
+- `factory/base/pitch.json` に factory-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-08 bento-vol1 まで。2027/1/9 以降に 2 本。**足す前に queue と PACKS の両方で id を確認**（free を確認済みの候補: juku-vol1 は「個別指導塾」として、seikotsu は bodycare-vol1/2 と重複するので不可、ramen-vol1・curry-vol1・izakaya-vol1（bar-vol1 と近いので「居酒屋 Vol.1」は避ける）、tutor-vol1 家庭教師・オンライン個別）
+- 右寄せ（anchor x 'right'）＋ tag 'above' や sub が主文より長いデザインは右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }` に
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- **月曜はアプリ枠あり**。roadmap は空なので候補: (a) `apps/bento-menu/`「日替わりメニュー表メーカー」（A4 印刷＋SNS 用正方形 PNG、週間 5 日分）は小さくて売れる系、(b) 売る側なら `factory/weekly_digest.mjs`（1 週間の reports を 1 枚にまとめる・月曜の報告に貼る）。(a) を推す
+- 株シミュ: **11/16（月）昼実行の mode と market_date を必ず確認**。楽天 637 円が候補で持ち越し。「休場日（評価のみ）」のままなら 4 回目の取りこぼし。11/13 昼の LINEヤフー 533 円を「買えていればいくらだったか」も所感に。「直して」が来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-15 向け（日）
 
 - 次の実装 = `ryokan-vol1`（11/20 Release・温泉旅館・ホテル 館内案内）。prefix は **ry-**（未使用を確認済み。念のため `grep -c "id: 'ry-" telop/designs.js` が 0 か見る）
