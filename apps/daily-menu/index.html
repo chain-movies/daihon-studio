@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>日替わりメニュー表メーカー｜週間メニューを A4 印刷と SNS 用画像に</title>
+<meta name="description" content="弁当店・社員食堂・定食屋・カフェの日替わりメニューを入力するだけで、店頭に貼る A4 の週間メニュー表と、SNS 用の正方形画像（1080×1080）・縦長画像（1080×1920）を書き出し。CSV 保存、ブラウザ内だけで完結。">
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--surface3:#2b2b29;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#e5484d;--warn:#fab219;--ok:#3fb950;--blue:#3987e5;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:13.5px;line-height:1.6}
+#app{display:grid;grid-template-columns:1fr 380px;grid-template-rows:56px 1fr;height:100%}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+header .logo{display:flex;align-items:center;gap:9px;font-weight:700}
+header .logo .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#f0a030,#e5484d);display:flex;align-items:center;justify-content:center;font-size:14px}
+header .sp{flex:1}
+header a{font-size:11px;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 8px;text-decoration:none}
+header .demo{font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:2px 8px}
+main{overflow:auto;padding:16px;background:#2a2a28}
+aside{background:var(--surface);border-left:1px solid var(--line);overflow:auto;padding:12px}
+h3{font-size:12px;color:var(--muted);font-weight:600;margin:14px 0 6px;letter-spacing:.04em}
+label{display:block;font-size:12px;color:var(--ink2);margin:8px 0 2px}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit}
+textarea{resize:vertical;min-height:54px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;width:100%;margin-top:8px}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.day{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:8px;background:var(--surface2)}
+.day .h{display:flex;align-items:center;gap:8px;font-weight:700}
+.day .h input[type=checkbox]{margin:0}
+.day .h .d{color:var(--muted);font-weight:400;font-size:11.5px;flex:1}
+.day input,.day textarea{margin-top:4px}
+.note{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+.sw{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.sw button{width:30px;height:30px;border-radius:8px;border:2px solid transparent;cursor:pointer}
+.sw button.on{border-color:#fff}
+/* ---- A4 sheet ---- */
+.sheet{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#1b1b1b;padding:14mm 14mm 12mm;box-shadow:0 20px 60px rgba(0,0,0,.5);font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;position:relative}
+.sheet .top{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:4px solid var(--c);padding-bottom:6mm;margin-bottom:6mm}
+.sheet .shop{font-size:13pt;color:#555;letter-spacing:.1em}
+.sheet .ttl{font-size:26pt;font-weight:900;color:var(--c);line-height:1.1}
+.sheet .week{font-size:12pt;color:#333;text-align:right}
+.sheet .week b{display:block;font-size:16pt}
+.sheet .days{display:grid;gap:4mm}
+.sheet .dy{display:grid;grid-template-columns:28mm 1fr auto;gap:4mm;align-items:center;border:1.5px solid #ddd;border-radius:3mm;padding:3.5mm 5mm;min-height:24mm;page-break-inside:avoid}
+.sheet .dy.off{opacity:.45}
+.sheet .dy .dow{font-size:22pt;font-weight:900;color:var(--c);line-height:1}
+.sheet .dy .dow small{display:block;font-size:9.5pt;color:#666;font-weight:600;margin-top:1mm}
+.sheet .dy .main{font-size:17pt;font-weight:800;line-height:1.25}
+.sheet .dy .side{font-size:10.5pt;color:#444;margin-top:1mm}
+.sheet .dy .price{font-size:20pt;font-weight:900;color:var(--c);white-space:nowrap;text-align:right}
+.sheet .dy .price small{display:block;font-size:9pt;color:#666;font-weight:600}
+.sheet .foot{margin-top:6mm;display:flex;justify-content:space-between;gap:6mm;font-size:9.5pt;color:#444;border-top:1px solid #ddd;padding-top:3mm}
+.sheet .foot .msg{flex:1;white-space:pre-wrap}
+.sheet .wm{position:absolute;right:12mm;bottom:8mm;font-size:8pt;color:#aaa}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--line);padding:8px 14px;border-radius:8px;font-size:12px;display:none}
+@media print{body{background:#fff}#app{display:block;height:auto}header,aside,.toast{display:none!important}main{padding:0;overflow:visible;background:#fff}.sheet{box-shadow:none;margin:0;width:auto;min-height:auto;padding:12mm}@page{size:A4;margin:0}}
+@media (max-width:1000px){#app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr}header{grid-column:1}aside{border-left:0;border-bottom:1px solid var(--line);max-height:50vh}.sheet{width:100%;padding:16px}.sheet .dy{grid-template-columns:64px 1fr auto}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo"><span class="mark">🍱</span><span>日替わりメニュー表メーカー</span><span style="color:var(--muted);font-weight:400;font-size:11.5px">A4 印刷＋SNS 画像</span></div>
+    <div class="sp"></div>
+    <span class="demo" id="demoBadge" hidden>デモ版: 3 日分まで・透かしあり</span>
+    <a href="../../shop/">素材集・製品版 →</a>
+  </header>
+  <main><div class="sheet" id="sheet"></div></main>
+  <aside>
+    <h3>お店</h3>
+    <input type="text" id="shop" placeholder="店名（例: 〇〇食堂）">
+    <label>タイトル</label><input type="text" id="title" value="今週の日替わり">
+    <div class="row"><div><label>週の初日</label><input type="date" id="start"></div><div><label>色</label><div class="sw" id="sw"></div></div></div>
+    <h3>各日のメニュー（チェックを外すと休業）</h3>
+    <div id="days"></div>
+    <label>下のひとこと（営業時間・注意など）</label>
+    <textarea id="msg" placeholder="例: 11:00〜14:00・売り切れ次第終了・アレルギー表示は店頭で"></textarea>
+    <h3>書き出し</h3>
+    <button class="btn primary" id="print">A4 で印刷 / PDF 保存</button>
+    <div class="row"><button class="btn" id="pngSq">正方形 PNG（1080）</button><button class="btn" id="pngTall">縦長 PNG（1080×1920）</button></div>
+    <div class="row"><button class="btn" id="csvOut">CSV 保存</button><button class="btn" id="csvIn">CSV 読込</button><input type="file" id="csvFile" accept=".csv,text/csv" hidden></div>
+    <div class="row"><button class="btn" id="nextWeek">翌週にコピー</button><button class="btn" id="clear">全部クリア</button></div>
+    <div class="note">入力はこのブラウザの中（localStorage）にだけ保存され、外部には送信されません。PNG は日本語フォントを含めて端末の標準フォントで描画します。</div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const DEMO=false; // 製品版は false。デモ版は true（3日分まで・透かし）
+const COLORS=['#d7263d','#f0a030','#1f5a3a','#0b3d5c','#6b4423','#8a2a4a'];
+const DOW=['日','月','火','水','木','金','土'];
+const $=id=>document.getElementById(id);
+const KEY='daily-menu-v1';
+let S=load()||{shop:'',title:'今週の日替わり',start:mondayOf(new Date()),color:COLORS[0],msg:'',days:Array.from({length:7},(_,i)=>({on:i<5,main:'',side:'',price:'',kcal:''}))};
+if(DEMO) $('demoBadge').hidden=false;
+function mondayOf(d){const x=new Date(d);const w=(x.getDay()+6)%7;x.setDate(x.getDate()-w);return x.toISOString().slice(0,10);}
+function load(){try{return JSON.parse(localStorage.getItem(KEY));}catch(e){return null;}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function dateOf(i){const d=new Date(S.start+'T00:00:00');d.setDate(d.getDate()+i);return d;}
+function fmt(d){return `${d.getMonth()+1}/${d.getDate()}`;}
+// ---- サイドバー ----
+function buildSide(){
+  $('shop').value=S.shop;$('title').value=S.title;$('start').value=S.start;$('msg').value=S.msg;
+  const sw=$('sw');sw.innerHTML='';COLORS.forEach(c=>{const b=document.createElement('button');b.style.background=c;b.className=c===S.color?'on':'';b.onclick=()=>{S.color=c;render();buildSide();};sw.appendChild(b);});
+  const box=$('days');box.innerHTML='';
+  S.days.forEach((d,i)=>{const dt=dateOf(i);const el=document.createElement('div');el.className='day';
+    el.innerHTML=`<div class="h"><input type="checkbox" ${d.on?'checked':''} data-k="on"><span>${DOW[dt.getDay()]}</span><span class="d">${fmt(dt)}</span></div>
+      <input type="text" data-k="main" placeholder="メイン（例: 鶏の唐揚げ定食）" value="${esc(d.main)}">
+      <input type="text" data-k="side" placeholder="副菜・ご飯・汁（例: 小鉢 2 品・みそ汁）" value="${esc(d.side)}">
+      <div class="row"><input type="text" data-k="price" placeholder="価格（例: 780）" value="${esc(d.price)}"><input type="text" data-k="kcal" placeholder="kcal（任意）" value="${esc(d.kcal)}"></div>`;
+    el.querySelectorAll('[data-k]').forEach(inp=>inp.oninput=()=>{const k=inp.dataset.k;S.days[i][k]=k==='on'?inp.checked:inp.value;render();});
+    box.appendChild(el);});
+}
+['shop','title','msg'].forEach(id=>$(id).oninput=()=>{S[id]=$(id).value;render();});
+$('start').onchange=()=>{S.start=$('start').value||mondayOf(new Date());render();buildSide();};
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+// ---- A4 ----
+function visibleDays(){let ds=S.days.map((d,i)=>({...d,i}));if(DEMO)ds=ds.slice(0,3);return ds;}
+function render(){
+  save();
+  const sh=$('sheet');sh.style.setProperty('--c',S.color);
+  const ds=visibleDays();const first=dateOf(0),last=dateOf(S.days.length-1);
+  sh.innerHTML=`<div class="top"><div><div class="shop">${esc(S.shop)||'&nbsp;'}</div><div class="ttl">${esc(S.title)}</div></div><div class="week">週間メニュー<b>${fmt(first)}（${DOW[first.getDay()]}）〜 ${fmt(last)}（${DOW[last.getDay()]}）</b></div></div>
+    <div class="days">${ds.map(d=>{const dt=dateOf(d.i);return `<div class="dy ${d.on?'':'off'}"><div class="dow">${DOW[dt.getDay()]}<small>${fmt(dt)}</small></div><div><div class="main">${d.on?(esc(d.main)||'—'):'お休み'}</div>${d.on&&d.side?`<div class="side">${esc(d.side)}</div>`:''}</div><div class="price">${d.on&&d.price?'¥'+esc(d.price):''}${d.on&&d.kcal?`<small>${esc(d.kcal)} kcal</small>`:''}</div></div>`;}).join('')}</div>
+    <div class="foot"><div class="msg">${esc(S.msg)}</div><div>${esc(S.shop)}</div></div>${DEMO?'<div class="wm">DEMO — 日替わりメニュー表メーカー</div>':''}`;
+}
+// ---- PNG ----
+function drawPng(W,H){
+  const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  const ds=visibleDays().filter(d=>d.on);const pad=Math.round(W*0.06);
+  x.fillStyle='#fff';x.fillRect(0,0,W,H);
+  x.fillStyle=S.color;x.fillRect(0,0,W,Math.round(H*(H>W?0.16:0.2)));
+  const hh=Math.round(H*(H>W?0.16:0.2));
+  x.fillStyle='#fff';x.textBaseline='top';
+  x.font=`600 ${Math.round(W*0.032)}px "Hiragino Sans","Noto Sans JP",sans-serif`;x.fillText(S.shop||'',pad,Math.round(hh*0.18));
+  x.font=`900 ${Math.round(W*0.075)}px "Hiragino Sans","Noto Sans JP",sans-serif`;x.fillText(S.title||'',pad,Math.round(hh*0.4));
+  const first=dateOf(0),last=dateOf(S.days.length-1);
+  x.font=`600 ${Math.round(W*0.03)}px "Hiragino Sans","Noto Sans JP",sans-serif`;x.textAlign='right';x.fillText(`${fmt(first)} 〜 ${fmt(last)}`,W-pad,Math.round(hh*0.22));x.textAlign='left';
+  const top=hh+pad*0.8, bottom=H-pad*1.6, rowH=Math.min((bottom-top)/Math.max(ds.length,1),H>W?260:190);
+  ds.forEach((d,k)=>{const dt=dateOf(d.i);const y=top+k*rowH;
+    x.fillStyle=k%2?'#fff':'#f6f3ee';x.fillRect(pad*0.6,y,W-pad*1.2,rowH-8);
+    x.fillStyle=S.color;x.font=`900 ${Math.round(rowH*0.42)}px "Hiragino Sans","Noto Sans JP",sans-serif`;x.fillText(DOW[dt.getDay()],pad,y+rowH*0.14);
+    x.fillStyle='#777';x.font=`600 ${Math.round(rowH*0.16)}px sans-serif`;x.fillText(fmt(dt),pad,y+rowH*0.62);
+    const mx=pad+rowH*0.75, mw=W-mx-pad-W*0.2;
+    x.fillStyle='#1b1b1b';x.font=`800 ${Math.round(rowH*0.3)}px "Hiragino Sans","Noto Sans JP",sans-serif`;fitText(x,d.main||'—',mx,y+rowH*0.16,mw);
+    if(d.side){x.fillStyle='#555';x.font=`500 ${Math.round(rowH*0.17)}px "Hiragino Sans","Noto Sans JP",sans-serif`;fitText(x,d.side,mx,y+rowH*0.56,mw);}
+    if(d.price){x.fillStyle=S.color;x.textAlign='right';x.font=`900 ${Math.round(rowH*0.34)}px "Hiragino Sans","Noto Sans JP",sans-serif`;x.fillText('¥'+d.price,W-pad,y+rowH*0.2);
+      if(d.kcal){x.fillStyle='#777';x.font=`600 ${Math.round(rowH*0.15)}px sans-serif`;x.fillText(d.kcal+' kcal',W-pad,y+rowH*0.62);}x.textAlign='left';}
+  });
+  x.fillStyle='#444';x.font=`500 ${Math.round(W*0.024)}px "Hiragino Sans","Noto Sans JP",sans-serif`;fitText(x,(S.msg||'').split('\n')[0],pad,H-pad*1.1,W-pad*2);
+  if(DEMO){x.fillStyle='rgba(0,0,0,.25)';x.font=`900 ${Math.round(W*0.08)}px sans-serif`;x.textAlign='center';x.fillText('DEMO',W/2,H/2);x.textAlign='left';}
+  return c;
+}
+function fitText(x,t,px,py,maxW){let s=t;while(s.length>1&&x.measureText(s).width>maxW)s=s.slice(0,-1);if(s!==t)s=s.slice(0,-1)+'…';x.fillText(s,px,py);}
+function dl(canvas,name){canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();toast(name+' を保存');},'image/png');}
+$('pngSq').onclick=()=>dl(drawPng(1080,1080),`menu_${S.start}_square.png`);
+$('pngTall').onclick=()=>dl(drawPng(1080,1920),`menu_${S.start}_story.png`);
+$('print').onclick=()=>window.print();
+// ---- CSV ----
+$('csvOut').onclick=()=>{const rows=[['date','dow','open','main','side','price','kcal']];S.days.forEach((d,i)=>{const dt=dateOf(i);rows.push([dt.toISOString().slice(0,10),DOW[dt.getDay()],d.on?1:0,d.main,d.side,d.price,d.kcal]);});
+  const csv='﻿'+rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`menu_${S.start}.csv`;a.click();toast('CSV を保存');};
+$('csvIn').onclick=()=>$('csvFile').click();
+$('csvFile').onchange=()=>{const f=$('csvFile').files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const lines=r.result.replace(/^﻿/,'').split(/\r?\n/).filter(Boolean).slice(1);
+  const parsed=lines.map(l=>l.match(/("([^"]|"")*"|[^,]*)(,|$)/g).map(c=>c.replace(/,$/,'').replace(/^"|"$/g,'').replace(/""/g,'"')));
+  if(parsed[0]&&parsed[0][0])S.start=parsed[0][0];
+  parsed.slice(0,7).forEach((c,i)=>{S.days[i]={on:c[2]!=='0',main:c[3]||'',side:c[4]||'',price:c[5]||'',kcal:c[6]||''};});
+  render();buildSide();toast(`${parsed.length} 日分を読み込み`);};r.readAsText(f);$('csvFile').value='';};
+$('nextWeek').onclick=()=>{const d=new Date(S.start+'T00:00:00');d.setDate(d.getDate()+7);S.start=d.toISOString().slice(0,10);render();buildSide();toast('日付を翌週に（メニューはそのまま）');};
+$('clear').onclick=()=>{if(!confirm('入力を全部消しますか？'))return;S.days=S.days.map(d=>({on:d.on,main:'',side:'',price:'',kcal:''}));S.msg='';render();buildSide();};
+let tt;function toast(s){const t=$('toast');t.textContent=s;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',2200);}
+buildSide();render();
+</script>
+</body>
+</html>

@@ -1,5 +1,19 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-17 向け（火）
+
+- 次の実装 = `flower-vol1`（11/22 Release・花屋・フラワーアレンジ）。prefix は **fl-**（未使用を確認済み。念のため `grep -c "id: 'fl-" telop/designs.js` が 0 か見る）
+- PACKS の挿入位置は `'factory-vol1'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`（11/15 にコンテナ再起動でキャッシュが消えて gen_gallery が落ちた）
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する（11/15 は exit 1 のまま push してしまい 2 回目の push が必要になった）
+- `factory/base/pitch.json` に flower-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-10 ramen-vol1 まで。2027/1/11 以降に 2 本。**足す前に queue と PACKS の両方で id を確認**。free を確認済みの候補: tutor-vol1（家庭教師・オンライン個別）、curry-vol1、kaigo-vol2（介護 Vol.2 施設見学）、watch-vol1（時計店・修理）、pc-repair-vol1（パソコン修理）、tailor-vol1（オーダースーツ）
+- Dela Gothic One は数字・英字向き。漢字を混ぜる数字デザイン（「10,000個」など）は Noto Sans JP 900 にする（11/16 fc-output で箱からはみ出た）
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- 火曜はアプリ枠なし
+- 株シミュ: **11/16（月）昼実行の mode と market_date を確認**。楽天 637 円が候補だった → 「休場日（評価のみ）」のままなら 4 回目の取りこぼし。11/13 昼の LINEヤフー 533 円の「買えていればいくら」も所感に。「直して」が来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-16 向け（月）
 
 - 次の実装 = `factory-vol1`（11/21 Release）。prefix は **fc-** か **fac-**（`grep -c "id: 'fc-" telop/designs.js` が 0 なら fc-）。calendar の brief に沿って 20 デザイン
