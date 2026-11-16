@@ -1,5 +1,19 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-18 向け（水）
+
+- 次の実装 = `kidsport-vol1`（11/23 Release・スイミング・子どもスポーツクラブ）。prefix は **ks-**（未使用を確認済み。念のため `grep -c "id: 'ks-" telop/designs.js` が 0 か見る）
+- PACKS の挿入位置は `'flower-vol1'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する
+- `factory/base/pitch.json` に kidsport-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-12 watch-vol1 まで。2027/1/13 以降に 2 本。**足す前に queue と PACKS の両方で id を確認**。free を確認済みの候補: curry-vol1、kaigo-vol2（介護 Vol.2 施設見学）、pc-repair-vol1（パソコン修理）、tailor-vol1（オーダースーツ）
+- 右寄せ＋長い tag/sub は右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One に漢字を混ぜない
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- **水曜はアプリ枠あり**。候補: (a) `apps/menu-pop/`「商品 POP メーカー」（A6／A5 の値札・POP を 4 面付けで印刷。daily-menu と対で小売店向け）、(b) `apps/caption-timer/`「読み上げ原稿→字幕タイミング」は srt-splitter と重複するので不可。(a) を推す
+- 株シミュ: 取りこぼしは 11/16 昼で 5 件（楽天 653・LINEヤフー 545）。「直して」が来るまで所感は 1 行に圧縮（日付・候補・件数）。来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-17 向け（火）
 
 - 次の実装 = `flower-vol1`（11/22 Release・花屋・フラワーアレンジ）。prefix は **fl-**（未使用を確認済み。念のため `grep -c "id: 'fl-" telop/designs.js` が 0 か見る）
