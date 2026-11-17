@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>商品 POP メーカー｜値札・店頭 POP を A4 に 4 面付けで印刷</title>
+<meta name="description" content="商品名・価格・ひとことを入れるだけで、店頭の値札・POP を A4 に 4 面（A6）または 2 面（A5）で面付けして印刷。色 6 種、税込・税抜の表示切替、SNS 用の正方形 PNG も書き出し。ブラウザ内だけで完結。">
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--surface3:#2b2b29;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#e5484d;--warn:#fab219;--ok:#3fb950;--blue:#3987e5;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:13.5px;line-height:1.6}
+#app{display:grid;grid-template-columns:1fr 380px;grid-template-rows:56px 1fr;height:100%}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+header .logo{display:flex;align-items:center;gap:9px;font-weight:700}
+header .logo .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#e5484d,#fab219);display:flex;align-items:center;justify-content:center;font-size:14px}
+header .sp{flex:1}
+header a{font-size:11px;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 8px;text-decoration:none}
+header .demo{font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:2px 8px}
+main{overflow:auto;padding:16px;background:#2a2a28}
+aside{background:var(--surface);border-left:1px solid var(--line);overflow:auto;padding:12px}
+h3{font-size:12px;color:var(--muted);font-weight:600;margin:14px 0 6px;letter-spacing:.04em}
+label{display:block;font-size:12px;color:var(--ink2);margin:8px 0 2px}
+input[type=text],select,textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;width:100%;margin-top:8px}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.btn.sm{width:auto;padding:4px 10px;font-size:12px;margin:0}
+.item{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:8px;background:var(--surface2)}
+.item .h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:12px;color:var(--muted)}
+.item .h .sp{flex:1}
+.item input{margin-top:4px}
+.sw{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.sw button{width:30px;height:30px;border-radius:8px;border:2px solid transparent;cursor:pointer}
+.sw button.on{border-color:#fff}
+.chk{display:flex;align-items:center;gap:7px;font-size:12.5px;margin:6px 0}
+.note{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+/* ---- A4 sheets ---- */
+.page{width:210mm;height:297mm;margin:0 auto 16px;background:#fff;color:#1b1b1b;display:grid;box-shadow:0 20px 60px rgba(0,0,0,.5);page-break-after:always;font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;position:relative}
+.page.a6{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.page.a5{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+.pop{border:0.3mm dashed #bbb;display:flex;flex-direction:column;padding:8mm;position:relative;overflow:hidden}
+.pop .cat{font-size:11pt;font-weight:700;color:#fff;background:var(--c);display:inline-block;align-self:flex-start;padding:1mm 4mm;border-radius:2mm}
+.pop .name{font-size:22pt;font-weight:900;line-height:1.2;margin-top:4mm;color:#1b1b1b}
+.a5 .pop .name{font-size:32pt}
+.pop .copy{font-size:11pt;color:#444;margin-top:2mm;line-height:1.4}
+.a5 .pop .copy{font-size:14pt}
+.pop .sp{flex:1}
+.pop .price{display:flex;align-items:baseline;gap:2mm;color:var(--c);font-weight:900;line-height:1}
+.pop .price .y{font-size:16pt}.pop .price .n{font-size:40pt;letter-spacing:-.02em}.pop .price .t{font-size:9pt;color:#666;font-weight:600}
+.a5 .pop .price .n{font-size:60pt}.a5 .pop .price .y{font-size:22pt}
+.pop .was{font-size:11pt;color:#888;text-decoration:line-through;margin-right:2mm}
+.pop .note{font-size:8.5pt;color:#666;margin-top:2mm;line-height:1.3}
+.pop .badge{position:absolute;right:6mm;top:6mm;width:22mm;height:22mm;border-radius:50%;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;font-size:10pt;line-height:1.1;padding:2mm;transform:rotate(8deg)}
+.a5 .pop .badge{width:30mm;height:30mm;font-size:13pt}
+.pop.empty{border-style:dashed;background:repeating-linear-gradient(45deg,#fafafa,#fafafa 4mm,#fff 4mm,#fff 8mm)}
+.pop .wm{position:absolute;left:0;right:0;bottom:3mm;text-align:center;font-size:8pt;color:#bbb}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--line);padding:8px 14px;border-radius:8px;font-size:12px;display:none}
+@media print{body{background:#fff}#app{display:block;height:auto}header,aside,.toast{display:none!important}main{padding:0;overflow:visible;background:#fff}.page{box-shadow:none;margin:0}@page{size:A4;margin:0}}
+@media (max-width:1000px){#app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr}header{grid-column:1}aside{border-left:0;border-bottom:1px solid var(--line);max-height:50vh}.page{width:100%;height:auto;aspect-ratio:210/297}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo"><span class="mark">¥</span><span>商品 POP メーカー</span><span style="color:var(--muted);font-weight:400;font-size:11.5px">値札・店頭 POP を A4 に面付け</span></div>
+    <div class="sp"></div>
+    <span class="demo" id="demoBadge" hidden>デモ版: 2 枚まで・透かしあり</span>
+    <a href="../../shop/">素材集・製品版 →</a>
+  </header>
+  <main id="pages"></main>
+  <aside>
+    <h3>レイアウト</h3>
+    <div class="row">
+      <div><label>サイズ</label><select id="size"><option value="a6">A6 × 4 面（A4 1 枚）</option><option value="a5">A5 × 2 面（A4 1 枚）</option></select></div>
+      <div><label>色</label><div class="sw" id="sw"></div></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="taxIn" checked> 価格は税込表示（「税込」を付ける）</label>
+    <label class="chk"><input type="checkbox" id="cut" checked> 切り取り線（点線）を印刷する</label>
+    <h3>商品（1 枚 = 1 商品）</h3>
+    <div id="items"></div>
+    <div class="row"><button class="btn" id="add">＋ 商品を追加</button><button class="btn" id="dup">最後の商品を複製</button></div>
+    <h3>書き出し</h3>
+    <button class="btn primary" id="print">A4 で印刷 / PDF 保存</button>
+    <button class="btn" id="pngAll">各商品を正方形 PNG で保存（1080）</button>
+    <div class="row"><button class="btn" id="csvOut">CSV 保存</button><button class="btn" id="csvIn">CSV 読込</button><input type="file" id="csvFile" accept=".csv,text/csv" hidden></div>
+    <div class="note">CSV の列: category, name, copy, price, was, badge, note。入力はこのブラウザの中（localStorage）にだけ保存され、外部には送信されません。印刷は Chrome 推奨（余白なし・A4）。</div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const DEMO=false; // 製品版 false／デモ版 true（2 枚まで・透かし）
+const COLORS=['#d7263d','#f0a030','#1f5a3a','#0b3d5c','#6b4423','#8a2a4a'];
+const $=id=>document.getElementById(id);
+const KEY='pop-maker-v1';
+const blank=()=>({category:'',name:'',copy:'',price:'',was:'',badge:'',note:''});
+let S=load()||{size:'a6',color:COLORS[0],taxIn:true,cut:true,items:[{category:'本日のおすすめ',name:'〇〇産 りんご',copy:'蜜入り・甘さしっかり',price:'198',was:'',badge:'特売',note:'1 個あたり・税込'},blank()]};
+if(DEMO)$('demoBadge').hidden=false;
+function load(){try{return JSON.parse(localStorage.getItem(KEY));}catch(e){return null;}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function buildSide(){
+  $('size').value=S.size;$('taxIn').checked=S.taxIn;$('cut').checked=S.cut;
+  const sw=$('sw');sw.innerHTML='';COLORS.forEach(c=>{const b=document.createElement('button');b.style.background=c;b.className=c===S.color?'on':'';b.onclick=()=>{S.color=c;render();buildSide();};sw.appendChild(b);});
+  const box=$('items');box.innerHTML='';
+  S.items.forEach((it,i)=>{const el=document.createElement('div');el.className='item';
+    el.innerHTML=`<div class="h"><span>商品 ${i+1}</span><span class="sp"></span><button class="btn sm" data-a="up">↑</button><button class="btn sm" data-a="del">削除</button></div>
+      <input type="text" data-k="category" placeholder="カテゴリ／見出し（例: 本日のおすすめ）" value="${esc(it.category)}">
+      <input type="text" data-k="name" placeholder="商品名" value="${esc(it.name)}">
+      <input type="text" data-k="copy" placeholder="ひとこと（例: 蜜入り・甘さしっかり）" value="${esc(it.copy)}">
+      <div class="row"><input type="text" data-k="price" placeholder="価格（例: 198）" value="${esc(it.price)}"><input type="text" data-k="was" placeholder="元の価格（任意）" value="${esc(it.was)}"></div>
+      <div class="row"><input type="text" data-k="badge" placeholder="丸バッジ（例: 特売／NEW／限定）" value="${esc(it.badge)}"><input type="text" data-k="note" placeholder="小さな注記（例: 100g あたり）" value="${esc(it.note)}"></div>`;
+    el.querySelectorAll('[data-k]').forEach(inp=>inp.oninput=()=>{S.items[i][inp.dataset.k]=inp.value;render();});
+    el.querySelector('[data-a=del]').onclick=()=>{S.items.splice(i,1);if(!S.items.length)S.items.push(blank());render();buildSide();};
+    el.querySelector('[data-a=up]').onclick=()=>{if(i>0){[S.items[i-1],S.items[i]]=[S.items[i],S.items[i-1]];render();buildSide();}};
+    box.appendChild(el);});
+}
+$('size').onchange=()=>{S.size=$('size').value;render();};
+$('taxIn').onchange=()=>{S.taxIn=$('taxIn').checked;render();};
+$('cut').onchange=()=>{S.cut=$('cut').checked;render();};
+$('add').onclick=()=>{S.items.push(blank());render();buildSide();};
+$('dup').onclick=()=>{S.items.push({...S.items[S.items.length-1]});render();buildSide();};
+function visible(){let it=S.items.filter(x=>x.name||x.price);if(DEMO)it=it.slice(0,2);return it;}
+function fmtPrice(p){const n=String(p).replace(/[^\d.]/g,'');return n?Number(n).toLocaleString('ja-JP'):'';}
+function render(){
+  save();const per=S.size==='a6'?4:2;const items=visible();const pages=Math.max(1,Math.ceil(items.length/per));let html='';
+  for(let p=0;p<pages;p++){html+=`<div class="page ${S.size}" style="--c:${S.color}">`;
+    for(let k=0;k<per;k++){const it=items[p*per+k];
+      if(!it){html+=`<div class="pop empty" style="${S.cut?'':'border-color:transparent'}"></div>`;continue;}
+      html+=`<div class="pop" style="${S.cut?'':'border-color:transparent'}">${it.category?`<div class="cat">${esc(it.category)}</div>`:''}${it.badge?`<div class="badge">${esc(it.badge)}</div>`:''}
+        <div class="name">${esc(it.name)}</div>${it.copy?`<div class="copy">${esc(it.copy)}</div>`:''}<div class="sp"></div>
+        <div class="price">${it.was?`<span class="was">¥${fmtPrice(it.was)}</span>`:''}<span class="y">¥</span><span class="n">${fmtPrice(it.price)}</span>${S.taxIn?'<span class="t">税込</span>':'<span class="t">税抜</span>'}</div>
+        ${it.note?`<div class="note">${esc(it.note)}</div>`:''}${DEMO?'<div class="wm">DEMO — 商品 POP メーカー</div>':''}</div>`;}
+    html+='</div>';}
+  $('pages').innerHTML=html;
+}
+// PNG
+function drawPop(it,W){const c=document.createElement('canvas');c.width=W;c.height=W;const x=c.getContext('2d');const pad=W*0.08;
+  x.fillStyle='#fff';x.fillRect(0,0,W,W);x.fillStyle=S.color;x.fillRect(0,0,W,W*0.05);
+  const F='"Hiragino Sans","Noto Sans JP",sans-serif';x.textBaseline='top';
+  let y=pad;
+  if(it.category){x.font=`700 ${W*0.04}px ${F}`;const w=x.measureText(it.category).width+W*0.04;x.fillStyle=S.color;x.fillRect(pad,y,w,W*0.065);x.fillStyle='#fff';x.fillText(it.category,pad+W*0.02,y+W*0.012);y+=W*0.1;}
+  x.fillStyle='#1b1b1b';x.font=`900 ${W*0.085}px ${F}`;wrap(x,it.name,pad,y,W-pad*2-(it.badge?W*0.2:0),W*0.1,2);y+=W*0.22;
+  if(it.copy){x.fillStyle='#444';x.font=`500 ${W*0.042}px ${F}`;wrap(x,it.copy,pad,y,W-pad*2,W*0.055,2);}
+  if(it.badge){x.save();x.translate(W-pad-W*0.09,pad+W*0.09);x.rotate(0.14);x.fillStyle=S.color;x.beginPath();x.arc(0,0,W*0.09,0,Math.PI*2);x.fill();x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.font=`900 ${W*0.045}px ${F}`;x.fillText(it.badge,0,0);x.restore();x.textBaseline='top';}
+  const py=W-pad-W*0.2;x.fillStyle=S.color;x.font=`900 ${W*0.2}px ${F}`;const n='¥'+fmtPrice(it.price);x.fillText(n,pad,py);
+  const nw=x.measureText(n).width;x.fillStyle='#666';x.font=`600 ${W*0.04}px ${F}`;x.fillText(S.taxIn?'税込':'税抜',pad+nw+W*0.02,py+W*0.14);
+  if(it.was){x.fillStyle='#888';x.font=`600 ${W*0.045}px ${F}`;const wt='¥'+fmtPrice(it.was);x.fillText(wt,pad,py-W*0.07);const ww=x.measureText(wt).width;x.fillRect(pad,py-W*0.045,ww,W*0.006);}
+  if(it.note){x.fillStyle='#666';x.font=`500 ${W*0.032}px ${F}`;x.fillText(it.note,pad,W-pad+W*0.02);}
+  if(DEMO){x.fillStyle='rgba(0,0,0,.2)';x.font=`900 ${W*0.1}px ${F}`;x.textAlign='center';x.fillText('DEMO',W/2,W*0.45);x.textAlign='left';}
+  return c;}
+function wrap(x,t,px,py,maxW,lh,maxLines){let line='',lines=[];for(const ch of String(t)){if(x.measureText(line+ch).width>maxW&&line){lines.push(line);line=ch;}else line+=ch;}lines.push(line);lines.slice(0,maxLines).forEach((l,i)=>x.fillText(i===maxLines-1&&lines.length>maxLines?l.slice(0,-1)+'…':l,px,py+i*lh));}
+function dl(canvas,name){return new Promise(r=>canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(r,300);},'image/png'));}
+$('pngAll').onclick=async()=>{const items=visible();if(!items.length)return toast('商品を入力してください');for(let i=0;i<items.length;i++)await dl(drawPop(items[i],1080),`pop_${String(i+1).padStart(2,'0')}_${(items[i].name||'item').slice(0,12)}.png`);toast(`${items.length} 枚を保存`);};
+$('print').onclick=()=>window.print();
+// CSV
+const COLS=['category','name','copy','price','was','badge','note'];
+$('csvOut').onclick=()=>{const rows=[COLS,...S.items.map(it=>COLS.map(k=>it[k]||''))];const csv='﻿'+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='pop_items.csv';a.click();toast('CSV を保存');};
+$('csvIn').onclick=()=>$('csvFile').click();
+$('csvFile').onchange=()=>{const f=$('csvFile').files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const lines=r.result.replace(/^﻿/,'').split(/\r?\n/).filter(Boolean);const head=lines[0].toLowerCase().includes('name')?1:0;
+  const parsed=lines.slice(head).map(l=>l.match(/("([^"]|"")*"|[^,]*)(,|$)/g).map(c=>c.replace(/,$/,'').replace(/^"|"$/g,'').replace(/""/g,'"')));
+  S.items=parsed.map(c=>Object.fromEntries(COLS.map((k,i)=>[k,c[i]||''])));if(!S.items.length)S.items.push(blank());render();buildSide();toast(`${parsed.length} 件を読み込み`);};r.readAsText(f);$('csvFile').value='';};
+let tt;function toast(s){const t=$('toast');t.textContent=s;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',2200);}
+buildSide();render();
+</script>
+</body>
+</html>

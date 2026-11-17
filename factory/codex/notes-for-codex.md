@@ -1,5 +1,19 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-19 向け（木）
+
+- 次の実装 = `seminar-vol1`（11/24 Release・法人研修・セミナー）。prefix は **sm-**（未使用を確認済み。`se-` は別パックが使用中なので使わない。念のため `grep -c "id: 'sm-" telop/designs.js` が 0 か見る）
+- PACKS の挿入位置は `'kidsport-vol1'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する
+- `factory/base/pitch.json` に seminar-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-14 pc-repair-vol1 まで。2027/1/15 以降に 2 本。**足す前に queue と PACKS の両方で id を確認**。free を確認済みの候補: curry-vol1、tailor-vol1（オーダースーツ）、他は `node -e` で確認してから
+- 右寄せ＋長い tag/sub は右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One に漢字を混ぜない
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- 木曜はアプリ枠なし
+- 株シミュ: 取りこぼし累計 5 件。「直して」が来るまで所感は 1 行（日付・候補・件数）。昼実行が 15:30 より前で候補が出ていたら件数を足す。来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-18 向け（水）
 
 - 次の実装 = `kidsport-vol1`（11/23 Release・スイミング・子どもスポーツクラブ）。prefix は **ks-**（未使用を確認済み。念のため `grep -c "id: 'ks-" telop/designs.js` が 0 か見る）
