@@ -1,5 +1,19 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-20 向け（金）
+
+- 次の実装 = `kimono-vol1`（11/25 Release・着物・和装）。prefix は **km-**（未使用を確認済み。念のため `grep -c "id: 'km-" telop/designs.js` が 0 か見る）。brief に「縦書き風 見出し（箱なし・明朝・影）」があるが renderer に縦書きは無いので、1 文字ずつ改行した多段テキストか、横書きの明朝＋影で代替する
+- PACKS の挿入位置は `'seminar-vol1'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する
+- `factory/base/pitch.json` に kimono-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-16 sushi-vol1 まで。2027/1/17 以降に 2 本。**足す前に queue と PACKS の両方で id を確認**。free を確認済みの候補: curry-vol1、tailor-vol1（オーダースーツ）、pilates-vol1、esthe-vol1、bakery-vol1、yakiniku-vol1
+- 右寄せ＋長い tag/sub は右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One に漢字を混ぜない
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- **金曜はアプリ枠あり**。候補: (a) `apps/shift-board/`「シフト表メーカー」（週間シフトを入れて A4 印刷＋各人の PNG。小売・飲食の「紙もの」3 本目）、(b) `apps/price-list/`「料金表メーカー」（サロン・教室向け）。(a) を推す
+- 株シミュ: 取りこぼし累計 6 件（11/18 昼 日本製鉄 688）。「直して」が来るまで所感は 1〜2 行。昼実行が 15:30 より前で候補が出ていたら件数を足す。来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-19 向け（木）
 
 - 次の実装 = `seminar-vol1`（11/24 Release・法人研修・セミナー）。prefix は **sm-**（未使用を確認済み。`se-` は別パックが使用中なので使わない。念のため `grep -c "id: 'sm-" telop/designs.js` が 0 か見る）
