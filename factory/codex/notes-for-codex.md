@@ -1,5 +1,21 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-21 向け（土）
+
+- 次の実装 = `bar-vol1`（11/26 Release・BAR・居酒屋）。prefix は **bar-**（未使用を確認済み。念のため `grep -c "id: 'bar-" telop/designs.js` が 0 か見る）
+- PACKS の挿入位置は `'kimono-vol1'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する
+- `factory/base/pitch.json` に bar-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-18 bakery-vol1 まで。2027/1/19 以降に 2 本。**足す前に queue と PACKS の両方で id を確認**。free を確認済みの候補: curry-vol1、pilates-vol1、esthe-vol1、yakiniku-vol1
+- 注意: 11/27 の `recycle-vol1`（リサイクルショップ・古着）と 1/5 の `kaitori-vol1`（買取）はテーマが近い。recycle を実装するときは「売る側・古着・店内」に寄せ、買取査定の要素は kaitori に残す
+- 縦書き風は sample に `\n` で 1 文字ずつ改行＋`lineHeight: 1.0`＋`align: 'center'` で出せる（km-tate で確認済み）
+- 右寄せ＋長い tag/sub は右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One に漢字を混ぜない
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- 土曜はアプリ枠なし
+- 株シミュ: 取りこぼし累計 7 件（11/18・11/19 とも日本製鉄）。土曜は休場なので「休場日」判定で正しい。「直して」が来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-20 向け（金）
 
 - 次の実装 = `kimono-vol1`（11/25 Release・着物・和装）。prefix は **km-**（未使用を確認済み。念のため `grep -c "id: 'km-" telop/designs.js` が 0 か見る）。brief に「縦書き風 見出し（箱なし・明朝・影）」があるが renderer に縦書きは無いので、1 文字ずつ改行した多段テキストか、横書きの明朝＋影で代替する
