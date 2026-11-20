@@ -1,5 +1,20 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-22 向け（日）
+
+- 次の実装 = `recycle-vol1`（11/27 Release・リサイクルショップ・古着）。prefix は **rcy-**（`rc-` は recruit-vol1、`re-` は別パックが使用中。念のため `grep -c "id: 'rcy-" telop/designs.js` が 0 か見る）
+- recycle-vol1 は「売る側・古着・店内・コーデ」に寄せる。買取査定の要素（査定額・買取強化中・古物商許可）は 1/5 の kaitori-vol1 に残す
+- PACKS の挿入位置は `'bar-vol1'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する
+- `factory/base/pitch.json` に recycle-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-20 pilates-vol1 まで。2027/1/21 以降に 2 本。**足す前に queue と PACKS の両方で id を確認**。free を確認済みの候補: curry-vol1、esthe-vol1、izakaya-vol1（bar-vol1 と近いので避ける）、soba-vol1、onsen-vol1（ryokan と近いので避ける）、guesthouse-vol1、golf-vol1、tennis-vol1
+- 右寄せ＋長い tag/sub は右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One に漢字を混ぜない
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- 日曜はアプリ枠なし
+- 株シミュ: 取りこぼし累計 7 件。土日は休場で実行なしのはず。「直して」が来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-21 向け（土）
 
 - 次の実装 = `bar-vol1`（11/26 Release・BAR・居酒屋）。prefix は **bar-**（未使用を確認済み。念のため `grep -c "id: 'bar-" telop/designs.js` が 0 か見る）
