@@ -1,5 +1,20 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-23 向け（月・祝）
+
+- 次の実装 = `zoo-vol1`（11/28 Release・動物園・水族館）。prefix は **zoo-**（未使用を確認済み。念のため `grep -c "id: 'zoo-" telop/designs.js` が 0 か見る）
+- PACKS の挿入位置は `'recycle-vol1'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する
+- `factory/base/pitch.json` に zoo-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-22 guesthouse-vol1 まで。2027/1/23 以降に 2 本。**足す前に queue と PACKS の両方で id を確認**。free を確認済みの候補: curry-vol1、esthe-vol1、soba-vol1、tennis-vol1、shoes-vol1、jewelry-vol1、cycle-vol1（自転車店）
+- recycle-vol1 は brief どおり買取の流れ・必要なものまで入れた。1/5 の kaitori-vol1 は「査定額の見せ方・ブランド／貴金属／家電のカテゴリ・古物商許可・出張エリア」に寄せて差をつける
+- 右寄せ＋長い tag/sub は右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One に漢字を混ぜない
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- **月曜はアプリ枠あり**（祝日でも工場は動く）。候補: (a) `apps/price-list/`「料金表メーカー」（サロン・教室・整体向け。コース名／時間／料金の表を A4 縦＋SNS 正方形に。紙もの 4 本目）、(b) `apps/qr-sign/`「QR 付き案内板メーカー」（Wi-Fi・予約・メニューの QR を A4 に。QR 生成は cdnjs の qrcode ライブラリ可）。(a) を推す
+- 株シミュ: 11/23 は祝日で休場。所感は 1 行（休場・累計 7 件・「直して」待ち N 日目）。火曜の昼が次の判定
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-22 向け（日）
 
 - 次の実装 = `recycle-vol1`（11/27 Release・リサイクルショップ・古着）。prefix は **rcy-**（`rc-` は recruit-vol1、`re-` は別パックが使用中。念のため `grep -c "id: 'rcy-" telop/designs.js` が 0 か見る）
