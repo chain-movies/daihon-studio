@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>料金表メーカー｜サロン・教室・整体の料金表を A4 印刷と SNS 画像に</title>
+<meta name="description" content="コース名・時間・料金を入れるだけで、店に貼る A4 の料金表と SNS 用の正方形画像（1080×1080）を書き出し。カテゴリ分け、税込／税抜、初回価格、おすすめマーク、CSV 保存。ブラウザ内だけで完結。">
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--surface3:#2b2b29;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#e5484d;--warn:#fab219;--ok:#3fb950;--blue:#3987e5;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:13.5px;line-height:1.6}
+#app{display:grid;grid-template-columns:1fr 390px;grid-template-rows:56px 1fr;height:100%}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+header .logo{display:flex;align-items:center;gap:9px;font-weight:700}
+header .logo .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#9085e9,#e5484d);display:flex;align-items:center;justify-content:center;font-size:14px}
+header .sp{flex:1}
+header a{font-size:11px;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 8px;text-decoration:none}
+header .demo{font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:2px 8px}
+main{overflow:auto;padding:16px;background:#2a2a28}
+aside{background:var(--surface);border-left:1px solid var(--line);overflow:auto;padding:12px}
+h3{font-size:12px;color:var(--muted);font-weight:600;margin:14px 0 6px;letter-spacing:.04em}
+label{display:block;font-size:12px;color:var(--ink2);margin:8px 0 2px}
+input[type=text],select,textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit}
+textarea{resize:vertical;min-height:50px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;width:100%;margin-top:8px}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.btn.sm{width:auto;padding:3px 9px;font-size:12px;margin:0}
+.item{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:8px;background:var(--surface2)}
+.item .h{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.item .h .sp{flex:1}
+.item input{margin-top:4px}
+.chk{display:flex;align-items:center;gap:7px;font-size:12.5px;margin:6px 0}
+.sw{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.sw button{width:28px;height:28px;border-radius:8px;border:2px solid transparent;cursor:pointer}
+.sw button.on{border-color:#fff}
+.note{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+/* ---- A4 ---- */
+.sheet{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#1b1b1b;padding:16mm 16mm 14mm;box-shadow:0 20px 60px rgba(0,0,0,.5);font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;position:relative}
+.sheet .top{text-align:center;border-bottom:3px solid var(--c);padding-bottom:5mm;margin-bottom:6mm}
+.sheet .shop{font-size:12pt;color:#555;letter-spacing:.14em}
+.sheet .ttl{font-size:26pt;font-weight:900;color:var(--c);letter-spacing:.08em;line-height:1.2}
+.sheet .lead{font-size:10pt;color:#444;margin-top:2mm}
+.sheet .cat{margin-top:6mm;page-break-inside:avoid}
+.sheet .cat h2{font-size:13pt;font-weight:800;color:#fff;background:var(--c);display:inline-block;padding:1.5mm 5mm;border-radius:2mm;margin:0 0 2mm}
+.sheet .ln{display:grid;grid-template-columns:1fr auto auto;gap:4mm;align-items:baseline;padding:2.6mm 0;border-bottom:0.3mm dotted #bbb}
+.sheet .ln .n{font-size:12.5pt;font-weight:700}
+.sheet .ln .n small{display:block;font-size:9pt;color:#555;font-weight:500}
+.sheet .ln .n .rec{display:inline-block;font-size:8.5pt;color:#fff;background:var(--c);padding:0 2mm;border-radius:1.5mm;margin-left:2mm;vertical-align:middle}
+.sheet .ln .t{font-size:10pt;color:#555;white-space:nowrap}
+.sheet .ln .p{font-size:14pt;font-weight:900;color:var(--c);white-space:nowrap;text-align:right}
+.sheet .ln .p .first{display:block;font-size:9pt;color:#c8102e;font-weight:700}
+.sheet .foot{margin-top:7mm;font-size:9pt;color:#444;white-space:pre-wrap;border-top:1px solid #ddd;padding-top:3mm}
+.sheet .wm{position:absolute;right:12mm;bottom:8mm;font-size:8pt;color:#aaa}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--line);padding:8px 14px;border-radius:8px;font-size:12px;display:none}
+@media print{body{background:#fff}#app{display:block;height:auto}header,aside,.toast{display:none!important}main{padding:0;overflow:visible;background:#fff}.sheet{box-shadow:none;margin:0;width:auto;min-height:auto;padding:14mm}@page{size:A4;margin:0}}
+@media (max-width:1000px){#app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr}header{grid-column:1}aside{border-left:0;border-bottom:1px solid var(--line);max-height:50vh}.sheet{width:100%;padding:16px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo"><span class="mark">¥</span><span>料金表メーカー</span><span style="color:var(--muted);font-weight:400;font-size:11.5px">A4 印刷＋SNS 画像</span></div>
+    <div class="sp"></div>
+    <span class="demo" id="demoBadge" hidden>デモ版: 5 行まで・透かしあり</span>
+    <a href="../../shop/">素材集・製品版 →</a>
+  </header>
+  <main><div class="sheet" id="sheet"></div></main>
+  <aside>
+    <h3>お店</h3>
+    <input type="text" id="shop" placeholder="店名（例: 〇〇サロン）">
+    <label>タイトル</label><input type="text" id="title" value="料金表">
+    <label>ひとこと（任意）</label><input type="text" id="lead" placeholder="例: すべて税込・初回はカウンセリング込み">
+    <div class="row"><div><label>色</label><div class="sw" id="sw"></div></div><div><label>価格の表示</label><select id="tax"><option value="税込">税込</option><option value="税抜">税抜</option><option value="">表示しない</option></select></div></div>
+    <h3>メニュー（カテゴリが同じ行はまとまります）</h3>
+    <div id="items"></div>
+    <div class="row"><button class="btn" id="add">＋ 行を追加</button><button class="btn" id="dup">最後の行を複製</button></div>
+    <label>下の注記</label><textarea id="msg" placeholder="例: 指名料 ¥500・キャンセルは前日までにご連絡ください"></textarea>
+    <h3>書き出し</h3>
+    <button class="btn primary" id="print">A4 で印刷 / PDF 保存</button>
+    <button class="btn" id="pngSq">正方形 PNG（1080・カテゴリごとに 1 枚）</button>
+    <div class="row"><button class="btn" id="csvOut">CSV 保存</button><button class="btn" id="csvIn">CSV 読込</button><input type="file" id="csvFile" accept=".csv,text/csv" hidden></div>
+    <div class="note">CSV の列: category, name, note, time, price, first, rec（おすすめは 1）。入力はこのブラウザの中（localStorage）にだけ保存され、外部には送信されません。印刷は Chrome 推奨（余白なし・A4）。</div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const DEMO=false; // 製品版 false／デモ版 true（5 行まで・透かし）
+const COLORS=['#8a2a4a','#0b3d5c','#1f5a3a','#6b4423','#c97b5a','#3b5f7a'];
+const $=id=>document.getElementById(id);
+const KEY='price-list-v1';
+const blank=()=>({category:'',name:'',note:'',time:'',price:'',first:'',rec:''});
+let S=load()||{shop:'',title:'料金表',lead:'',color:COLORS[0],tax:'税込',msg:'',items:[{category:'カット',name:'カット',note:'シャンプー・ブロー込み',time:'60 分',price:'4,400',first:'3,300',rec:'1'},{category:'カット',name:'前髪カット',note:'',time:'15 分',price:'1,100',first:'',rec:''},{category:'カラー',name:'フルカラー',note:'カット別',time:'90 分',price:'7,700',first:'',rec:''},blank()]};
+if(DEMO)$('demoBadge').hidden=false;
+function load(){try{return JSON.parse(localStorage.getItem(KEY));}catch(e){return null;}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function fmtP(p){const n=String(p).replace(/[^\d.]/g,'');return n?'¥'+Number(n).toLocaleString('ja-JP'):String(p||'');}
+function buildSide(){
+  $('shop').value=S.shop;$('title').value=S.title;$('lead').value=S.lead;$('tax').value=S.tax;$('msg').value=S.msg;
+  const sw=$('sw');sw.innerHTML='';COLORS.forEach(c=>{const b=document.createElement('button');b.style.background=c;b.className=c===S.color?'on':'';b.onclick=()=>{S.color=c;render();buildSide();};sw.appendChild(b);});
+  const box=$('items');box.innerHTML='';
+  S.items.forEach((it,i)=>{const el=document.createElement('div');el.className='item';
+    el.innerHTML=`<div class="h"><span>行 ${i+1}</span><span class="sp"></span><label class="chk" style="margin:0"><input type="checkbox" data-k="rec" ${it.rec?'checked':''}> おすすめ</label><button class="btn sm" data-a="up">↑</button><button class="btn sm" data-a="del">削除</button></div>
+      <div class="row"><input type="text" data-k="category" placeholder="カテゴリ（例: カット）" value="${esc(it.category)}"><input type="text" data-k="name" placeholder="メニュー名" value="${esc(it.name)}"></div>
+      <input type="text" data-k="note" placeholder="補足（例: シャンプー込み）" value="${esc(it.note)}">
+      <div class="row"><input type="text" data-k="time" placeholder="時間（例: 60 分）" value="${esc(it.time)}"><input type="text" data-k="price" placeholder="料金（例: 4400）" value="${esc(it.price)}"><input type="text" data-k="first" placeholder="初回（任意）" value="${esc(it.first)}"></div>`;
+    el.querySelectorAll('[data-k]').forEach(inp=>inp.oninput=()=>{const k=inp.dataset.k;S.items[i][k]=k==='rec'?(inp.checked?'1':''):inp.value;render();});
+    el.querySelector('[data-a=del]').onclick=()=>{S.items.splice(i,1);if(!S.items.length)S.items.push(blank());render();buildSide();};
+    el.querySelector('[data-a=up]').onclick=()=>{if(i>0){[S.items[i-1],S.items[i]]=[S.items[i],S.items[i-1]];render();buildSide();}};
+    box.appendChild(el);});
+}
+['shop','title','lead','msg'].forEach(id=>$(id).oninput=()=>{S[id]=$(id).value;render();});
+$('tax').onchange=()=>{S.tax=$('tax').value;render();};
+$('add').onclick=()=>{S.items.push(blank());render();buildSide();};
+$('dup').onclick=()=>{S.items.push({...S.items[S.items.length-1]});render();buildSide();};
+function visible(){let it=S.items.filter(x=>x.name);if(DEMO)it=it.slice(0,5);return it;}
+function groups(){const g=[];for(const it of visible()){const c=it.category||'メニュー';let x=g.find(y=>y.name===c);if(!x){x={name:c,items:[]};g.push(x);}x.items.push(it);}return g;}
+function render(){
+  save();const sh=$('sheet');sh.style.setProperty('--c',S.color);
+  sh.innerHTML=`<div class="top"><div class="shop">${esc(S.shop)||'&nbsp;'}</div><div class="ttl">${esc(S.title)}</div>${S.lead?`<div class="lead">${esc(S.lead)}</div>`:''}</div>
+    ${groups().map(g=>`<div class="cat"><h2>${esc(g.name)}</h2>${g.items.map(it=>`<div class="ln"><div class="n">${esc(it.name)}${it.rec?'<span class="rec">おすすめ</span>':''}${it.note?`<small>${esc(it.note)}</small>`:''}</div><div class="t">${esc(it.time)}</div><div class="p">${fmtP(it.price)}${S.tax?`<span style="font-size:8.5pt;color:#666;font-weight:600"> ${S.tax}</span>`:''}${it.first?`<span class="first">初回 ${fmtP(it.first)}</span>`:''}</div></div>`).join('')}</div>`).join('')}
+    ${S.msg?`<div class="foot">${esc(S.msg)}</div>`:''}${DEMO?'<div class="wm">DEMO — 料金表メーカー</div>':''}`;
+}
+// PNG per category
+function drawGroup(g,W){const c=document.createElement('canvas');c.width=W;c.height=W;const x=c.getContext('2d');const F='"Hiragino Sans","Noto Sans JP",sans-serif';const pad=W*0.08;
+  x.fillStyle='#fff';x.fillRect(0,0,W,W);x.fillStyle=S.color;x.fillRect(0,0,W,W*0.2);x.fillStyle='#fff';x.textBaseline='top';
+  x.font=`600 ${W*0.03}px ${F}`;x.fillText(S.shop||'',pad,W*0.045);x.font=`900 ${W*0.07}px ${F}`;x.fillText(`${S.title}・${g.name}`,pad,W*0.09);
+  const rows=g.items.slice(0,8);const top=W*0.26,rowH=Math.min((W-top-pad)/Math.max(rows.length,1),W*0.11);
+  rows.forEach((it,i)=>{const y=top+i*rowH;x.fillStyle=i%2?'#fff':'#f6f3ee';x.fillRect(pad*0.6,y,W-pad*1.2,rowH-6);
+    x.fillStyle='#1b1b1b';x.font=`800 ${rowH*0.34}px ${F}`;fit(x,it.name+(it.rec?' ★':''),pad,y+rowH*0.14,W*0.5);
+    if(it.note||it.time){x.fillStyle='#666';x.font=`500 ${rowH*0.2}px ${F}`;fit(x,[it.time,it.note].filter(Boolean).join('・'),pad,y+rowH*0.56,W*0.5);}
+    x.fillStyle=S.color;x.textAlign='right';x.font=`900 ${rowH*0.4}px ${F}`;x.fillText(fmtP(it.price),W-pad,y+rowH*0.16);
+    if(it.first){x.fillStyle='#c8102e';x.font=`700 ${rowH*0.2}px ${F}`;x.fillText('初回 '+fmtP(it.first),W-pad,y+rowH*0.62);}x.textAlign='left';});
+  x.fillStyle='#666';x.font=`500 ${W*0.026}px ${F}`;x.fillText([S.tax,(S.msg||'').split('\n')[0]].filter(Boolean).join('・').slice(0,40),pad,W-pad*0.9);
+  if(DEMO){x.fillStyle='rgba(0,0,0,.2)';x.font=`900 ${W*0.1}px ${F}`;x.textAlign='center';x.fillText('DEMO',W/2,W*0.45);x.textAlign='left';}
+  return c;}
+function fit(x,t,px,py,maxW){let s=String(t);while(s.length>1&&x.measureText(s).width>maxW)s=s.slice(0,-1);if(s!==String(t))s=s.slice(0,-1)+'…';x.fillText(s,px,py);}
+function dl(canvas,name){return new Promise(r=>canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(r,300);},'image/png'));}
+$('pngSq').onclick=async()=>{const gs=groups();if(!gs.length)return toast('メニューを入力してください');for(const g of gs)await dl(drawGroup(g,1080),`price_${g.name}.png`);toast(`${gs.length} 枚を保存`);};
+$('print').onclick=()=>window.print();
+const COLS=['category','name','note','time','price','first','rec'];
+$('csvOut').onclick=()=>{const rows=[COLS,...S.items.map(it=>COLS.map(k=>it[k]||''))];const csv='﻿'+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='price_list.csv';a.click();toast('CSV を保存');};
+$('csvIn').onclick=()=>$('csvFile').click();
+$('csvFile').onchange=()=>{const f=$('csvFile').files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const lines=r.result.replace(/^﻿/,'').split(/\r?\n/).filter(Boolean);const head=lines[0].toLowerCase().includes('name')?1:0;
+  const parsed=lines.slice(head).map(l=>l.match(/("([^"]|"")*"|[^,]*)(,|$)/g).map(c=>c.replace(/,$/,'').replace(/^"|"$/g,'').replace(/""/g,'"')));
+  S.items=parsed.map(c=>Object.fromEntries(COLS.map((k,i)=>[k,c[i]||''])));if(!S.items.length)S.items.push(blank());render();buildSide();toast(`${parsed.length} 行を読み込み`);};r.readAsText(f);$('csvFile').value='';};
+let tt;function toast(s){const t=$('toast');t.textContent=s;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',2200);}
+buildSide();render();
+</script>
+</body>
+</html>

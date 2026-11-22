@@ -1,5 +1,19 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-24 向け（火）
+
+- 次の実装 = `english-vol2`（11/29 Release・英会話 Vol.2 ビジネス英語）。prefix は **en2-**（`en-` は english-vol1 が使用中。念のため `grep -c "id: 'en2-" telop/designs.js` が 0 か見る）
+- PACKS の挿入位置は `'zoo-vol1'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する
+- `factory/base/pitch.json` に english-vol2 の「■ このパックの特徴」を追加
+- calendar は 2027-01-24 jewelry-vol1 まで。2027/1/25 以降に 2 本。**足す前に queue と PACKS の両方で id を確認し、タイトルの業種も既存と重ならないか grep する**（11/22 に optician が optical と重複していた）。free を確認済みの候補: curry-vol1、esthe-vol1、soba-vol1、tennis-vol1、shoes-vol1、udon-vol1、sake-vol1、brewery-vol1、winery-vol1
+- 右寄せ＋長い tag/sub は右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One に漢字を混ぜない
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- 火曜はアプリ枠なし
+- 株シミュ: **11/24（火）の昼実行の mode と market_date を確認**（連休明け）。候補が出ていて「休場日」なら累計 8 件目。「直して」が来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-23 向け（月・祝）
 
 - 次の実装 = `zoo-vol1`（11/28 Release・動物園・水族館）。prefix は **zoo-**（未使用を確認済み。念のため `grep -c "id: 'zoo-" telop/designs.js` が 0 か見る）
