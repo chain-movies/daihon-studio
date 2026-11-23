@@ -1,5 +1,19 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-25 向け（水）
+
+- 次の実装 = `optical-vol1`（11/30 Release・眼鏡・コンタクト）。prefix は **op-**（未使用を確認済み。念のため `grep -c "id: 'op-" telop/designs.js` が 0 か見る）。brief の「効果の断定・医療判断は不可、『眼科の受診を』を添える」を守る
+- PACKS の挿入位置は `'english-vol2'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する
+- `factory/base/pitch.json` に optical-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-26 taxi-vol1 まで。2027/1/27 以降に 2 本。**足す前に queue と PACKS の両方で id を確認し、タイトルの業種も grep する**。free を確認済みの候補: curry-vol1、esthe-vol1、soba-vol1、tennis-vol1、udon-vol1、brewery-vol1（クラフトビール）、winery-vol1、florist は flower-vol1 と重複なので不可、laundry-vol2
+- 右寄せ＋長い tag/sub は右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One に漢字を混ぜない
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- **水曜はアプリ枠あり**。候補: (a) `apps/qr-sign/`「QR 付き案内板メーカー」（Wi-Fi・予約・メニュー・SNS の QR を A4／A5 の案内板に。QR 生成は cdnjs の qrcodejs 1.0.0 を使う・外部送信なし）、(b) `apps/coupon-maker/`「クーポン券メーカー」（A4 に 8 面付け・有効期限・通し番号）。(a) を推す（紙もの 5 本目、店頭に貼る物はすべて揃う）
+- 株シミュ: **11/24（火）昼実行の mode と market_date を確認**（連休明け）。候補が出ていて「休場日」なら累計 8 件目
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-24 向け（火）
 
 - 次の実装 = `english-vol2`（11/29 Release・英会話 Vol.2 ビジネス英語）。prefix は **en2-**（`en-` は english-vol1 が使用中。念のため `grep -c "id: 'en2-" telop/designs.js` が 0 か見る）
