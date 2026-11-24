@@ -1,5 +1,19 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-26 向け（木）
+
+- 次の実装 = `handyman-vol1`（12/1 Release・便利屋・何でも屋）。prefix は **hd-**（`hm-` は別パックが使用中。念のため `grep -c "id: 'hd-" telop/designs.js` が 0 か見る）
+- PACKS の挿入位置は `'optical-vol1'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する
+- `factory/base/pitch.json` に handyman-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-28 curry-vol1 まで。2027/1/29 以降に 2 本。**足す前に queue と PACKS の両方で id を確認し、タイトルの業種も grep する**。free を確認済みの候補: esthe-vol1、soba-vol1、tennis-vol1、udon-vol1、brewery-vol1（クラフトビール）、winery-vol1、laundry-vol2、butcher-vol1（精肉店）、fruit-vol1（果物店は greengrocer と近いので避ける）
+- 右寄せ＋長い tag/sub は右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One に漢字を混ぜない
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- 木曜はアプリ枠なし
+- 株シミュ: 11/25（水）の昼実行の時刻と mode を確認。最近は昼の実行が 15:30 以降にずれている日がある（11/24 は 17:42）。取引時間中（9:00〜15:30）に候補が出て「休場日」なら累計 8 件目。「直して」が来ていれば engine.mjs の 3 点修正（state.json は触らない）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-25 向け（水）
 
 - 次の実装 = `optical-vol1`（11/30 Release・眼鏡・コンタクト）。prefix は **op-**（未使用を確認済み。念のため `grep -c "id: 'op-" telop/designs.js` が 0 か見る）。brief の「効果の断定・医療判断は不可、『眼科の受診を』を添える」を守る
