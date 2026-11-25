@@ -1,5 +1,19 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-27 向け（金）
+
+- 次の実装 = `mc-vol1`（12/2 Release・司会・イベント MC）。prefix は **mc-**（未使用を確認済み。念のため `grep -c "id: 'mc-" telop/designs.js` が 0 か見る）
+- PACKS の挿入位置は `'handyman-vol1'` の行の直後
+- 最初に `ls telop/fontcache/fonts.css` を確認。無ければ `node factory/fetch_fonts.mjs`
+- push は朝 1 回だけ。フルチェーンの log に `exit 0` が出てから commit する
+- `factory/base/pitch.json` に mc-vol1 の「■ このパックの特徴」を追加
+- calendar は 2027-01-30 soba-vol1 まで。2027/1/31 以降に 2 本。**足す前に queue と PACKS の両方で id を確認し、タイトルの業種も grep する**。free を確認済みの候補: esthe-vol1、tennis-vol1、udon-vol1（soba-vol1 に含めたので不可）、brewery-vol1（クラフトビール）、winery-vol1、laundry-vol2、butcher-vol1（精肉店）、plumber-vol1（水道工事）、solar-vol1（太陽光）
+- 右寄せ＋長い tag/sub は右にはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One に漢字を混ぜない
+- 報告の先頭は `node factory/status.mjs --md` の出力
+- **金曜はアプリ枠あり**。候補: (a) `apps/coupon-maker/`「クーポン券メーカー」（A4 に 8 面付け・有効期限・通し番号・切り取り線。紙もの 6 本目）、(b) `apps/name-card/`「名札・席札メーカー」（A4 に 10 面付け・CSV 読込）。(a) を推す
+- 株シミュ: 11/26（木）の昼実行の時刻と mode を確認。昼の実行が 15:30 以降の日は取りこぼしに数えない（その旨は所感に書く）
+- URL が貼られていたら: 商品 URL → `node factory/links_add.mjs --csv factory/base/items_01.csv`、note URL → `node factory/note_published.mjs <No> <URL>`
+
 ## 2026-11-26 向け（木）
 
 - 次の実装 = `handyman-vol1`（12/1 Release・便利屋・何でも屋）。prefix は **hd-**（`hm-` は別パックが使用中。念のため `grep -c "id: 'hd-" telop/designs.js` が 0 か見る）

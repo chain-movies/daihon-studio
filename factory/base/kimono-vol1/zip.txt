@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-kimono-vol1-2026-11-25
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= kimono-vol1_2026-11-25.zip
