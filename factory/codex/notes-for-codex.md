@@ -1,5 +1,16 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-28 向け（土）
+- 次の実装対象は `node factory/calendar.mjs next-design` → **nengajo-vol1**（12/3 分）。prefix は `ng-`（`grep -c "id: 'ng-" telop/designs.js` が 0 を確認してから）。PACKS 行は `'mc-vol1'` の行の直後に追加
+- 最初に `[ -f telop/fontcache/fonts.css ] && echo fontcache-ok || node factory/fetch_fonts.mjs`
+- 20 デザイン → 検証（count 20・id 重複なし・font/weight すべて FONTS 内）→ `--quick` → contact_sheet 目視 → フルチェーン（build_pack → gen_gallery → base_kit --ref main --split 10 → gen_howto_caps）を背景で回し `exit 0` を確認してから commit。push は朝 1 回
+- `factory/base/pitch.json` に nengajo-vol1 の特徴文
+- calendar は 2027/2/2 以降に 2 本追加（id が queue と PACKS にないこと＋業種タイトルの grep 重複なし）。候補: esthe-vol1 エステ、tennis-vol1 テニススクール、brewery-vol1 クラフトビール醸造所、winery-vol1 ワイナリー、laundry-vol2 コインランドリー2、solar-vol1 太陽光、piano-vol1 ピアノ教室、kindergarten-vol1 幼稚園、hoken-vol1 保険代理店
+- 右寄せ（x 'right'）のデザインで tag 'above' や sub が本文より長いとはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One は数字・英字のみ（漢字は Noto Sans JP 900）
+- 報告の先頭は `node factory/status.mjs --md`。CSV 件数は `ls factory/base/items_0*.csv | wc -l`
+- 土曜なのでアプリ枠なし。株は 11/27 昼の実行時刻とモードを確認（夜 02:20 で LINEヤフー 525 円が候補。昼が取引時間内＝「通常」なら初売買の可能性、休場モードなら取りこぼし #8）
+- nengajo-vol1 ブリーフ: 年賀状・年末年始のあいさつ動画向け（謹賀新年の見出し＝明朝・金、干支ラベル差し替え、2027 の数字、旧年中はお世話になりました、本年もよろしくお願いします、初売り 1/2 10:00 時刻、福袋 ¥〇,〇〇〇（一例）価格、年始の営業 1/4〜、休業 12/30〜1/3 帯、今年の抱負ポイント、家族より／スタッフ一同引用、ありがとうエンド、「あけおめ」ピル、おみくじ 大吉 スタンプ burst、用語: 松の内、注意: 年賀状の受付は 12/25 まで帯、章タイトル 振り返り／新年、1 年の数字 365 日、初詣 スポット 場所、小ラベル 撮影 〇〇）。色: 白・朱 #c8102e・金 #c9a227・墨 #1c1c1c・松 #1f5a3a・生成り #f6f1e7。フォント: Shippori Mincho B1・Zen Old Mincho・Noto Sans JP 900／700・Yuji Syuku（筆・1 つ）・Dela Gothic One（数字）。実在ブランド不可
+
 ## 2026-11-27 向け（金）
 
 - 次の実装 = `mc-vol1`（12/2 Release・司会・イベント MC）。prefix は **mc-**（未使用を確認済み。念のため `grep -c "id: 'mc-" telop/designs.js` が 0 か見る）

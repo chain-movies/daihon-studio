@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>クーポン券メーカー｜割引券・次回使えるチケットを A4 に 8 面付け</title>
+<meta name="description" content="特典・条件・有効期限を入れるだけで、クーポン券を A4 1 枚に 8 面（名刺大）または 4 面（A6）で面付けして印刷。通し番号、切り取り線、色 6 種、SNS 用の正方形画像も書き出し。ブラウザ内だけで完結。">
+<style>
+:root{--bg:#0d0d0d;--surface:#1a1a19;--surface2:#232322;--surface3:#2b2b29;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--line:#2c2c2a;--accent:#e5484d;--warn:#fab219;--ok:#3fb950;--blue:#3987e5;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;font-size:13.5px;line-height:1.6}
+#app{display:grid;grid-template-columns:1fr 380px;grid-template-rows:56px 1fr;height:100%}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+header .logo{display:flex;align-items:center;gap:9px;font-weight:700}
+header .logo .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#e5484d,#9085e9);display:flex;align-items:center;justify-content:center;font-size:14px}
+header .sp{flex:1}
+header a{font-size:11px;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 8px;text-decoration:none}
+header .demo{font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:2px 8px}
+main{overflow:auto;padding:16px;background:#2a2a28}
+aside{background:var(--surface);border-left:1px solid var(--line);overflow:auto;padding:12px}
+h3{font-size:12px;color:var(--muted);font-weight:600;margin:14px 0 6px;letter-spacing:.04em}
+label{display:block;font-size:12px;color:var(--ink2);margin:8px 0 2px}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit}
+textarea{resize:vertical;min-height:50px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;width:100%;margin-top:8px}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.chk{display:flex;align-items:center;gap:7px;font-size:12.5px;margin:6px 0}
+.sw{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.sw button{width:28px;height:28px;border-radius:8px;border:2px solid transparent;cursor:pointer}
+.sw button.on{border-color:#fff}
+.note{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+/* ---- A4 ---- */
+.page{width:210mm;height:297mm;margin:0 auto 16px;background:#fff;color:#1b1b1b;display:grid;padding:10mm;gap:0;box-shadow:0 20px 60px rgba(0,0,0,.5);page-break-after:always;font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif}
+.page.c8{grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr)}
+.page.c4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.cp{border:0.3mm dashed #bbb;position:relative;display:flex;overflow:hidden}
+.cp .side{width:12mm;background:var(--c);color:#fff;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:700;letter-spacing:.2em}
+.c4 .cp .side{width:16mm;font-size:11pt}
+.cp .body{flex:1;padding:4mm 5mm;display:flex;flex-direction:column}
+.c4 .cp .body{padding:8mm 9mm}
+.cp .shop{font-size:8pt;color:#666;letter-spacing:.1em}
+.c4 .cp .shop{font-size:10pt}
+.cp .ttl{font-size:17pt;font-weight:900;color:var(--c);line-height:1.15;margin-top:1mm}
+.c4 .cp .ttl{font-size:28pt}
+.cp .cond{font-size:7.5pt;color:#444;margin-top:1.5mm;line-height:1.4;white-space:pre-wrap}
+.c4 .cp .cond{font-size:10pt}
+.cp .sp{flex:1}
+.cp .exp{font-size:8pt;color:#1b1b1b;font-weight:700}
+.c4 .cp .exp{font-size:11pt}
+.cp .no{position:absolute;right:3mm;bottom:2mm;font-size:7pt;color:#888;font-family:ui-monospace,Menlo,monospace}
+.c4 .cp .no{font-size:9pt}
+.cp .stamp{position:absolute;right:4mm;top:3mm;width:16mm;height:16mm;border:0.8mm solid var(--c);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--c);font-weight:900;font-size:8pt;text-align:center;line-height:1.1;transform:rotate(-10deg);opacity:.9}
+.c4 .cp .stamp{width:26mm;height:26mm;font-size:12pt}
+.cp.empty{background:repeating-linear-gradient(45deg,#fafafa,#fafafa 4mm,#fff 4mm,#fff 8mm)}
+.cp .wm{position:absolute;left:14mm;bottom:2mm;font-size:6.5pt;color:#bbb}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--line);padding:8px 14px;border-radius:8px;font-size:12px;display:none}
+@media print{body{background:#fff}#app{display:block;height:auto}header,aside,.toast{display:none!important}main{padding:0;overflow:visible;background:#fff}.page{box-shadow:none;margin:0}@page{size:A4;margin:0}}
+@media (max-width:1000px){#app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr}header{grid-column:1}aside{border-left:0;border-bottom:1px solid var(--line);max-height:50vh}.page{width:100%;height:auto;aspect-ratio:210/297}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo"><span class="mark">✂</span><span>クーポン券メーカー</span><span style="color:var(--muted);font-weight:400;font-size:11.5px">A4 に 8 面付け</span></div>
+    <div class="sp"></div>
+    <span class="demo" id="demoBadge" hidden>デモ版: 1 枚（8 面）まで・透かしあり</span>
+    <a href="../../shop/">素材集・製品版 →</a>
+  </header>
+  <main id="pages"></main>
+  <aside>
+    <h3>内容</h3>
+    <input type="text" id="shop" placeholder="店名（例: 〇〇カフェ）">
+    <label>特典（大きく出ます）</label><input type="text" id="title" value="ドリンク 1 杯 無料">
+    <label>条件・使い方</label><textarea id="cond">お食事をご注文の方・1 枚につき 1 名様
+他の割引との併用はできません</textarea>
+    <div class="row"><div><label>有効期限</label><input type="date" id="exp"></div><div><label>期限の書き方</label><select id="expStyle"><option value="date">日付（2027/1/31 まで）</option><option value="none">期限なし</option></select></div></div>
+    <label>スタンプの文字（任意・丸印）</label><input type="text" id="stamp" placeholder="例: 次回 使える">
+    <label>横の帯の文字</label><input type="text" id="side" value="COUPON">
+    <h3>レイアウト</h3>
+    <div class="row">
+      <div><label>面付け</label><select id="size"><option value="c8">名刺大 × 8 面</option><option value="c4">A6 × 4 面</option></select></div>
+      <div><label>枚数（A4 の枚数）</label><input type="number" id="npages" min="1" max="50" value="1"></div>
+    </div>
+    <div class="row"><div><label>色</label><div class="sw" id="sw"></div></div><div><label>通し番号の開始</label><input type="number" id="startNo" min="0" value="1"></div></div>
+    <label class="chk"><input type="checkbox" id="numbering" checked> 通し番号を入れる（No.001〜）</label>
+    <label class="chk"><input type="checkbox" id="cut" checked> 切り取り線（点線）を印刷する</label>
+    <h3>書き出し</h3>
+    <button class="btn primary" id="print">A4 で印刷 / PDF 保存</button>
+    <button class="btn" id="pngSq">SNS 用 正方形 PNG（1080）</button>
+    <div class="note">入力はこのブラウザの中（localStorage）にだけ保存され、外部には送信されません。印刷は Chrome 推奨（余白なし・A4）。名刺大は 91×55mm 相当、A6 は 105×148mm 相当です。</div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const DEMO=false; // 製品版 false／デモ版 true（1 枚・透かし）
+const COLORS=['#d7263d','#0b3d5c','#1f5a3a','#f0a030','#8a2a4a','#6b4423'];
+const $=id=>document.getElementById(id);
+const KEY='coupon-maker-v1';
+let S=load()||{shop:'',title:'ドリンク 1 杯 無料',cond:'お食事をご注文の方・1 枚につき 1 名様\n他の割引との併用はできません',exp:'',expStyle:'date',stamp:'',side:'COUPON',size:'c8',pages:1,color:COLORS[0],startNo:1,numbering:true,cut:true};
+if(DEMO)$('demoBadge').hidden=false;
+function load(){try{return JSON.parse(localStorage.getItem(KEY));}catch(e){return null;}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function expText(){if(S.expStyle==='none'||!S.exp)return S.expStyle==='none'?'有効期限なし':'';const d=new Date(S.exp+'T00:00:00');return `有効期限 ${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} まで`;}
+function buildSide(){
+  for(const k of ['shop','title','cond','exp','expStyle','stamp','side','size','startNo'])$(k).value=S[k];$('npages').value=S.pages;
+  $('numbering').checked=S.numbering;$('cut').checked=S.cut;
+  const sw=$('sw');sw.innerHTML='';COLORS.forEach(c=>{const b=document.createElement('button');b.style.background=c;b.className=c===S.color?'on':'';b.onclick=()=>{S.color=c;render();buildSide();};sw.appendChild(b);});
+}
+for(const k of ['shop','title','cond','exp','expStyle','stamp','side','size','startNo']){$(k).oninput=()=>{S[k]=k==='startNo'?+$(k).value:$(k).value;render();};$(k).onchange=$(k).oninput;}
+$('npages').oninput=()=>{S.pages=+$('npages').value;render();};$('npages').onchange=$('npages').oninput;
+$('numbering').onchange=()=>{S.numbering=$('numbering').checked;render();};
+$('cut').onchange=()=>{S.cut=$('cut').checked;render();};
+function render(){
+  save();const per=S.size==='c8'?8:4;let pages=Math.max(1,Math.min(50,S.pages||1));if(DEMO)pages=1;let html='';let no=S.startNo||0;
+  for(let p=0;p<pages;p++){html+=`<div class="page ${S.size}" style="--c:${S.color}">`;
+    for(let k=0;k<per;k++){const n=String(no++).padStart(3,'0');
+      html+=`<div class="cp" style="${S.cut?'':'border-color:transparent'}"><div class="side">${esc(S.side)}</div><div class="body"><div class="shop">${esc(S.shop)||'&nbsp;'}</div><div class="ttl">${esc(S.title)}</div><div class="cond">${esc(S.cond)}</div><div class="sp"></div><div class="exp">${esc(expText())}</div></div>${S.stamp?`<div class="stamp">${esc(S.stamp)}</div>`:''}${S.numbering?`<div class="no">No.${n}</div>`:''}${DEMO?'<div class="wm">DEMO</div>':''}</div>`;}
+    html+='</div>';}
+  $('pages').innerHTML=html;
+}
+function drawSq(W){const c=document.createElement('canvas');c.width=W;c.height=W;const x=c.getContext('2d');const F='"Hiragino Sans","Noto Sans JP",sans-serif';const pad=W*0.08;
+  x.fillStyle=S.color;x.fillRect(0,0,W,W);x.fillStyle='#fff';x.fillRect(pad*0.6,pad*0.6,W-pad*1.2,W-pad*1.2);
+  x.fillStyle=S.color;x.font=`700 ${W*0.034}px ${F}`;x.textBaseline='top';x.fillText(S.shop||'',pad,pad);
+  x.font=`900 ${W*0.045}px ${F}`;x.fillText(S.side||'COUPON',pad,pad+W*0.06);
+  x.fillStyle='#1b1b1b';x.font=`900 ${W*0.09}px ${F}`;wrap(x,S.title,pad,pad+W*0.16,W-pad*2,W*0.105,2);
+  x.fillStyle='#444';x.font=`500 ${W*0.036}px ${F}`;let y=pad+W*0.42;(S.cond||'').split('\n').slice(0,3).forEach(l=>{x.fillText(l,pad,y);y+=W*0.05;});
+  x.fillStyle='#1b1b1b';x.font=`700 ${W*0.04}px ${F}`;x.fillText(expText(),pad,W-pad-W*0.06);
+  if(S.stamp){x.save();x.translate(W-pad-W*0.12,W-pad-W*0.14);x.rotate(-0.17);x.strokeStyle=S.color;x.lineWidth=W*0.008;x.beginPath();x.arc(0,0,W*0.11,0,Math.PI*2);x.stroke();x.fillStyle=S.color;x.textAlign='center';x.textBaseline='middle';x.font=`900 ${W*0.04}px ${F}`;x.fillText(S.stamp,0,0);x.restore();}
+  if(DEMO){x.fillStyle='rgba(0,0,0,.2)';x.font=`900 ${W*0.12}px ${F}`;x.textAlign='center';x.textBaseline='middle';x.fillText('DEMO',W/2,W/2);}
+  return c;}
+function wrap(x,t,px,py,maxW,lh,maxLines){let line='',lines=[];for(const ch of String(t||'')){if(x.measureText(line+ch).width>maxW&&line){lines.push(line);line=ch;}else line+=ch;}lines.push(line);lines.slice(0,maxLines).forEach((l,i)=>x.fillText(l,px,py+i*lh));}
+$('pngSq').onclick=()=>drawSq(1080).toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='coupon_square.png';a.click();toast('PNG を保存');},'image/png');
+$('print').onclick=()=>window.print();
+let tt;function toast(s){const t=$('toast');t.textContent=s;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',2200);}
+buildSide();render();
+</script>
+</body>
+</html>
