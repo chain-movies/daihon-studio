@@ -1,5 +1,16 @@
 # Claude → Codex 引き継ぎメモ（新しい日付が上）
 
+## 2026-11-29 向け（日）
+- 次の実装対象は `node factory/calendar.mjs next-design` → **ski-vol1**（12/4 分）。prefix は `ski-`（`grep -c "id: 'ski-" telop/designs.js` が 0 を確認してから）。PACKS 行は `'nengajo-vol1'` の行の直後に追加
+- 最初に `[ -f telop/fontcache/fonts.css ] && echo fontcache-ok || node factory/fetch_fonts.mjs`
+- 20 デザイン → 検証（count 20・id 重複なし・font/weight すべて FONTS 内、variants の font も含めて）→ `--quick` → contact_sheet 目視 → フルチェーン（build_pack → gen_gallery → base_kit --ref main --split 10 → gen_howto_caps）を背景で回し `exit 0` を確認してから commit。push は朝 1 回
+- `factory/base/pitch.json` に ski-vol1 の特徴文
+- calendar は 2027/2/4 以降に 2 本追加（id が queue と PACKS にないこと＋業種タイトルの grep 重複なし。11/28 は hoken-vol1 が insurance-vol1 と、piano-vol1 が music-vol2「楽器店・音楽教室」と重なって見送った）。候補: esthe-vol1 エステ（beauty-vol1「美容・サロン」と近いので title を「エステ・脱毛サロン」に）、brewery-vol1 クラフトビール醸造所（sake-vol1 酒蔵とは別）、winery-vol1 ワイナリー、laundry-vol2 コインランドリー2、kindergarten-vol1 幼稚園（nursery と近い・要確認）、drone-vol1 ドローン空撮、shoe-vol1 靴店・靴修理、stationery-vol1 文房具店
+- 右寄せ（x 'right'）のデザインで tag 'above' や sub が本文より長いとはみ出す → `{ x: 'left', y: 'middle', margin: 120 }`。Dela Gothic One は数字・英字のみ（漢字は Noto Sans JP 900）。Mochiy Pop One は 1 パック 1 つまで。ski の brief にある Zen Kaku Gothic New は FONTS にあるか先に確認し、無ければ Noto Sans JP 700 に置き換える
+- 報告の先頭は `node factory/status.mjs --md`。CSV 件数は `ls factory/base/items_0*.csv | wc -l`
+- 日曜なのでアプリ枠なし。株は土日休場なので「取引なし・通算は増えない」とだけ。月曜の昼の実行時刻とモードが次の判定（11/27 は 15:59 で大引け後）
+- ski-vol1 ブリーフは calendar.json の brief をそのまま使う（積雪 120cm・気温 -3℃・リフト券 ¥4,500（一例）・営業 8:30〜16:30・コース 初級／中級／上級・ナイター営業ピル・今季初滑りスタンプ・レンタル価格・運休注意帯・用語パウダー・スクール受付中・アクセス・コンディション ◎・圧雪 Before／After・お客様の声・スタッフより・キッズパーク見出し・チケット CTA・また来てねエンド・オープニング）。色: 白・氷ブルー #5bc0eb・紺 #0b1f3a・雪白 #f4f8fb・オレンジ #f08a24・グレー #6b7a90。価格には「（一例）」を付ける
+
 ## 2026-11-28 向け（土）
 - 次の実装対象は `node factory/calendar.mjs next-design` → **nengajo-vol1**（12/3 分）。prefix は `ng-`（`grep -c "id: 'ng-" telop/designs.js` が 0 を確認してから）。PACKS 行は `'mc-vol1'` の行の直後に追加
 - 最初に `[ -f telop/fontcache/fonts.css ] && echo fontcache-ok || node factory/fetch_fonts.mjs`

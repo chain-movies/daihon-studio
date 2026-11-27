@@ -1,0 +1,2 @@
+販売用ZIPの取得元（Release）: https://github.com/chain-movies/daihon-studio/releases/tag/product-recycle-vol1-2026-11-27
+Assets の「販売用ZIP（BASE/BOOTHにアップロード）」= recycle-vol1_2026-11-27.zip
